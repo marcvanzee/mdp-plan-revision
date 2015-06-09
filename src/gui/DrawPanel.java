@@ -8,6 +8,7 @@ import java.awt.Shape;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Timer;
@@ -15,14 +16,15 @@ import java.util.Timer;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import model.ActionEdge;
-import model.Edge;
-import model.MDP;
 import model.Model;
-import model.QEdge;
-import model.QState;
-import model.State;
-import model.Vertex;
+import model.Operations;
+import model.mdp.ActionEdge;
+import model.mdp.Edge;
+import model.mdp.MDP;
+import model.mdp.QEdge;
+import model.mdp.QState;
+import model.mdp.State;
+import model.mdp.Vertex;
 
 import org.apache.commons.collections15.Transformer;
 
@@ -69,15 +71,18 @@ class DrawPanel extends JPanel implements Observer {
 	
 	Model model;
 	
+	boolean computedValueIteration = false;
+	
+	HashSet<ActionEdge> highlightActionEdges = new HashSet<ActionEdge>();
+	HashSet<QEdge> highlightQEdges = new HashSet<QEdge>();
+	
 	DrawPanel() {
 		// set a preferred size for the custom panel.
 		setPreferredSize(new Dimension(400,250));
-		
-		System.out.println(this.getMaximumSize());
-		
+
 	}
 	
-    public void init(Model model)
+    public void init()
     {
     	 //create a graph
     	Graph<Vertex<?>,Edge<?,?>> ig = Graphs.<Vertex<?>,Edge<?,?>>synchronizedDirectedGraph(new DirectedSparseMultigraph<Vertex<?>,Edge<?,?>>());
@@ -86,7 +91,7 @@ class DrawPanel extends JPanel implements Observer {
      
         this.g = og;
         //create a graphdraw
-        layout = new SpringLayout<Vertex<?>,Edge<?,?>>(g);
+        layout = new KKLayout<Vertex<?>,Edge<?,?>>(g);
         layout.setSize(new Dimension(600,600));
 		Relaxer relaxer = new VisRunner((IterativeContext)layout);
 		relaxer.stop();
@@ -97,7 +102,7 @@ class DrawPanel extends JPanel implements Observer {
         vv = new VisualizationViewer<Vertex<?>,Edge<?,?>>(staticLayout, new Dimension(600,600));
 
         setLayout(new BorderLayout());
-        setBackground(java.awt.Color.WHITE);
+        setBackground(Color.WHITE);
         setFont(new Font("Serif", Font.BOLD, 15));
 
         vv.setGraphMouse(new DefaultModalGraphMouse<Vertex<?>,Edge<?,?>>());
@@ -107,7 +112,13 @@ class DrawPanel extends JPanel implements Observer {
         vv.getRenderer().getVertexLabelRenderer().setPosition(Renderer.VertexLabel.Position.CNTR);
         vv.getRenderContext().setVertexLabelTransformer(new ToStringLabeller<Vertex<?>>() {
         	@Override
-        	public String transform(Vertex<?> v) {
+        	public String transform(Vertex<?> v) 
+        	{
+        		if (v instanceof State && computedValueIteration)
+        		{
+        			double d = model.getValue((State)(v));
+        			return (d < 0.01 ? 0 : Operations.round(d,1))+"";
+        		}
         		return v.getName();
         	}
         });
@@ -117,6 +128,14 @@ class DrawPanel extends JPanel implements Observer {
                 return (v instanceof State ? Color.RED : Color.BLUE);
             }
         }  );
+            
+        vv.getRenderContext().setEdgeDrawPaintTransformer(new Transformer<Edge<?,?>,Paint>() {
+        	public Paint transform(Edge<?,?> e) 
+        	{
+        		return (computedValueIteration && (highlightActionEdges.contains(e) || 
+        				highlightQEdges.contains(e)) ? Color.GREEN : Color.BLACK);
+        	}
+        });
         
         vv.getRenderContext().setEdgeLabelTransformer(new Transformer<Edge<?,?>,String>(){
             public String transform(Edge<?,?> e) 
@@ -131,7 +150,6 @@ class DrawPanel extends JPanel implements Observer {
         });
         
         vv.getRenderContext().setEdgeShapeTransformer(new EdgeShape.QuadCurve<Vertex<?>,Edge<?,?>>());        
-        vv.getRenderContext().setEdgeDrawPaintTransformer(new PickableEdgePaintTransformer<Edge<?,?>>(vv.getPickedEdgeState(), Color.black, Color.cyan));
         
         AbstractEdgeShapeTransformer<Vertex<?>,Edge<?,?>> aesf = 
                 (AbstractEdgeShapeTransformer<Vertex<?>,Edge<?,?>>)vv.getRenderContext().getEdgeShapeTransformer();
@@ -150,6 +168,7 @@ class DrawPanel extends JPanel implements Observer {
 				layout.setSize(arg0.getComponent().getSize());
 			}});
 
+        vv.setBackground(Color.WHITE);
         add(vv);
    }
 
@@ -198,8 +217,16 @@ class DrawPanel extends JPanel implements Observer {
 				Animator animator = new Animator(lt);
 				animator.start();
 				vv.getRenderContext().getMultiLayerTransformer().setToIdentity();
+				
+				l.lock(true);
 				vv.repaint();
         	 
+				if (this.model.computedValueIteration()) {
+					computedValueIteration = true;
+					this.highlightActionEdges = this.model.getOptimalActionEdges();
+					this.highlightQEdges = this.model.getMostProbableQEdges();
+				}
+				
          } catch (Exception e) {
              e.printStackTrace();
 
@@ -243,11 +270,11 @@ class DrawPanel extends JPanel implements Observer {
         public Shape transform(Vertex<?> v) {
         	        	
             if (v instanceof State) {
-                return factory.getRegularPolygon(v, 3);
+            	return factory.getEllipse(v);
             }
             
             else {
-                return factory.getEllipse(v);
+               return factory.getRegularPolygon(v, 3);
             }
         }
     }

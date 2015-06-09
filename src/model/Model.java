@@ -1,12 +1,17 @@
 package model;
 
-import gui.Settings;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Observable;
 import java.util.Random;
+
+import model.mdp.Action;
+import model.mdp.ActionEdge;
+import model.mdp.MDP;
+import model.mdp.QEdge;
+import model.mdp.State;
+import model.mdp.valueiteration.ValueIterator;
 
 /**
  * A model is the entire simulation.
@@ -19,31 +24,54 @@ import java.util.Random;
  */
 public class Model extends Observable 
 {
-	private MDP mdp;
+	
 	private Settings settings;
-	private Random r;
+	private MDP mdp;
+	private Random r = new Random();
+	private ValueIterator valueIterator;
 	
-	
-	public Model() 
-	{
-		settings = new Settings();
-		mdp = new MDP(settings);
-		
-		r = new Random();
-	}
+	boolean computedValueIteration = false;
 	
 	public void buildNewModel(Settings settings) 
 	{
 		this.settings = settings;
-		
+		mdp = new MDP(settings);
+			
 		generateModel();
 		
 		setChanged();
 		notifyObservers();
 	}
 	
+	public void computeOptimalPolicy()
+	{
+		valueIterator = new ValueIterator(mdp);
+		valueIterator.startValueIteration();
+		
+		computedValueIteration = true;
+		
+		setChanged();
+		notifyObservers();
+	}
+	
+	public boolean computedValueIteration() {
+		return computedValueIteration;
+	}
+	
 	public MDP getMDP() {
 		return mdp;
+	}
+	
+	public HashSet<ActionEdge> getOptimalActionEdges() {
+		return valueIterator.getOptimalActionEdges();
+	}
+	
+	public HashSet<QEdge> getMostProbableQEdges() {
+		return valueIterator.getMostProbableQEdges();
+	}
+	
+	public double getValue(State s) {
+		return valueIterator.getValue(mdp.getStates().indexOf(s));
 	}
 	
 	/**
@@ -184,6 +212,7 @@ public class Model extends Observable
 			}
 		}		
 	}
+	
 	
 	// if the queue is empty, create a new state, else use first from queue and remove it
 	private State getNewState(LinkedList<State> stateQueue) 
