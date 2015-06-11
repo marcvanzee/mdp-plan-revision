@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
 
-import model.Operations;
-import model.Settings;
+import constants.MathOperations;
+import model.SimulationSettings;
 
 /**
  * A Markov Decision Process (S,A,T,Pr,R) is structure containing:
@@ -42,7 +42,7 @@ public class MDP
 	ArrayList<QEdge> qEdges;
 	ArrayList<Action> actions = new ArrayList<Action>();
 	
-	Settings settings = new Settings();
+	SimulationSettings settings = SimulationSettings.getInstance();
 
 	Random r = new Random();
 
@@ -51,8 +51,8 @@ public class MDP
 	 ***********************
 	 */
 	
-	public MDP(Settings settings) {
-		init(settings);
+	public MDP() {
+		init();
 	}
 
 	/***********************
@@ -107,8 +107,14 @@ public class MDP
 		return str;
 	}
 	
-	public void reset(Settings settings) {
-		init(settings);
+	public void reset() {
+		init();
+	}
+	
+	public Action getRandomAction()
+	{
+		int index = r.nextInt(actions.size());
+		return actions.get(index);
 	}
 	
 	public State getRandomState()
@@ -297,8 +303,9 @@ public class MDP
 	 ***********************
 	 */
 	
-	private void init(Settings settings) {
-		this.settings = settings;
+	private void init() 
+	{
+		settings = SimulationSettings.getInstance();
 		states = new ArrayList<State>();
 		qStates = new ArrayList<QState>();
 		actionEdges = new ArrayList<ActionEdge>();
@@ -362,7 +369,7 @@ public class MDP
 		
 		for (int i=0; i < probabilities.size(); i++) {
 			double d = probabilities.get(i);
-			probabilities.set(i, Operations.round(d/sum,2));
+			probabilities.set(i, MathOperations.round(d/sum,2));
 	    }
 	    
 		return probabilities;

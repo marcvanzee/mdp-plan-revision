@@ -1,9 +1,9 @@
-package model.mdp.valueiteration;
+package model.mdp.operations;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 
+import constants.MathOperations;
 import model.mdp.Action;
 import model.mdp.ActionEdge;
 import model.mdp.MDP;
@@ -11,14 +11,8 @@ import model.mdp.QEdge;
 import model.mdp.QState;
 import model.mdp.State;
 
-public class ValueIterator
+public class MDPValueIterator extends MDPOperation
 {	
-	MDP mdp = null;
-	
-	// we store these for coloring in the GUI
-	HashSet<ActionEdge> optimalActionEdges = new HashSet<ActionEdge>();
-	HashSet<QEdge> mostProbableQEdges = new HashSet<QEdge>();
-	
 	// use these mappings for efficiency so we don't have to look them up every time
 	HashMap<State,ArrayList<ActionEdge>> stateToActionEdges = new HashMap<State,ArrayList<ActionEdge>>();
 	HashMap<QState,ArrayList<QEdge>> qStateToQEdges = new HashMap<QState,ArrayList<QEdge>>();
@@ -33,13 +27,13 @@ public class ValueIterator
 	// the optimal policy will be stored, simply mapping state indices to actions
 	Action policy[];
 	
-	public ValueIterator(MDP mdp)
+	public MDPValueIterator(MDP mdp)
 	{
-		this.mdp = mdp;
+		super(mdp);
 		initializeMappings();
 	}
 	
-	public void startValueIteration() 
+	public void run() 
 	{
 		int countStates = mdp.countStates();
 		
@@ -65,9 +59,7 @@ public class ValueIterator
 			}
 		} while (!finished && k < 100);
 		
-		System.out.println(k + " iterations");
-		
-		computeEdgeValues();
+		setOptimalVerticesAndEdges();
 	}
 	
 	public Action getPolicy(int i) {
@@ -77,21 +69,11 @@ public class ValueIterator
 	public double getValue(int i) {
 		return V[i];
 	}
-	
-	public HashSet<ActionEdge> getOptimalActionEdges() {
-		return optimalActionEdges;
-	}
-	
-	public HashSet<QEdge> getMostProbableQEdges() {
-		return mostProbableQEdges;
-	}
 		
 	private void initializeMappings() 
 	{
-		System.out.println("--- initializing mappings");
 		for (State s : mdp.getStates()) 
 		{
-			System.out.print("state: " + s.getName());
 			ArrayList<ActionEdge> actionEdges = new ArrayList<ActionEdge>();
 			
 			for (ActionEdge ae : mdp.getActionEdges())
@@ -101,7 +83,6 @@ public class ValueIterator
 			}
 			
 			stateToActionEdges.put(s, actionEdges);
-			System.out.println("--> edges: " + actionEdges.size());
 		}
 		
 		for (QState qs: mdp.getQStates())
@@ -147,25 +128,32 @@ public class ValueIterator
 			}
 		}
 		
-		System.out.println("state " + i + ": " + (a==null?"null":a.getName()) + " (" + max + ")");
 		V[i] = max;
 		policy[i] = a;
 	}
 	
-	private void computeEdgeValues() 
+	private void setOptimalVerticesAndEdges() 
 	{
 		for (int i=0; i<mdp.countStates(); i++)
 		{
+			// set the name of the state to its value obtained from value iteration
+			State s = mdp.getState(i);
+			double stateValue = V[i];
+			
+			s.setName((stateValue < 0.01 ? 0 : MathOperations.round(stateValue,2))+"");
+			
+			// highlight the actions that are chosen by the policy
 			Action a = policy[i];
 			
 			if (a == null)
 				continue;
 			
-			State s = mdp.getState(i);
 			ActionEdge ae = mdp.getActionEdge(s, a);
 			
 			if (ae != null)
-				optimalActionEdges.add(ae);
+				ae.setOptimal(true);
+			
+			// also highlight the most probable outcome for each action in the policy
 			
 			QState s2 = ae.getToVertex();
 			ArrayList<QEdge> qEdges = mdp.getQEdges(s2);
@@ -173,7 +161,7 @@ public class ValueIterator
 			QEdge qEdge = getMostProbableQEdge(qEdges);
 			
 			if (qEdge != null) 
-				mostProbableQEdges.add(qEdge);			
+				qEdge.setOptimal(true);
 		}
 	}
 	

@@ -179,7 +179,7 @@ public class AnimatingAddNodeDemo extends javax.swing.JApplet {
     public void start() {
         validate();
         //set timer so applet will change
-        timer.schedule(new RemindTask(), 1000, 1000); //subsequent rate
+        timer.schedule(new RemindTask(), 200, 50); //subsequent rate
         vv.repaint();
     }
 

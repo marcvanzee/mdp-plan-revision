@@ -1,6 +1,6 @@
 package model.mdp;
 
-import model.Operations;
+import constants.MathOperations;
 
 
 public class QEdge extends Edge<QState,State> {
@@ -9,14 +9,14 @@ public class QEdge extends Edge<QState,State> {
 	
 	public QEdge(QState from, State to, double probability, double reward) {
 		super(from, to);
-		this.probability = Operations.round(probability, 2);
-		this.reward = Operations.round(reward, 2);
+		this.probability = MathOperations.round(probability, 2);
+		this.reward = MathOperations.round(reward, 2);
 		
 		System.out.println("storing p=" + this.probability);
 	}
 	
 	public String toString() {
-		return probability + " / " + (reward > 0 ? "+":"") + reward;
+		return "p="+probability + ", r=" + (reward > 0 ? "+":"") + reward;
 	}
 	
 	public double getProbability() {

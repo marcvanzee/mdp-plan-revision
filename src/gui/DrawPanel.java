@@ -1,23 +1,22 @@
 package gui;
+
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Paint;
 import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.Timer;
 
-import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import messaging.MessageType;
 import model.Model;
-import model.Operations;
 import model.mdp.ActionEdge;
 import model.mdp.Edge;
 import model.mdp.MDP;
@@ -28,6 +27,7 @@ import model.mdp.Vertex;
 
 import org.apache.commons.collections15.Transformer;
 
+import constants.GUIConstants;
 import edu.uci.ics.jung.algorithms.layout.AbstractLayout;
 import edu.uci.ics.jung.algorithms.layout.KKLayout;
 import edu.uci.ics.jung.algorithms.layout.Layout;
@@ -45,7 +45,6 @@ import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
 import edu.uci.ics.jung.visualization.decorators.AbstractEdgeShapeTransformer;
 import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.uci.ics.jung.visualization.decorators.EllipseVertexShapeTransformer;
-import edu.uci.ics.jung.visualization.decorators.PickableEdgePaintTransformer;
 import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 import edu.uci.ics.jung.visualization.layout.LayoutTransition;
 import edu.uci.ics.jung.visualization.renderers.Renderer;
@@ -57,29 +56,23 @@ import edu.uci.ics.jung.visualization.util.Animator;
  * @author marc.vanzee
  *
  */
-class DrawPanel extends JPanel implements Observer {
-	
+class DrawPanel extends JPanel implements Observer 
+{	
 	private static final long serialVersionUID = -5345319851341875800L;
 	
 	private VisualizationViewer<Vertex<?>,Edge<?,?>> vv = null;
 	private AbstractLayout<Vertex<?>,Edge<?,?>> layout = null;
 	private Graph<Vertex<?>,Edge<?,?>> g = null;
+	SpringLayout<Vertex<?>, Edge<?,?>> springLayout;
 	
-	Timer timer;
-	boolean done;
-	protected JButton switchLayout;
+	private Model model;
 	
-	Model model;
-	
-	boolean computedValueIteration = false;
-	
-	HashSet<ActionEdge> highlightActionEdges = new HashSet<ActionEdge>();
-	HashSet<QEdge> highlightQEdges = new HashSet<QEdge>();
+	boolean animate = true;
 	
 	DrawPanel() {
 		// set a preferred size for the custom panel.
 		setPreferredSize(new Dimension(400,250));
-
+		init();
 	}
 	
     public void init()
@@ -90,20 +83,20 @@ class DrawPanel extends JPanel implements Observer {
     	ObservableGraph<Vertex<?>,Edge<?,?>> og = new ObservableGraph<Vertex<?>,Edge<?,?>>(ig);
      
         this.g = og;
+        
         //create a graphdraw
         layout = new KKLayout<Vertex<?>,Edge<?,?>>(g);
         layout.setSize(new Dimension(600,600));
 		Relaxer relaxer = new VisRunner((IterativeContext)layout);
 		relaxer.stop();
 		relaxer.prerelax();
-
+		
 		Layout<Vertex<?>,Edge<?,?>> staticLayout = new StaticLayout<Vertex<?>,Edge<?,?>>(g, layout);
 
         vv = new VisualizationViewer<Vertex<?>,Edge<?,?>>(staticLayout, new Dimension(600,600));
 
         setLayout(new BorderLayout());
-        setBackground(Color.WHITE);
-        setFont(new Font("Serif", Font.BOLD, 15));
+        setSize(new Dimension(2000, 2000));
 
         vv.setGraphMouse(new DefaultModalGraphMouse<Vertex<?>,Edge<?,?>>());
 
@@ -114,11 +107,6 @@ class DrawPanel extends JPanel implements Observer {
         	@Override
         	public String transform(Vertex<?> v) 
         	{
-        		if (v instanceof State && computedValueIteration)
-        		{
-        			double d = model.getValue((State)(v));
-        			return (d < 0.01 ? 0 : Operations.round(d,1))+"";
-        		}
         		return v.getName();
         	}
         });
@@ -132,24 +120,27 @@ class DrawPanel extends JPanel implements Observer {
         vv.getRenderContext().setEdgeDrawPaintTransformer(new Transformer<Edge<?,?>,Paint>() {
         	public Paint transform(Edge<?,?> e) 
         	{
-        		return (computedValueIteration && (highlightActionEdges.contains(e) || 
-        				highlightQEdges.contains(e)) ? Color.GREEN : Color.BLACK);
+        		return (e.isOptimal() ? Color.GREEN : Color.BLACK); 
         	}
         });
         
+        Transformer<Edge<?,?>, Stroke> edgeStrokeTransformer = new Transformer<Edge<?,?>, Stroke>() {
+        	public Stroke transform(Edge<?,?> s) {
+        		float d = s.isOptimal() ? 10.0f : 1.0f;
+        		return new BasicStroke(d);
+        	}
+        };
+        
+        vv.getRenderContext().setEdgeStrokeTransformer(edgeStrokeTransformer);
+
         vv.getRenderContext().setEdgeLabelTransformer(new Transformer<Edge<?,?>,String>(){
             public String transform(Edge<?,?> e) 
             {
-            	if (e instanceof ActionEdge) {
-            		return ((ActionEdge) e).toString();
-            	} else if (e instanceof QEdge) {
-            		return ((QEdge) e).toString();
-            	}
-                return null;
+            	return e.toString();
             }
         });
         
-        vv.getRenderContext().setEdgeShapeTransformer(new EdgeShape.QuadCurve<Vertex<?>,Edge<?,?>>());        
+        vv.getRenderContext().setEdgeShapeTransformer(new EdgeShape.Line<Vertex<?>,Edge<?,?>>());        
         
         AbstractEdgeShapeTransformer<Vertex<?>,Edge<?,?>> aesf = 
                 (AbstractEdgeShapeTransformer<Vertex<?>,Edge<?,?>>)vv.getRenderContext().getEdgeShapeTransformer();
@@ -157,14 +148,9 @@ class DrawPanel extends JPanel implements Observer {
         
         
         vv.addComponentListener(new ComponentAdapter() {
-
-			/**
-			 * @see java.awt.event.ComponentAdapter#componentResized(java.awt.event.ComponentEvent)
-			 */
 			@Override
 			public void componentResized(ComponentEvent arg0) {
 				super.componentResized(arg0);
-				System.err.println("resized");
 				layout.setSize(arg0.getComponent().getSize());
 			}});
 
@@ -172,21 +158,46 @@ class DrawPanel extends JPanel implements Observer {
         add(vv);
    }
 
+    /**
+     * Receive messages, type is defined in MessageType
+     */
     @Override
-	public void update(Observable model, Object arg) {
+	public void update(Observable model, Object type) 
+    {
+    	if (!(type instanceof Integer)) 
+    	{
+    		System.out.println("Unidentified messagetype: " + type.toString());
+    		return;
+    	}
     	
-    	this.model = ((Model)model);
+    	switch ((int) type) {
+    	case MessageType.REFRESH_MDP: repaint(); break;
+    	case MessageType.RELOAD_MDP: 
+    		if (!(model instanceof Model))
+    		{
+    			System.out.println("Not a model for updating");
+    			return;
+    		}
+    		load((Model) model);
+    		break;
+    	}
+    }
+    
+    /**
+     * Load a new model
+     * 
+     * @param newModel
+     */
+    public void load(Model newModel) 
+    {
+    	this.model = newModel;
     	
     	clearGraph();
     	
-		vv.getRenderContext().getPickedVertexState().clear();
-    	vv.getRenderContext().getPickedEdgeState().clear();
-		
 		try 
 		{
-   
     		 MDP mdp = this.model.getMDP();
-    		     		 
+    		 
     		 for (State s : mdp.getStates()) {
     			 g.addVertex(s);
     		 }
@@ -204,39 +215,43 @@ class DrawPanel extends JPanel implements Observer {
     			 g.addEdge(qe, qe.getFromVertex(), qe.getToVertex());
     		 }
     		 
-    		 vv.repaint();
-        	 repaint();	
-    		 
-        	 SpringLayout<Vertex<?>, Edge<?,?>> l = new SpringLayout<Vertex<?>, Edge<?,?>>(g);
+        	 springLayout = new SpringLayout<Vertex<?>, Edge<?,?>>(g);
              
-             l.setInitializer(vv.getGraphLayout());
-             l.setSize(vv.getSize());
+        	 vv.setSize(new Dimension(2000, 2000));
+             springLayout.setInitializer(vv.getGraphLayout());
+             springLayout.setSize(vv.getSize());
              
-				LayoutTransition<Vertex<?>, Edge<?,?>> lt =
-					new LayoutTransition<Vertex<?>, Edge<?,?>>(vv, vv.getGraphLayout(), l);
-				Animator animator = new Animator(lt);
-				animator.start();
-				vv.getRenderContext().getMultiLayerTransformer().setToIdentity();
-				
-				l.lock(true);
-				vv.repaint();
-        	 
-				if (this.model.computedValueIteration()) {
-					computedValueIteration = true;
-					this.highlightActionEdges = this.model.getOptimalActionEdges();
-					this.highlightQEdges = this.model.getMostProbableQEdges();
-				}
+             LayoutTransition<Vertex<?>, Edge<?,?>> lt =
+					new LayoutTransition<Vertex<?>, Edge<?,?>>(vv, vv.getGraphLayout(), springLayout);
+             
+             Animator animator = new Animator(lt);
+             animator.start();
+             vv.getRenderContext().getMultiLayerTransformer().setToIdentity();
+			
+             springLayout.lock(animate);
+             
+             vv.repaint();
 				
          } catch (Exception e) {
              e.printStackTrace();
-
-         }
-		
-		
+         }	
     }
     
-    private void clearGraph() {
+    public void toggleAnimate() {
+    	animate = !animate;
     	
+    	if (springLayout != null)
+    		springLayout.lock(animate);
+    }
+    
+    
+    
+    
+    /**
+     * Remove all vertices and edges
+     */
+    private void clearGraph() 
+    {
     	if (g.getVertexCount() > 0)
     	{
 
@@ -253,6 +268,16 @@ class DrawPanel extends JPanel implements Observer {
     		}
     	}
     }
+    
+    public void setEdgeType(int type) 
+    {
+    	if (type == GUIConstants.STRAIGHT_EDGES) {
+    		vv.getRenderContext().setEdgeShapeTransformer(new EdgeShape.Line<Vertex<?>,Edge<?,?>>());
+    	} else {
+    		vv.getRenderContext().setEdgeShapeTransformer(new EdgeShape.QuadCurve<Vertex<?>,Edge<?,?>>());
+    	}
+    	vv.repaint();
+    }
         
     class VertexShapeFunction extends EllipseVertexShapeTransformer<Vertex<?>> 
     {
@@ -261,7 +286,7 @@ class DrawPanel extends JPanel implements Observer {
             setSizeTransformer(new Transformer<Vertex<?>,Integer>() {
         		public Integer transform(Vertex<?> v) 
         		{
-                	return (v instanceof State ? 30 : 20);
+                	return (v instanceof State ? 20 : 20);
                 }
             });
         }

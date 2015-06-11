@@ -5,6 +5,10 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Panel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -18,7 +22,12 @@ import javax.swing.JSeparator;
 import javax.swing.JTextField;
 
 import model.Model;
-import model.Settings;
+import model.SimulationSettings;
+
+import javax.swing.JComboBox;
+
+import constants.GUIConstants;
+import constants.SimulationConstants;
 
 /**
  * This is the main application. 
@@ -43,22 +52,24 @@ import model.Settings;
  * @author marc.vanzee
  *
  */
-public class MainApplication {
+public class MainApplication implements ItemListener, ActionListener {
 	
 	private Model model;
 	private JFrame frame;
-	private Settings settings;
+	private SimulationSettings settings;
 	
-	JTextField textFieldNumStates, textFieldNumActions,
-		textFieldMinReward, textFieldMaxReward;
+	private JTextField textFieldNumStates, textFieldNumActions;
 	
-	DrawPanel drawPanel;
+	private DrawPanel drawPanel;
 	private JCheckBox chckbxAllowCycles;
-	private JCheckBox chckbxShowQstates;
+	private JCheckBox chckbxAnimate;
 	private Component horizontalStrut;
 	private JLabel lblAvgActionsPer;
 	private JTextField textFieldAvgActionsState;
 	private JButton btnComputePolicy;
+	
+	private Component horizontalStrut_1;
+	private JLabel lblDynamicity;
 				
 	/**
 	 * Launch the application.
@@ -69,16 +80,7 @@ public class MainApplication {
 	
 	public void go() {
 		try 
-		{
-			model = new Model();
-			drawPanel = new DrawPanel();
-			
-			// initialize the drawPanel 
-			drawPanel.init();
-			
-			// make sure the view is notified when the model changes
-			model.addObserver(drawPanel);
-			
+		{			
 			// build GUI and set parameters in GUI according to model.Settings
 			buildGUI();
 			initializeParametersInGUI();
@@ -154,20 +156,6 @@ public class MainApplication {
 		
 		pNavTop.add(jSep);
 		
-		pNavTop.add(new JLabel("min reward: "));
-		
-		textFieldMinReward = new JTextField();
-		textFieldMinReward.setMaximumSize( new Dimension(30, 20) );
-		pNavTop.add(textFieldMinReward);
-		pNavTop.add(Box.createHorizontalStrut(10));
-		
-		pNavTop.add(new JLabel("max reward: "));
-		textFieldMaxReward = new JTextField();
-		textFieldMaxReward.setMaximumSize( new Dimension(30, 20) );
-		pNavTop.add(textFieldMaxReward);
-		
-		pNavTop.add(Box.createHorizontalStrut(10));
-		
 		jSep = new JSeparator(JSeparator.VERTICAL);
 		jSep.setMaximumSize(new Dimension(2, 25));
 		
@@ -176,16 +164,29 @@ public class MainApplication {
 		chckbxAllowCycles = new JCheckBox("allow cycles");
 		pNavTop.add(chckbxAllowCycles);
 		
-		chckbxShowQstates = new JCheckBox("show q-states");
-		pNavTop.add(chckbxShowQstates);
-				
+		chckbxAnimate = new JCheckBox("dynamic nodes");
+		chckbxAnimate.addItemListener(this);
+		
+		pNavTop.add(chckbxAnimate);
+		
+		horizontalStrut_1 = Box.createHorizontalStrut(10);
+		pNavTop.add(horizontalStrut_1);
+		
+		lblDynamicity = new JLabel("dynamicity:");
+		pNavTop.add(lblDynamicity);
+		
+		//comboBox = new JComboBox<String>(edgeTypes);
+		//comboBox.setMaximumSize(new Dimension(110, 20));
+		
+		//pNavTop.add(comboBox);
+		
 		Panel pNavBottom = new Panel();
 		
 		pNavContainer.add(pNavBottom, BorderLayout.SOUTH);
 	
 		pNavBottom.setLayout(new BoxLayout(pNavBottom, BoxLayout.X_AXIS));
 		
-		JButton btnCreateMdp = new JButton("Create MDP");
+		JButton btnCreateMdp = new JButton("New MDP");
 		btnCreateMdp.setMaximumSize(new Dimension(110, 20));
 		
 		pNavBottom.add(btnCreateMdp);
@@ -209,6 +210,7 @@ public class MainApplication {
 		
 		pNavBottom.add(btnStep);
 
+		drawPanel = new DrawPanel();
 		
 		cPane.add(drawPanel);
 		
@@ -221,11 +223,16 @@ public class MainApplication {
 	private void buildNewModel() {
 		try
 		{
-			// first retrieve settings from GUI and validate them.
+			model = new Model();
+			
+			// make sure the view can observe the model
+			model.addObserver(drawPanel);
+						
+			// retrieve settings from GUI and validate them.
 			getParametersFromGUI();
 			
-			// then build the model according to the new settings.
-			model.buildNewModel(settings);
+			// build the model according to the new settings.
+			model.buildNewModel();
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -243,33 +250,29 @@ public class MainApplication {
 	
 	private void initializeParametersInGUI() 
 	{
-		settings = new Settings();
+		settings = SimulationSettings.getInstance();
 		
 		int numActions = settings.getNumActions(),
 				numStates = settings.getNumStates(),
 				avgActionsState = settings.getAvgActionsState();
-		double minReward = settings.getMinReward();
-		double maxReward = settings.getMaxReward();
 		
 		textFieldNumActions.setText(Integer.toString(numActions));
 		textFieldNumStates.setText(Integer.toString(numStates));
 		textFieldAvgActionsState.setText(Integer.toString(avgActionsState));
-		textFieldMinReward.setText(Double.toString(minReward));
-		textFieldMaxReward.setText(Double.toString(maxReward));
 	}
 
-	private void getParametersFromGUI() throws Exception {
-		
-		int numActions = validateInt(textFieldNumActions,1,Settings.MAX_ALLOWED_ACTIONS),
-				numStates = validateInt(textFieldNumStates,1,Settings.MAX_ALLOWED_STATES),
+	private void getParametersFromGUI() throws Exception 
+	{
+		int numActions = validateInt(textFieldNumActions,1,SimulationConstants.MAX_ALLOWED_ACTIONS),
+				numStates = validateInt(textFieldNumStates,1,SimulationConstants.MAX_ALLOWED_STATES),
 				avgActionsState = validateInt(textFieldAvgActionsState, 1, numStates);
-		
-		double minReward = validateDouble(textFieldMinReward,Settings.MIN_ALLOWED_REWARD,Settings.MAX_ALLOWED_REWARD),
-				maxReward = validateDouble(textFieldMaxReward,Settings.MIN_ALLOWED_REWARD,Settings.MAX_ALLOWED_REWARD);
 		
 		boolean cycles = chckbxAllowCycles.isSelected();
 		
-		settings = new Settings(numStates, numActions, avgActionsState, minReward, maxReward, cycles);
+		settings.setNumStates(numStates);
+		settings.setNumActions(numActions);
+		settings.setAvgActionsState(avgActionsState);
+		settings.setCyclic(cycles);
 		
 		validateConstraints();
 	}
@@ -296,5 +299,25 @@ public class MainApplication {
 		} else {
 			throw new Exception("Parsing problem");
 		}
-	}	
+	}
+
+	@Override
+	public void itemStateChanged(ItemEvent e) {
+		// TODO Auto-generated method stub
+		if (e.getItem() == chckbxAnimate) {
+			drawPanel.toggleAnimate();
+		}
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		JComboBox<String> cb = (JComboBox<String>)e.getSource();
+		String edgeType = (String)cb.getSelectedItem();
+		
+		if (edgeType.equals(GUIConstants.STRAIGHT_EDGES_STR)) {
+			drawPanel.setEdgeType(GUIConstants.STRAIGHT_EDGES);
+		} else {
+			drawPanel.setEdgeType(GUIConstants.CURVED_EDGES);
+		}
+    }
 }

@@ -9,6 +9,13 @@ public class Vertex<E>
 	ArrayList<E> edges = new ArrayList<E>();
 	Color color = Color.BLACK;
 	
+	public Vertex() {	
+	}
+	
+	public Vertex(String newName) {
+		this.name = newName;
+	}
+	
 	public void setName(String name) {
 		this.name = name;
 	}
