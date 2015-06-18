@@ -54,7 +54,7 @@ public class Model extends Observable
 		
 		populatedMDP.reset();
 		
-		// try adding an observer so that the MDP can send it's changes directly to the GUI
+		// try adding an observer so that the MDP can send its changes directly to the GUI
 				
 		mdpGenerator.run(populatedMDP);
 		
@@ -92,6 +92,8 @@ public class Model extends Observable
 		steps++;
 		
 		populatedMDP.step();
+		
+		notifyGUI();
 	}
 	
 	public int getSteps() {

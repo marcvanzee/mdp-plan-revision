@@ -60,6 +60,8 @@ public class MDPValueIterator extends MDPOperation
 		
 		initializeMappings();
 		
+		removeHighlights();
+		
 		int countStates = mdp.countStates();
 		
 		// V:S->R is a function from states to rational numbers
@@ -89,6 +91,15 @@ public class MDPValueIterator extends MDPOperation
 	}
 	
 	
+	private void removeHighlights() {
+		for (ActionEdge ae : mdp.getActionEdges())
+			ae.setOptimal(false);
+		
+		for (QEdge qe : mdp.getQEdges())
+			qe.setOptimal(false);
+		
+	}
+
 	//
 	// PRIVATE METHODS
 	//

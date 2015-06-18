@@ -87,7 +87,7 @@ public class MDPChanger extends MDPOperation
 		int avgNodesToRemove = avgNodesToChange(mdp, settings.getDGamma());
 				
 		// we can not remove all nodes, because the one where the agent is on should never be removed
-		int numNodesToRemove = MathOperations.getRandomInt(avgNodesToRemove, variance, 1, mdp.countActions());
+		//int numNodesToRemove = MathOperations.getRandomInt(avgNodesToRemove, variance, 1, mdp.countActions());
 		
 		// remove nodes
 	}

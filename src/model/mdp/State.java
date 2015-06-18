@@ -14,6 +14,8 @@ public class State extends Vertex<ActionEdge>
 	
 	public void setVisited(boolean visited) {
 		this.visited = visited;
+		
+		this.color = visited ? Color.YELLOW : Color.RED;
 	}
 
 	@Override

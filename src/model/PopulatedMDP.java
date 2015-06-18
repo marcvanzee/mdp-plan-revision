@@ -40,6 +40,7 @@ public class PopulatedMDP extends MDP
 	
 	public void addAgent() {
 		agent = new Agent(this);
+		states.get(getStateIndex(agent.getCurrentState())).setVisited(true);
 	}
 	
 	/**

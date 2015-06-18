@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.JPanel;
 
@@ -49,10 +51,6 @@ class DrawPanel extends JPanel implements Observer
     private final Layout<Vertex<?>,Edge<?,?>> staticLayout = new StaticLayout<Vertex<?>,Edge<?,?>>(g, layout);
     
     private final VisualizationViewer<Vertex<?>,Edge<?,?>> vv = new JUNGRendering(layout, staticLayout);
-    
-    private final LayoutTransition<Vertex<?>,Edge<?,?>> lt =
-			new LayoutTransition<Vertex<?>,Edge<?,?>>(vv, vv.getGraphLayout(),
-					staticLayout);
     	
 	private final MainGUI mainApp;
 	private final Model model;
@@ -87,7 +85,6 @@ class DrawPanel extends JPanel implements Observer
     	System.out.println("received message");
     	// schedule to execute the message by adding it to the queue
     	taskScheduler.add((ChangeMessageBuffer)type);
-    	
     }
         
     public void toggleAnimate() {
@@ -130,9 +127,18 @@ class DrawPanel extends JPanel implements Observer
     	
     	mainApp.textFieldSteps.setText(model.getSteps()+"");
     	
+    	animate();
+    }
+    
+    private void animate()
+    {
+    	// while we are animating, the task scheduler is not allowed to modify the graph
+    	// otherwise we will have a ConcurrentModificationException, because this animation iterates
+    	// over the vertices and edges, while the task scheduler thread modifies them.
+    	
     	layout.initialize();
 
-		Relaxer relaxer = new VisRunner((IterativeContext)layout);
+    	Relaxer relaxer = new VisRunner((IterativeContext)layout);
 		relaxer.stop();
 		relaxer.prerelax();
 		
@@ -147,7 +153,15 @@ class DrawPanel extends JPanel implements Observer
 		animator.start();
 		vv.repaint();
     	repaint();
-    	    	
     	
+    	resumeTaskScheduler(200); // resume scheduling after 200ms, give the visualization some time to draw before editing the graph again
+    }
+    
+    private void resumeTaskScheduler(int ms) {
+    	(new Timer()).schedule(new TimerTask() {
+    		public void run() {
+    			taskScheduler.setWait(false);
+    		}
+    	}, ms);
     }
 }

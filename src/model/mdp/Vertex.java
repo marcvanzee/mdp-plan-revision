@@ -9,8 +9,7 @@ public abstract class Vertex<E>
 	protected ArrayList<E> edges = new ArrayList<E>();
 	protected Color color = Color.BLACK;
 	
-	public Vertex() {	
-	}
+	public Vertex() {}
 	
 	public Vertex(String newName) {
 		this.name = newName;

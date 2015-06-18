@@ -45,7 +45,7 @@ public class SimulationSettings
 	/*
 	 * VISUALIZATION SETTINGS
 	 */
-	int repaintDelay = 10;					// repaint delay in ms
+	int repaintDelay = 300;					// repaint delay in ms
 	
 	/*
 	 * Enforce the singleton property. We do not want to have two setting files 

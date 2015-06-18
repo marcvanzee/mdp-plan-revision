@@ -5,10 +5,6 @@ import java.awt.Color;
 public class QState extends Vertex<QEdge> 
 {
 	public QState() {
-	}
-	
-	public QState(String newName) {
-		super(newName);
 		this.color = Color.BLUE;
 	}
 
