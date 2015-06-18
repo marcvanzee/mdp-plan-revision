@@ -5,9 +5,11 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Random;
 
+import messaging.ChangeMessage;
 import model.mdp.Action;
 import model.mdp.MDP;
 import model.mdp.State;
+import constants.MathOperations;
 
 /**
  * This class generates an arbitrary MDP in the method run(MDP), based on the settings in constants.SimulationSettings.
@@ -43,14 +45,11 @@ import model.mdp.State;
  */
 public class MDPGenerator extends MDPOperation
 {
-	Random r = new Random();
-	
-	public MDPGenerator(MDP mdp) {
-		super(mdp);
-	}
-	
-	public void run() 
+	private final Random r = new Random();
+		
+	public void run(MDP mdp) 
 	{
+		
 		int countMaxStates = settings.getNumStates(),
 				numActions = settings.getNumActions();
 		
@@ -71,71 +70,84 @@ public class MDPGenerator extends MDPOperation
 						
 			for (Action a : actionSet)
 			{
-				// a is deterministic with p = Settings.P_DETERMINISTIC
-				if (throw_dice(settings.getPDeterministic()))
-				{
-					State nextState;
-					// we have to find a single successor state
-					// if no cycles are allowed we have to create a new state
-					// if cycles are allowed we create a new state with probability 1-Settings.P_CYCLE
-					// we combine these two things in a single if-statement
-					if (!settings.allowCycles() || throw_dice(1-settings.getPCyclic()))
-					{
-						nextState = mdp.addState();
-						
-						// add the state to the queue so we can process it later
-						stateQueue.add(nextState);
-					}
-					
-					// we do not create a new state but reuse an existing one
-					else
-					{
-						nextState = mdp.getRandomState();
-					}
-					
-					// now we are done. simply create a link from s to newState with p=1
-					mdp.addTransition(s, a, nextState);
-				}
-				else 
-				{
-					// a is non-deterministic
-					// we select an arbitrary number of successor states in [0,Settings.MAX_SUCCESSOR_STATES]
-					int numNewStates = r.nextInt(settings.getmaxSuccessorStates());
-					
-					ArrayList<State> nextStates;
-					
-					// if we allow no cycles, we have to generate all new states
-					if (!settings.allowCycles()) 
-					{
-						// but do not create more states than we have to
-						// do not create more states than numStates 
-						int countMaxNewStates = countMaxStates - mdp.countStates();
-						numNewStates = Math.min(countMaxNewStates, numNewStates);
-						
-						nextStates = mdp.addStates(numNewStates);				
-					}
-					
-					else
-					{
-						// if cycles are allowed, select m existing nodes with m = n * Settings.P_CYCLE
-						int countMaxExistingStates = (int)(numNewStates *  settings.getPCyclic());
-					
-						nextStates = mdp.getRandomStates(countMaxExistingStates);
-						
-						// now create new states
-						ArrayList<State> newStates = mdp.addStates(numNewStates - countMaxExistingStates);
-						
-						// add the new states to the queue
-						stateQueue.addAll(newStates);
-						
-						nextStates.addAll(newStates);
-					}
-					
-					// create transitions from s to the new states (probability distribution is generated in the method)
-					mdp.addTransitions(s, a, nextStates);
-				}
+				LinkedList<State> newQueue = generateStates(mdp, s, a);
+				stateQueue.addAll(newQueue);
 			}
 		}		
+	}
+	
+	public LinkedList<State> generateStates(MDP mdp, State s, Action a)
+	{
+		LinkedList<State> returnQueue = new LinkedList<State>();
+		
+		int countMaxStates = settings.getNumStates();
+		
+		// a is deterministic with p = Settings.P_DETERMINISTIC
+		if (MathOperations.throw_dice(settings.getPDeterministic()))
+		{
+			State nextState;
+			// we have to find a single successor state
+			// if no cycles are allowed we have to create a new state
+			// if cycles are allowed we create a new state with probability 1-Settings.P_CYCLE
+			// we combine these two things in a single if-statement
+			if (!settings.allowCycles() || MathOperations.throw_dice(1-settings.getPCyclic()))
+			{
+				
+				nextState = mdp.addState();
+				
+				// add the state to the queue so we can process it later
+				returnQueue.add(nextState);
+			}
+			
+			// we do not create a new state but reuse an existing one
+			else
+			{
+				nextState = mdp.getRandomState();
+			}
+			
+			// now we are done. simply create a link from s to newState with p=1
+			mdp.addTransition(s, a, nextState);
+		}
+		else 
+		{
+			// a is non-deterministic
+			// we select an arbitrary number of successor states in [0,Settings.MAX_SUCCESSOR_STATES]
+			int numNewStates = r.nextInt(settings.getmaxSuccessorStates());
+			
+			ArrayList<State> nextStates;
+			
+			// if we allow no cycles, we have to generate all new states
+			if (!settings.allowCycles()) 
+			{
+				// but do not create more states than we have to
+				// do not create more states than numStates 
+				int countMaxNewStates = countMaxStates - mdp.countStates();
+				numNewStates = Math.min(countMaxNewStates, numNewStates);
+				
+				nextStates = mdp.addStates(numNewStates);				
+			}
+			
+			else
+			{
+				// if cycles are allowed, select m existing nodes with m = n * Settings.P_CYCLE
+				int countMaxExistingStates = (int)(numNewStates *  settings.getPCyclic());
+			
+				nextStates = mdp.getRandomStates(countMaxExistingStates);
+				
+				// now create new states
+				ArrayList<State> newStates = mdp.addStates(numNewStates - countMaxExistingStates);
+				
+				// add the new states to the queue
+				returnQueue.addAll(newStates);
+				
+				nextStates.addAll(newStates);
+			}
+			
+			// create transitions from s to the new states (probability distribution is generated in the method)
+			mdp.addTransitions(s, a, nextStates);
+		}
+		
+		return returnQueue;
 	}
 	
 	// if the queue is empty, create a new state, else use first from queue and remove it
@@ -167,15 +179,12 @@ public class MDPGenerator extends MDPOperation
 	{
 		int countActions = mdp.countActions();
 		int avgActions = settings.getAvgActionsState();
+		int variance = settings.getActionVariance();
 		
-		// we select randomly avgActions +/- 3
-		// so if avgActions = 5, then we select 2 to 8 actions.
-		// if avgActions-3 < 1, then we select in [0,avgActions+3]
-		// if avgActions+3 > numActions. then we select in [avgActions-3,numActions]
-		int minActions = Math.max(1, avgActions-3);
-		int maxActions = Math.min(countActions, avgActions+3);
-		int numActions = r.nextInt((maxActions - minActions) + 1) + minActions;
-		
+		// we select randomly avgActions +/- SimulationSettings.actionsVariance
+		// if avgActions = n, then we select max(n-actionsVariance,1) to min(numActions,n+actionsVariance) actions.
+		int numActions = MathOperations.getRandomInt(avgActions, variance, 1, countActions);
+				
 		HashSet<Action> actionSetHash = new HashSet<Action>();
 		
 		// now generate numActions random actions between [0,countActions]
@@ -186,9 +195,5 @@ public class MDPGenerator extends MDPOperation
 		}
 		
 		return new LinkedList<Action>(actionSetHash);
-	}
-	
-	private boolean throw_dice(double d) {
-		return r.nextDouble() < d;
 	}
 }

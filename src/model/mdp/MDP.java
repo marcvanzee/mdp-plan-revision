@@ -2,10 +2,18 @@ package model.mdp;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 
-import constants.MathOperations;
+import messaging.ChangeMessage;
+import messaging.ChangeMessageBuffer;
+import messaging.ClearGraphMessage;
+import messaging.edges.AddActionEdgesMessage;
+import messaging.edges.AddQEdgesMessage;
+import messaging.states.AddQStatesMessage;
+import messaging.states.AddStatesMessage;
 import model.SimulationSettings;
+import model.mdp.operations.MDPTransitionGenerator;
 
 /**
  * A Markov Decision Process (S,A,T,Pr,R) is structure containing:
@@ -30,31 +38,28 @@ import model.SimulationSettings;
  * 
  * Similarly, ActionEdge<State,QState> and QEdge<QState,State> both extend Edge<V,W> 
  *
- * And two kinds 
+ * 
+ * This class extends the Observable class, which means it can be observed by gui.DrawPanel.
+ * It sends a notification to the DrawPanel when a vertex or edge is added or removed.
+ * 
  * @author marc.vanzee
  *
  */
 public class MDP
 {
-	ArrayList<State> states;
-	ArrayList<QState> qStates;
-	ArrayList<ActionEdge> actionEdges;
-	ArrayList<QEdge> qEdges;
-	ArrayList<Action> actions = new ArrayList<Action>();
+	protected final ArrayList<State> states = new ArrayList<State>();
+	protected final ArrayList<QState> qStates = new ArrayList<QState>();
+	protected final ArrayList<ActionEdge> actionEdges = new ArrayList<ActionEdge>();
+	protected final ArrayList<QEdge> qEdges = new ArrayList<QEdge>();
+	protected final ArrayList<Action> actions = new ArrayList<Action>();	
+	protected final SimulationSettings settings = SimulationSettings.getInstance();
+	protected final MDPTransitionGenerator tGenerator = new MDPTransitionGenerator(this);
+	protected final Random r = new Random();
+
+	// not final.
+	// TOOD: change this.
+	protected ChangeMessageBuffer mBuffer = new ChangeMessageBuffer();
 	
-	SimulationSettings settings = SimulationSettings.getInstance();
-
-	Random r = new Random();
-
-	/***********************
-	 * CONSTRUCTORS
-	 ***********************
-	 */
-	
-	public MDP() {
-		init();
-	}
-
 	/***********************
 	 * GETTERS AND SETTERS
 	 ***********************
@@ -64,32 +69,52 @@ public class MDP
 		return states.size();
 	}
 	
+	public int countQStates() {
+		return qStates.size();
+	}
+	
 	public int countActions() {
 		return actions.size();
+	}
+	
+	public int countQEdges() {
+		return qEdges.size();
 	}
 	
 	public Action getAction(int index) {
 		return actions.get(index);
 	}
 	
-	public ArrayList<State> getStates() {
+	public List<Action> getActions() {
+		return actions;
+	}
+	
+	public List<State> getStates() {
 		return states;
 	}
 	
-	public ArrayList<QState> getQStates() {
+	public List<QState> getQStates() {
 		return qStates;
 	}
 	
-	public ArrayList<ActionEdge> getActionEdges() {
+	public List<ActionEdge> getActionEdges() {
 		return actionEdges;
 	}
 	
-	public ArrayList<QEdge> getQEdges() {
+	public List<QEdge> getQEdges() {
 		return qEdges;
 	}
 	
 	public State getState(int i) {
 		return states.get(i);
+	}
+	
+	public int getStateIndex(State s) {
+		return states.indexOf(s);
+	}
+	
+	public ChangeMessageBuffer getMessageBuffer() {
+		return mBuffer;
 	}
 	
 	/***********************
@@ -106,11 +131,21 @@ public class MDP
 		
 		return str;
 	}
-	
+		
 	public void reset() {
-		init();
+		states.clear();
+		qStates.clear();
+		actionEdges.clear();
+		qEdges.clear();
+		
+		// TOOD: this should also be final at some point
+		mBuffer = new ChangeMessageBuffer();
 	}
 	
+	public void clearMessageBuffer() {
+		mBuffer.clear();
+	}
+		
 	public Action getRandomAction()
 	{
 		int index = r.nextInt(actions.size());
@@ -144,10 +179,14 @@ public class MDP
 	
 	public void addState(State state) {
 		states.add(state);
+		
+		addMessage(new AddStatesMessage(state));
 	}
 	
-	public void addStates(ArrayList<State> states) {
-		this.states.addAll(states);
+	public void addStates(List<State> states) {
+		this.states.addAll(states);		
+		
+		addMessage(new AddStatesMessage(states));
 	}
 	
 	public void addAction(Action a) {
@@ -158,85 +197,14 @@ public class MDP
 		this.actions.addAll(actions);
 	}
 	
-	// add transitions from s to a list of state. 
-	// the probability distribution over the list is generated in the method
-	public void addTransitions(State s, Action a, ArrayList<State> toStates) 
-	{
-		ArrayList<Double> probabilities = generateProbDistribution(toStates.size());
-		
-		for (double d : probabilities) 
-			System.out.println(d);
-		for (int i=0; i<toStates.size(); i++) 
-		{
-			addTransition(s, a, toStates.get(i), probabilities.get(i));
-		}
-	}
-	
-	/**
-	 * The function addTransition is overloaded. 
-	 * - If no probability is given, it is assumed to be 1
-	 * - if no reward is given, it is generated in [minReward,maxReward] from settings
-	 */
-	
-	public void addTransition(State s1, Action a, State s2) 
-	{
-		addTransition(s1, a, s2, 1.0);
-	}
-
-	public void addTransition(State s1, Action a, State s2, double probability) 
-	{
-		double minReward = settings.getMinReward();
-		double maxReward = settings.getMaxReward();
-		
-		double reward = r.nextDouble() * (maxReward - minReward) + minReward;
-		
-		addTransition(s1, a, s2, probability, reward);
-	}
-	
-	public void addTransition(State s1, Action a, State s2, double probability, double reward) 
-	{
-		if (s1 == null || a == null || s2 == null) {
-			System.err.println("Trying to add a transition and reward but one of the arguments is null.");
-			return;
-		}
-			
-		if (!states.contains(s1) || !states.contains(s2) || !actions.contains(a)) {
-			System.err.println("Trying to add transition and reward from " + s1.getName() + " to " 
-					 + s2.getName() + " by action " + a.getName() + ", but the states or action do not exist in MDP.");
-			return;
-		}
-		
-		// first check whether there already exists a qState for this action
-		QState qState = getQState(s1, a);
-		
-		// if not, create a new qState and a new edge from s1 to this qState
-		if (qState == null) {
-			
-			qState = createQState();
-			ActionEdge edge = createActionEdge(s1, qState, a);
-			s1.addEdge(edge);
-		}
-		
-		// if the qState existed already, check whether there already exists a QEdge from qState to s2
-		// if so, do nothing
-		else {
-			if (getQEdge(qState, s2) != null) {
-				System.err.println("Trying to add transition and reward from " + s1.getName() + " to " 
-					 + s2.getName() + " by action " + a.getName() + ", but there already exists a transition here.");
-				return;
-			}
-			
-		}
-		
-		QEdge qEdge = createQEdge(qState, s2, probability, reward);
-		qState.addEdge(qEdge);
-	}
-	
 	// add a new state and return it so it can directly be used
 	public State addState()
 	{
 		State s = new State(states.size() + "");
 		states.add(s);
+		
+		addMessage(new AddStatesMessage(s));
+		
 		return s;
 	}
 	
@@ -298,31 +266,7 @@ public class MDP
 		return qes;
 	}
 	
-	/***********************
-	 * PRIVATE METHODS
-	 ***********************
-	 */
-	
-	private void init() 
-	{
-		settings = SimulationSettings.getInstance();
-		states = new ArrayList<State>();
-		qStates = new ArrayList<QState>();
-		actionEdges = new ArrayList<ActionEdge>();
-		qEdges = new ArrayList<QEdge>();
-	}
-	
-	private QState getQState(State s, Action a) {
-		for (ActionEdge edge : s.getEdges()) {
-			
-			if (edge.getAction() == a)
-				return edge.getToVertex();
-		}
-		
-		return null;
-	}
-	
-	private QEdge getQEdge(QState qState, State s) {
+	public QEdge getQEdge(QState qState, State s) {
 		for (QEdge edge : qState.getEdges()) {
 			
 			if (edge.getToVertex() == s)
@@ -332,46 +276,60 @@ public class MDP
 		return null;
 	}
 
-	private QState createQState() {
+	public QState createQState() {
 		QState qState = new QState();
 		this.qStates.add(qState);
+		
+		addMessage(new AddQStatesMessage(qState));
 		
 		return qState;
 	}
 	
-	private ActionEdge createActionEdge(State s, QState qState, Action a) {
+	public ActionEdge createActionEdge(State s, QState qState, Action a) 
+	{
 		ActionEdge edge = new ActionEdge(s, qState, a);
 		this.actionEdges.add(edge);
+		
+		addMessage(new AddActionEdgesMessage(edge));
 		
 		return edge;
 	}
 	
-	private QEdge createQEdge(QState qState, State s, double prop,
-			double reward) {
+	public QEdge createQEdge(QState qState, State s, double prop,
+			double reward) 
+	{
 		QEdge qEdge = new QEdge(qState, s, prop, reward);
 		this.qEdges.add(qEdge);
+		
+		addMessage(new AddQEdgesMessage(qEdge));
 		
 		return qEdge;
 	}
 
-	private ArrayList<Double> generateProbDistribution(int countVariables) 
-	{
-		ArrayList<Double> probabilities = new ArrayList<Double>();
-		
-		double sum = 0;
-	    
-		for (int i=0; i<countVariables; i++) {
-			double rand = r.nextDouble();
+	public void addTransition(State s, Action a, State nextState) {
+		tGenerator.add(s, a, nextState);
+	}
+
+	public void addTransitions(State s, Action a, ArrayList<State> nextStates) {
+		tGenerator.add(s, a, nextStates);
+	}
+	
+	public QState getQState(State s, Action a) {
+		for (ActionEdge edge : s.getEdges()) {
 			
-			probabilities.add(rand);
-	    	sum += rand;
-	    }
+			if (edge.getAction() == a)
+				return edge.getToVertex();
+		}
 		
-		for (int i=0; i < probabilities.size(); i++) {
-			double d = probabilities.get(i);
-			probabilities.set(i, MathOperations.round(d/sum,2));
-	    }
-	    
-		return probabilities;
+		return null;
+	}
+
+	/***********************
+	 * PRIVATE METHODS
+	 ***********************
+	 */
+
+	private void addMessage(ChangeMessage cm) {
+		mBuffer.addMessage(cm);
 	}
 }

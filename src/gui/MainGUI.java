@@ -5,8 +5,6 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Panel;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
@@ -19,14 +17,11 @@ import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JSeparator;
+import javax.swing.JSlider;
 import javax.swing.JTextField;
 
 import model.Model;
 import model.SimulationSettings;
-
-import javax.swing.JComboBox;
-
-import constants.GUIConstants;
 import constants.SimulationConstants;
 
 /**
@@ -52,30 +47,40 @@ import constants.SimulationConstants;
  * @author marc.vanzee
  *
  */
-public class MainApplication implements ItemListener, ActionListener {
+public class MainGUI implements ItemListener {
 	
-	private Model model;
-	private JFrame frame;
-	private SimulationSettings settings;
+	private final Model model = new Model();
+	private final JFrame frame = new JFrame();
+	private final DrawPanel drawPanel = new DrawPanel(this);
+	private final SimulationSettings settings = SimulationSettings.getInstance();
 	
-	private JTextField textFieldNumStates, textFieldNumActions;
+	// TODO: make them public for now so we can change them easily in the DrawPanel
+	public JTextField textFieldRewards = new JTextField(), 
+			textFieldActs = new JTextField(), 
+			textFieldDeliberations = new JTextField(),
+			textFieldNumStates = new JTextField(), 
+			textFieldNumActions = new JTextField(),
+			textFieldAvgActionsState = new JTextField(),
+			textFieldDynamicity = new JTextField(),
+			textFieldSteps	 = new JTextField();
 	
-	private DrawPanel drawPanel;
-	private JCheckBox chckbxAllowCycles;
-	private JCheckBox chckbxAnimate;
-	private Component horizontalStrut;
-	private JLabel lblAvgActionsPer;
-	private JTextField textFieldAvgActionsState;
-	private JButton btnComputePolicy;
 	
-	private Component horizontalStrut_1;
-	private JLabel lblDynamicity;
-				
+	private final JCheckBox chckbxAllowCycles = new JCheckBox("allow cycles"),
+			chckbxAnimate = new JCheckBox("dynamic nodes");
+	private final JButton btnStep = new JButton("Step");
+	private final JSlider slider = new JSlider();
+	private final Component horizontalStrut = Box.createHorizontalStrut(10);
+	private final JLabel lblSpeed = new JLabel("speed:");
+	
+	final JButton btnPlay = new JButton("|>"),
+			btnPause = new JButton("||"),
+			btnNewModel = new JButton("New Model");
+			
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String args[]) {
-		(new MainApplication()).go();
+		(new MainGUI()).go();
 	}
 	
 	public void go() {
@@ -83,13 +88,20 @@ public class MainApplication implements ItemListener, ActionListener {
 		{			
 			// build GUI and set parameters in GUI according to model.Settings
 			buildGUI();
+			addListeners();
 			initializeParametersInGUI();
 			
+			model.addObserver(drawPanel);
+						
 			frame.setVisible(true);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public Model getModel() {
+		return model;
 	}
 
 	/**
@@ -97,125 +109,174 @@ public class MainApplication implements ItemListener, ActionListener {
 	 */
 	private void buildGUI()
 	{
-		frame = new JFrame();
+		final Container cPane = frame.getContentPane();
+				
+		final Panel pNavContainer = new Panel(),
+				pNavTop = new Panel(),
+				pNavBottom = new Panel();
+		
+		final int nav_height = 47;
+		
+		final JSeparator jSep1 = new JSeparator(JSeparator.VERTICAL),
+				jSep2 = new JSeparator(JSeparator.VERTICAL);
+		
 		frame.setBounds(100, 100, 950, 515);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		Container cPane = frame.getContentPane();
+		
 		cPane.setLayout(new BoxLayout(cPane, BoxLayout.Y_AXIS));
-		
-		int nav_height = 47;
-
-		Panel pNavContainer = new Panel();
-		
 		cPane.add(pNavContainer);
 		
 		pNavContainer.setPreferredSize(new Dimension(frame.getWidth(), nav_height));
 		pNavContainer.setMaximumSize(new Dimension(frame.getWidth(), nav_height));
 		pNavContainer.setMinimumSize(new Dimension(frame.getWidth(), nav_height));
 		pNavContainer.setLayout(new BorderLayout());
-		
-		JSeparator jSep = new JSeparator();
-		
 		pNavContainer.add(new JSeparator(), BorderLayout.CENTER);
-		
-		Panel pNavTop = new Panel();
-		
 		pNavContainer.add(pNavTop, BorderLayout.NORTH);
 		
-		
 		pNavTop.setLayout(new BoxLayout(pNavTop, BoxLayout.X_AXIS));
-		
 		pNavTop.add(Box.createHorizontalStrut(5));
-		
 		pNavTop.add(new JLabel("states"));
 		
-		textFieldNumStates = new JTextField();
 		textFieldNumStates.setMaximumSize( new Dimension(30, 20) );
 		pNavTop.add(textFieldNumStates);
 		pNavTop.add(Box.createHorizontalStrut(10));
 		
 		pNavTop.add(new JLabel("actions"));
-		textFieldNumActions = new JTextField();
 		textFieldNumActions.setMaximumSize( new Dimension(30, 20) );
 		pNavTop.add(textFieldNumActions);
 		
 		pNavTop.add(Box.createHorizontalStrut(10));
+		pNavTop.add(new JLabel("avg. actions/state"));
 		
-		lblAvgActionsPer = new JLabel("avg. actions/state");
-		pNavTop.add(lblAvgActionsPer);
-		
-		textFieldAvgActionsState = new JTextField();
 		textFieldAvgActionsState.setMaximumSize(new Dimension(30, 20));
 		pNavTop.add(textFieldAvgActionsState);
 		
-		horizontalStrut = Box.createHorizontalStrut(10);
-		pNavTop.add(horizontalStrut);
+		pNavTop.add(Box.createHorizontalStrut(10));
 		
-		jSep = new JSeparator(JSeparator.VERTICAL);
-		jSep.setMaximumSize(new Dimension(2, 25));
+		jSep1.setMaximumSize(new Dimension(2, 25));
 		
-		pNavTop.add(jSep);
+		pNavTop.add(jSep1);
 		
-		jSep = new JSeparator(JSeparator.VERTICAL);
-		jSep.setMaximumSize(new Dimension(2, 25));
+		jSep2.setMaximumSize(new Dimension(2, 25));
 		
-		pNavTop.add(jSep);
+		pNavTop.add(jSep2);
 		
-		chckbxAllowCycles = new JCheckBox("allow cycles");
 		pNavTop.add(chckbxAllowCycles);
 		
-		chckbxAnimate = new JCheckBox("dynamic nodes");
 		chckbxAnimate.addItemListener(this);
 		
 		pNavTop.add(chckbxAnimate);
 		
-		horizontalStrut_1 = Box.createHorizontalStrut(10);
-		pNavTop.add(horizontalStrut_1);
+		pNavTop.add(Box.createHorizontalStrut(10));
 		
-		lblDynamicity = new JLabel("dynamicity:");
-		pNavTop.add(lblDynamicity);
+		pNavTop.add(new JLabel("dynamicity:"));
 		
-		//comboBox = new JComboBox<String>(edgeTypes);
-		//comboBox.setMaximumSize(new Dimension(110, 20));
+		textFieldDynamicity.setText("0.5");
+		textFieldDynamicity.setMaximumSize(new Dimension(50, 20));
+		pNavTop.add(textFieldDynamicity);
 		
-		//pNavTop.add(comboBox);
+		pNavTop.add(horizontalStrut);
 		
-		Panel pNavBottom = new Panel();
+		pNavTop.add(lblSpeed);
+		
+		slider.setMaximumSize(new Dimension(200, 20));
+		
+		pNavTop.add(slider);
 		
 		pNavContainer.add(pNavBottom, BorderLayout.SOUTH);
 	
 		pNavBottom.setLayout(new BoxLayout(pNavBottom, BoxLayout.X_AXIS));
 		
-		JButton btnCreateMdp = new JButton("New MDP");
-		btnCreateMdp.setMaximumSize(new Dimension(110, 20));
+		btnNewModel.setMaximumSize(new Dimension(100, 20));
 		
-		pNavBottom.add(btnCreateMdp);
-		btnCreateMdp.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseReleased(MouseEvent arg0) {
-				MainApplication.this.buildNewModel();			
-			}
-		});
-		
-		btnComputePolicy = new JButton("Compute Policy");
-		pNavBottom.add(btnComputePolicy);
-		btnComputePolicy.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseReleased(MouseEvent arg0) {
-				MainApplication.this.computeOptimalPolicy();			
-			}
-		});
-		
-		JButton btnStep = new JButton("Step");
+		pNavBottom.add(btnNewModel);
+		btnStep.setMaximumSize(new Dimension(80, 20));
 		
 		pNavBottom.add(btnStep);
-
-		drawPanel = new DrawPanel();
 		
+		btnPause.setMaximumSize(new Dimension(60, 20));
+		btnPlay.setMaximumSize(new Dimension(60, 20));
+		
+		pNavBottom.add(btnPlay);
+		pNavBottom.add(btnPause);
+		pNavBottom.add(Box.createHorizontalStrut(10));
+		
+		pNavBottom.add(new JLabel("total steps"));
+		
+		textFieldSteps.setEditable(false);
+		textFieldSteps.setText("0");
+		textFieldSteps.setMaximumSize(new Dimension(50, 20));
+		pNavBottom.add(textFieldSteps);
+		
+		pNavBottom.add(Box.createHorizontalStrut(10));
+		
+		pNavBottom.add(new JLabel("deliberations"));
+		
+		textFieldDeliberations.setEditable(false);
+		textFieldDeliberations.setText("0");
+		textFieldDeliberations.setMaximumSize(new Dimension(50, 20));
+		pNavBottom.add(textFieldDeliberations);
+		
+		pNavBottom.add(Box.createHorizontalStrut(10));
+		
+		pNavBottom.add(new JLabel("acts"));
+		
+		textFieldActs.setEditable(false);
+		textFieldActs.setText("0");
+		textFieldActs.setMaximumSize(new Dimension(50, 20));
+		pNavBottom.add(textFieldActs);
+		
+		pNavBottom.add(new JLabel("reward"));
+		
+		pNavBottom.add(Box.createHorizontalStrut(10));
+		
+		textFieldRewards.setEditable(false);
+		textFieldRewards.setText("0");
+		textFieldRewards.setMaximumSize(new Dimension(50, 20));
+		pNavBottom.add(textFieldRewards);
+
 		cPane.add(drawPanel);
 		
 		frame.setVisible(true);
 	}
+	
+	
+	private void addListeners() 
+	{
+		btnNewModel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				MainGUI.this.buildNewModel();			
+			}
+		});
+		
+		btnPlay.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				MainGUI.this.startSimulation();		
+			}
+		});
+		
+		btnPause.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				MainGUI.this.pauseSimulation();	
+			}
+		});
+		
+		btnStep.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				MainGUI.this.step();		
+			}
+		});
+		
+		
+	}
+	
+	//
+	// CALLBACK METHODS
+	//
 	
 	/**
 	 * Build a new model according to the current settings in the GUI
@@ -223,42 +284,41 @@ public class MainApplication implements ItemListener, ActionListener {
 	private void buildNewModel() {
 		try
 		{
-			model = new Model();
-			
-			// make sure the view can observe the model
-			model.addObserver(drawPanel);
-						
-			// retrieve settings from GUI and validate them.
-			getParametersFromGUI();
+			// clear the graph
+			drawPanel.clearGraph();
 			
 			// build the model according to the new settings.
+			getParametersFromGUI();
 			model.buildNewModel();
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-	/** Compute optimal policy through value iteration
-	 * 
-	 */
-	private void computeOptimalPolicy() 
-	{
-		model.computeOptimalPolicy();
+	private void startSimulation() {
+		model.startSimulation();
+	}
+	
+	private void pauseSimulation() {
+		model.stopSimulation();
+	}
+	
+	private void step() {
+		model.step();
 	}
 	
 	private void initializeParametersInGUI() 
 	{
-		settings = SimulationSettings.getInstance();
-		
 		int numActions = settings.getNumActions(),
 				numStates = settings.getNumStates(),
 				avgActionsState = settings.getAvgActionsState();
+		double dynamicity = settings.getDynamicity();
 		
 		textFieldNumActions.setText(Integer.toString(numActions));
 		textFieldNumStates.setText(Integer.toString(numStates));
 		textFieldAvgActionsState.setText(Integer.toString(avgActionsState));
+		textFieldDynamicity.setText(Double.toString(dynamicity));
 	}
 
 	private void getParametersFromGUI() throws Exception 
@@ -308,16 +368,4 @@ public class MainApplication implements ItemListener, ActionListener {
 			drawPanel.toggleAnimate();
 		}
 	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		JComboBox<String> cb = (JComboBox<String>)e.getSource();
-		String edgeType = (String)cb.getSelectedItem();
-		
-		if (edgeType.equals(GUIConstants.STRAIGHT_EDGES_STR)) {
-			drawPanel.setEdgeType(GUIConstants.STRAIGHT_EDGES);
-		} else {
-			drawPanel.setEdgeType(GUIConstants.CURVED_EDGES);
-		}
-    }
 }

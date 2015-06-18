@@ -3,38 +3,63 @@ package model.mdp.operations;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import constants.MathOperations;
 import model.mdp.Action;
 import model.mdp.ActionEdge;
 import model.mdp.MDP;
 import model.mdp.QEdge;
 import model.mdp.QState;
 import model.mdp.State;
+import constants.MathOperations;
 
 public class MDPValueIterator extends MDPOperation
 {	
 	// use these mappings for efficiency so we don't have to look them up every time
 	HashMap<State,ArrayList<ActionEdge>> stateToActionEdges = new HashMap<State,ArrayList<ActionEdge>>();
 	HashMap<QState,ArrayList<QEdge>> qStateToQEdges = new HashMap<QState,ArrayList<QEdge>>();
-	
-	// parameters for value iteration: http://artint.info/html/ArtInt_227.html
-	double theta = 0.5;
-	double gamma = 0.9;
-	
+		
 	// V contains the V values for each node, while prevV contains those of the previous iteration
 	double V[], prevV[];
 	
 	// the optimal policy will be stored, simply mapping state indices to actions
 	Action policy[];
 	
-	public MDPValueIterator(MDP mdp)
+	double theta = settings.getTheta(),
+			gamma = settings.getGamma();
+		
+	//
+	// CONSTRUCTORS
+	//
+	
+	public MDPValueIterator()
 	{
-		super(mdp);
-		initializeMappings();
 	}
 	
-	public void run() 
+	//
+	// GETTERS AND SETTERS
+	//
+	
+	public Action[] getPolicy() {
+		return this.policy;
+	}
+	
+	public Action getPolicy(int i) {
+		return policy[i];
+	}
+	
+	public double getValue(int i) {
+		return V[i];
+	}
+	
+	//
+	// OTHER PUBLIC METHODS
+	//
+	
+	public void run(MDP mdp) 
 	{
+		this.mdp = mdp;
+		
+		initializeMappings();
+		
 		int countStates = mdp.countStates();
 		
 		// V:S->R is a function from states to rational numbers
@@ -46,6 +71,7 @@ public class MDPValueIterator extends MDPOperation
 				
 		int k = 0;
 		boolean finished = true;
+		
 		do {
 			k++;
 			for (int i=0; i<countStates; i++)
@@ -57,19 +83,16 @@ public class MDPValueIterator extends MDPOperation
 					finished = false;
 				
 			}
-		} while (!finished && k < 100);
+		} while (!finished && k < settings.getValueIterations());
 		
 		setOptimalVerticesAndEdges();
 	}
 	
-	public Action getPolicy(int i) {
-		return policy[i];
-	}
 	
-	public double getValue(int i) {
-		return V[i];
-	}
-		
+	//
+	// PRIVATE METHODS
+	//
+	
 	private void initializeMappings() 
 	{
 		for (State s : mdp.getStates()) 
@@ -183,6 +206,5 @@ public class MDPValueIterator extends MDPOperation
 		
 		return mostProbableQEdge;
 	}
-	
-	
+
 }

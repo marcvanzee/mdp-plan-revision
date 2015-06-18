@@ -1,5 +1,7 @@
 package model.mdp;
 
+import java.awt.Color;
+
 
 public class Edge<S,T> {
 	S from;
@@ -29,5 +31,13 @@ public class Edge<S,T> {
 	
 	public boolean isOptimal() {
 		return optimal;
+	}
+	
+	public Color getColor() {
+		return isOptimal() ? Color.GREEN : Color.BLACK;
+	}
+	
+	public float getStrokeWidth() {
+		return isOptimal() ? 10.0f : 1.0f;
 	}
 }

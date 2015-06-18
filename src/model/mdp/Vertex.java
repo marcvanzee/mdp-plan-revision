@@ -3,11 +3,11 @@ package model.mdp;
 import java.awt.Color;
 import java.util.ArrayList;
 
-public class Vertex<E> 
+public abstract class Vertex<E> 
 {
-	String name;
-	ArrayList<E> edges = new ArrayList<E>();
-	Color color = Color.BLACK;
+	protected String name;
+	protected ArrayList<E> edges = new ArrayList<E>();
+	protected Color color = Color.BLACK;
 	
 	public Vertex() {	
 	}
@@ -36,7 +36,9 @@ public class Vertex<E>
 		return edges;
 	}
 	
-	public void setColor(Color newColor) {
-		this.color = newColor;
+	public Color getColor() {
+		return this.color;
 	}
+	
+	public abstract int getSize();
 }

@@ -22,8 +22,6 @@ public class Action {
 		int num = i % 26;
 		char c = (char) ('a' + num);
 		
-		System.out.println("action char: " + c + "" + times);
-		
 		this.name = c + (times > 0 ? times + "" : "");
 	}
 	

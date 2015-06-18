@@ -16,10 +16,5 @@ public abstract class MDPOperation
 	protected MDP mdp = null;
 	protected SimulationSettings settings = SimulationSettings.getInstance();
 	
-	public MDPOperation(MDP mdp) 
-	{
-		this.mdp = mdp;
-	}
-	
-	public abstract void run(); // run the operation
+	public abstract void run(MDP mdp); // run the operation
 }

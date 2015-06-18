@@ -11,8 +11,6 @@ public class QEdge extends Edge<QState,State> {
 		super(from, to);
 		this.probability = MathOperations.round(probability, 2);
 		this.reward = MathOperations.round(reward, 2);
-		
-		System.out.println("storing p=" + this.probability);
 	}
 	
 	public String toString() {
