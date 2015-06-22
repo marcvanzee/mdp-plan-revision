@@ -1,10 +1,11 @@
 package model;
 
+import gui.DrawTaskScheduler;
+
 import java.util.Observable;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import messaging.ChangeMessageBuffer;
 import model.mdp.State;
 import model.mdp.operations.MDPGenerator;
 import model.mdp.operations.MDPValueIterator;
@@ -25,7 +26,7 @@ public class Model extends Observable
 	
 	boolean isRunning = false;
 	
-	final Timer timer = new Timer(true);
+	private Timer timer;
 	
 	//
 	// GETTERS AND SETTERS
@@ -58,35 +59,31 @@ public class Model extends Observable
 				
 		mdpGenerator.run(populatedMDP);
 		
-		populatedMDP.addAgent();
+		if (Settings.ADD_AGENT)
+			populatedMDP.addAgent();
 		
 		steps = 0;
 		
 		notifyGUI();
 	}
 	
-	public void startSimulation()
+	public void startSimulation(DrawTaskScheduler scheduler)
 	{
 		if (isRunning) {
 			timer.cancel();
 		}
 		
-		timer.schedule(new StepTask(), 500, 500);
+		timer = new Timer(true);
+		
+		// try to step every 100 ms, this will only work when the GUI has finished drawing
+		timer.schedule(new StepTask(scheduler), 100, 100); 
 	}
 	
 	public void stopSimulation()
 	{
 		timer.cancel();
 	}
-	
-	public void computeOptimalPolicy()
-	{
-		valueIterator.run(populatedMDP);
 		
-		// we do not have to send any changes to the observer,
-		// because we only change the value of the vertices, we do not add or remove any
-	}
-	
 	public void step() 
 	{
 		steps++;
@@ -101,16 +98,23 @@ public class Model extends Observable
 	}
 	
 	public void notifyGUI() {
-		System.out.println("notifying gui");
 		setChanged();
 	    notifyObservers(populatedMDP.getMessageBuffer());
 	}
 		
 	class StepTask extends TimerTask
 	{
+		DrawTaskScheduler scheduler;
+		
+		public StepTask(DrawTaskScheduler s) {
+			this.scheduler = s;
+		}
+		
 		public void run() 
 		{
-			step();
+			if (scheduler.hasFinished())
+				step();
 		}
+			// wait until the GUI has finished drawing
 	}
 }

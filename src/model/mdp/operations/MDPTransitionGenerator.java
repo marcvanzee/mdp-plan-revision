@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import model.SimulationSettings;
+import model.Settings;
 import model.mdp.Action;
 import model.mdp.ActionEdge;
 import model.mdp.MDP;
@@ -16,11 +16,21 @@ import constants.MathOperations;
 public class MDPTransitionGenerator 
 {
 	private final MDP mdp;
-	private final SimulationSettings settings = SimulationSettings.getInstance();
 	protected final Random r = new Random();
 	
 	public MDPTransitionGenerator(MDP mdp) {
 		this.mdp = mdp;
+	}
+	
+	/**
+	 * The function add is overloaded. 
+	 * - If no probability is given, it is assumed to be 1
+	 * - if no reward is given, it is generated in [minReward,maxReward] from settings
+	 */
+	
+	public void add(State s1, Action a, State s2) 
+	{
+		add(s1, a, s2, 1.0);
 	}
 	
 	public void add(State s, Action a, ArrayList<State> toStates) 
@@ -32,22 +42,11 @@ public class MDPTransitionGenerator
 			add(s, a, toStates.get(i), probabilities.get(i));
 		}
 	}
-	
-	/**
-	 * The function addTransition is overloaded. 
-	 * - If no probability is given, it is assumed to be 1
-	 * - if no reward is given, it is generated in [minReward,maxReward] from settings
-	 */
-	
-	public void add(State s1, Action a, State s2) 
-	{
-		add(s1, a, s2, 1.0);
-	}
 
 	public void add(State s1, Action a, State s2, double probability) 
 	{
-		double minReward = settings.getMinReward();
-		double maxReward = settings.getMaxReward();
+		double minReward = Settings.MIN_REWARD;
+		double maxReward = Settings.MAX_REWARD;
 		
 		double reward = r.nextDouble() * (maxReward - minReward) + minReward;
 		

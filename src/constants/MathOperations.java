@@ -23,7 +23,8 @@ public class MathOperations
 	}
 	
 	public static boolean throw_dice(double d) {
-		return r.nextDouble() < d;
+		double rand = r.nextDouble();
+		return rand < d;
 	}
 	
 	/**

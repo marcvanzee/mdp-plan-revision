@@ -8,7 +8,7 @@ import java.awt.geom.Rectangle2D;
 
 import javax.swing.JPanel;
 
-import model.SimulationSettings;
+import model.Settings;
 
 import org.jgraph.JGraph;
 import org.jgraph.graph.AttributeMap;

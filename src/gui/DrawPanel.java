@@ -14,6 +14,7 @@ import messaging.ChangeMessageBuffer;
 import messaging.ClearGraphMessage;
 import model.Agent;
 import model.Model;
+import model.Settings;
 import model.mdp.Edge;
 import model.mdp.Vertex;
 import edu.uci.ics.jung.algorithms.layout.AbstractLayout;
@@ -130,6 +131,10 @@ class DrawPanel extends JPanel implements Observer
     	animate();
     }
     
+    public DrawTaskScheduler getTaskScheduler() {
+    	return taskScheduler;
+    }
+    
     private void animate()
     {
     	// while we are animating, the task scheduler is not allowed to modify the graph
@@ -138,23 +143,26 @@ class DrawPanel extends JPanel implements Observer
     	
     	layout.initialize();
 
-    	Relaxer relaxer = new VisRunner((IterativeContext)layout);
-		relaxer.stop();
-		relaxer.prerelax();
-		
-		
-		StaticLayout<Vertex<?>,Edge<?,?>> staticLayout =
+    	if (Settings.ANIMATE) {
+	    	Relaxer relaxer = new VisRunner((IterativeContext)layout);
+			relaxer.stop();
+			relaxer.prerelax();
+			
+			StaticLayout<Vertex<?>,Edge<?,?>> staticLayout =
  			new StaticLayout<Vertex<?>,Edge<?,?>>(g, layout);
 			LayoutTransition<Vertex<?>,Edge<?,?>> lt =
 				new LayoutTransition<Vertex<?>,Edge<?,?>>(vv, vv.getGraphLayout(),
 						staticLayout);
 		
-		Animator animator = new Animator(lt);
-		animator.start();
+			Animator animator = new Animator(lt);
+			animator.start();
+    	}
+    	
 		vv.repaint();
     	repaint();
     	
-    	resumeTaskScheduler(200); // resume scheduling after 200ms, give the visualization some time to draw before editing the graph again
+    	// resume scheduling after 200ms, give the visualization some time to draw before editing the graph again
+    	resumeTaskScheduler(Settings.REPAINT_DELAY-100); 
     }
     
     private void resumeTaskScheduler(int ms) {

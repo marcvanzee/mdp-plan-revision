@@ -22,6 +22,5 @@ public class State extends Vertex<ActionEdge>
 	public int getSize() {
 		// TODO Auto-generated method stub
 		return 20;
-	}
-	
+	}	
 }

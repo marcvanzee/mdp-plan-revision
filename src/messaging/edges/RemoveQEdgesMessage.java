@@ -1,16 +1,21 @@
 package messaging.edges;
 
-import java.util.LinkedList;
+import java.util.List;
 
-import messaging.ChangeMessage;
 import model.mdp.Edge;
 import model.mdp.QEdge;
 import model.mdp.Vertex;
 import edu.uci.ics.jung.graph.Graph;
 
-public class RemoveQEdgesMessage implements ChangeMessage
+public class RemoveQEdgesMessage extends ChangeEdgesMessage<QEdge>
 {
-	LinkedList<QEdge> edges = new LinkedList<QEdge>();
+	public RemoveQEdgesMessage(QEdge e) {
+		super(e);
+	}
+	
+	public RemoveQEdgesMessage(List<QEdge> es) {
+		super(es);
+	}
 	
 	@Override
 	public void modifyGraph(Graph<Vertex<?>, Edge<?, ?>> g) 
@@ -18,9 +23,5 @@ public class RemoveQEdgesMessage implements ChangeMessage
 		for (QEdge e : edges) {
 			g.removeEdge(e);
 		}
-	}
-	
-	public void removeEdges(LinkedList<QEdge> edges) {
-		edges.addAll(edges);
 	}
 }

@@ -8,8 +8,11 @@ public abstract class Vertex<E>
 	protected String name;
 	protected ArrayList<E> edges = new ArrayList<E>();
 	protected Color color = Color.BLACK;
+	int indegree = 0, outdegree = 0;
 	
 	public Vertex() {}
+	
+	public abstract int getSize();
 	
 	public Vertex(String newName) {
 		this.name = newName;
@@ -39,5 +42,33 @@ public abstract class Vertex<E>
 		return this.color;
 	}
 	
-	public abstract int getSize();
+	public String toString() {
+		return name; 
+	}
+	
+	public void incIndegree() {
+		this.indegree++;
+	}
+	
+	public void decIndegree() {
+		this.indegree--;
+	}
+	
+	public int getIndegree() {
+		return this.indegree;
+	}
+	
+	public void incOutdegree() {
+		this.outdegree++;
+	}
+	
+	public void decOutdegree() {
+		this.outdegree--;
+	}
+	
+	public int getOutdegree() {
+		return this.outdegree;
+	}
+	
+	
 }

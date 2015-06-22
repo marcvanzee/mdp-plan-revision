@@ -1,22 +1,26 @@
 package messaging.edges;
 
+import java.util.List;
+
+import model.mdp.ActionEdge;
 import model.mdp.Edge;
-import model.mdp.QState;
-import model.mdp.State;
 import model.mdp.Vertex;
 import edu.uci.ics.jung.graph.Graph;
 
-public class RemoveActionEdgesMessage extends ChangeEdgesMessage<State, QState>
+public class RemoveActionEdgesMessage extends ChangeEdgesMessage<ActionEdge>
 {
-	public RemoveActionEdgesMessage(Edge<State, QState> e) {
+	public RemoveActionEdgesMessage(ActionEdge e) {
 		super(e);
-		// TODO Auto-generated constructor stub
+	}
+	
+	public RemoveActionEdgesMessage(List<ActionEdge> es) {
+		super(es);
 	}
 
 	@Override
 	public void modifyGraph(Graph<Vertex<?>, Edge<?, ?>> g) 
 	{
-		for (Edge<State,QState> e : edges) {
+		for (ActionEdge e : edges) {
 			g.removeEdge(e);
 		}
 	}

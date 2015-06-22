@@ -6,13 +6,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import messaging.ChangeMessage;
+import model.Settings;
 
 public class DrawTaskScheduler 
 {
 	// we create a queue with tasks and execute a task every REDRAW_RATE milliseconds
     // this is to avoid concurrent modification of our graph.
 	private final LinkedList<ChangeMessage> taskList = new LinkedList<ChangeMessage>();
-	private final int REDRAW_RATE = 500;
 	private Timer timer;
 	private final DrawPanel parent;
 	
@@ -41,7 +41,8 @@ public class DrawTaskScheduler
 		if (!running) {
 			running = true;
 			timer = new Timer();
-			timer.schedule(new ExecuteTask(), REDRAW_RATE, REDRAW_RATE); 
+			timer.schedule(new ExecuteTask(), Settings.REPAINT_DELAY, 
+					Settings.REPAINT_DELAY); 
 		}
 	}
 		      
@@ -62,6 +63,10 @@ public class DrawTaskScheduler
     			wait = false;
     		}
          }
+    }
+    
+    public boolean hasFinished() {
+    	return (taskList.size() == 0 && !wait); 
     }
     
 }

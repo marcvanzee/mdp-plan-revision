@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Random;
 
-import messaging.ChangeMessage;
+import model.Settings;
 import model.mdp.Action;
 import model.mdp.MDP;
 import model.mdp.State;
@@ -50,8 +50,8 @@ public class MDPGenerator extends MDPOperation
 	public void run(MDP mdp) 
 	{
 		
-		int countMaxStates = settings.getNumStates(),
-				numActions = settings.getNumActions();
+		int countMaxStates = Settings.NUM_STATES,
+				numActions = Settings.NUM_ACTIONS;
 		
 		mdp.reset();
 		
@@ -61,36 +61,42 @@ public class MDPGenerator extends MDPOperation
 		// we implement the Queue simply using a LinkedList
 		LinkedList<State> stateQueue = new LinkedList<State>();
 		
+		// don't allow cycles for the first state
+		boolean cycles = Settings.CYCLES_ALLOWED;
+		Settings.CYCLES_ALLOWED = false;
+		
 		while (mdp.countStates() < countMaxStates) 
 		{
 			// if the queue is empty, create a new state, else use first from queue and remove it
 			State s = getNewState(mdp, stateQueue);
 
 			LinkedList<Action> actionSet = generateActionSet(mdp);
-						
+			
 			for (Action a : actionSet)
 			{
-				LinkedList<State> newQueue = generateStates(mdp, s, a);
+				LinkedList<State> newQueue = generateStates(mdp, s, a, true);
 				stateQueue.addAll(newQueue);
 			}
-		}		
+			
+			Settings.CYCLES_ALLOWED = cycles;
+		}
 	}
 	
-	public LinkedList<State> generateStates(MDP mdp, State s, Action a)
+	public LinkedList<State> generateStates(MDP mdp, State s, Action a, boolean initial)
 	{
 		LinkedList<State> returnQueue = new LinkedList<State>();
 		
-		int countMaxStates = settings.getNumStates();
+		int countMaxStates = Settings.NUM_STATES;
 		
 		// a is deterministic with p = Settings.P_DETERMINISTIC
-		if (MathOperations.throw_dice(settings.getPDeterministic()))
+		if (MathOperations.throw_dice(Settings.P_DETERMINISTIC))
 		{
 			State nextState;
 			// we have to find a single successor state
 			// if no cycles are allowed we have to create a new state
 			// if cycles are allowed we create a new state with probability 1-Settings.P_CYCLE
 			// we combine these two things in a single if-statement
-			if (!settings.allowCycles() || MathOperations.throw_dice(1-settings.getPCyclic()))
+			if (!Settings.CYCLES_ALLOWED || MathOperations.throw_dice(1-Settings.P_CYCLE))
 			{
 				
 				nextState = mdp.addState();
@@ -109,20 +115,20 @@ public class MDPGenerator extends MDPOperation
 			mdp.addTransition(s, a, nextState);
 		}
 		else 
-		{
+		{	
 			// a is non-deterministic
-			// we select an arbitrary number of successor states in [0,Settings.MAX_SUCCESSOR_STATES]
-			int numNewStates = r.nextInt(settings.getmaxSuccessorStates());
+			// we select an arbitrary number of successor states in [1,Settings.MAX_SUCCESSOR_STATES]
+			int numNewStates = r.nextInt(Settings.MAX_SUCCESSOR_STATES-1)+1;
 			
 			ArrayList<State> nextStates;
 			
 			// if we allow no cycles, we have to generate all new states
-			if (!settings.allowCycles()) 
+			if (!Settings.CYCLES_ALLOWED) 
 			{
-				// but do not create more states than we have to
-				// do not create more states than numStates 
-				int countMaxNewStates = countMaxStates - mdp.countStates();
-				numNewStates = Math.min(countMaxNewStates, numNewStates);
+				// if this is the first time, do not create more states than we have to
+				if (initial)
+					numNewStates = Math.min(
+							countMaxStates - mdp.countStates(), numNewStates);
 				
 				nextStates = mdp.addStates(numNewStates);				
 			}
@@ -130,7 +136,7 @@ public class MDPGenerator extends MDPOperation
 			else
 			{
 				// if cycles are allowed, select m existing nodes with m = n * Settings.P_CYCLE
-				int countMaxExistingStates = (int)(numNewStates *  settings.getPCyclic());
+				int countMaxExistingStates = (int)(numNewStates *  Settings.P_CYCLE);
 			
 				nextStates = mdp.getRandomStates(countMaxExistingStates);
 				
@@ -159,10 +165,13 @@ public class MDPGenerator extends MDPOperation
 			
 			// if there are already states in the mdp, then connect s to an existing state.
 			// this avoids creating multiple disconnected graphs
-			State s0 = mdp.getRandomState();
-			Action a = mdp.getRandomAction();
-			
-			mdp.addTransition(s0, a, s);
+			if (mdp.countStates() > 1) {
+				State s0 = mdp.getRandomState(s);
+								
+				Action a = mdp.getRandomAction();
+				
+				mdp.addTransition(s0, a, s);
+			}
 			
 			return s;
 		}
@@ -178,8 +187,8 @@ public class MDPGenerator extends MDPOperation
 	private LinkedList<Action> generateActionSet(MDP mdp) 
 	{
 		int countActions = mdp.countActions();
-		int avgActions = settings.getAvgActionsState();
-		int variance = settings.getActionVariance();
+		int avgActions = Settings.AVG_ACTIONS_STATE;
+		int variance = Settings.ACTION_VARIANCE;
 		
 		// we select randomly avgActions +/- SimulationSettings.actionsVariance
 		// if avgActions = n, then we select max(n-actionsVariance,1) to min(numActions,n+actionsVariance) actions.

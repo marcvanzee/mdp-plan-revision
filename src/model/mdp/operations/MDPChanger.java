@@ -1,5 +1,7 @@
 package model.mdp.operations;
 
+import model.Agent;
+import model.Settings;
 import model.mdp.Action;
 import model.mdp.MDP;
 import model.mdp.State;
@@ -39,22 +41,24 @@ import constants.MathOperations;
  */
 public class MDPChanger extends MDPOperation 
 {
-	private int agentChoice = -1;
-	private final int variance = settings.getActionVariance();
+	private Agent agent;
 	private final MDPGenerator mdpGenerator = new MDPGenerator();
 	
-	public void setAgentChoice(int newAgentChoice) 
-	{
-		this.agentChoice = newAgentChoice;
+	public MDPChanger(Agent agent) {
+		this.agent = agent;
 	}
 	
 	public void run(MDP mdp) 
 	{
 		this.mdp = mdp;
-					
-		// first remove nodes, so we make sure we won't remove nodes we just have added
-		removeNodes();
-		addNodes();
+		
+		// only add and remove nodes when the MDP is a tree
+		if (!Settings.CYCLES_ALLOWED) 
+		{
+			// first remove nodes, so we make sure we won't remove nodes we just have added
+			removeNodes();
+			addNodes();
+		}
 		
 		changeProbabilities();
 		changeRewards();	
@@ -62,10 +66,11 @@ public class MDPChanger extends MDPOperation
 	
 	private void addNodes() 
 	{
-		int avgNodesToAdd = avgNodesToChange(mdp, settings.getDGamma());
+		int avgNodesToAdd = avgNodesToChange(mdp, Settings.D_GAMMA);
 		
 		// there's no limit on the number of nodes to add
-		int numNodesToAdd = MathOperations.getRandomInt(avgNodesToAdd, variance, 0, Integer.MAX_VALUE);
+		int numNodesToAdd = MathOperations.getRandomInt(
+				avgNodesToAdd, Settings.ACTION_VARIANCE, 0, Integer.MAX_VALUE);
 		
 		while (numNodesToAdd > 0)
 		{
@@ -76,29 +81,42 @@ public class MDPChanger extends MDPOperation
 			Action a = mdp.getRandomAction();
 			
 			int countStatesBefore = mdp.countStates();
-			mdpGenerator.generateStates(mdp, s, a);
+			mdpGenerator.generateStates(mdp, s, a, false);
 			int nodesAdded = mdp.countStates() - countStatesBefore;
 			
 			numNodesToAdd -= nodesAdded;
 		}
 	}
+	
 	private void removeNodes() 
 	{
-		int avgNodesToRemove = avgNodesToChange(mdp, settings.getDGamma());
-				
+		int avgNodesToRemove = avgNodesToChange(mdp, Settings.D_GAMMA);
+		int variance = Settings.ACTION_VARIANCE;
 		// we can not remove all nodes, because the one where the agent is on should never be removed
-		//int numNodesToRemove = MathOperations.getRandomInt(avgNodesToRemove, variance, 1, mdp.countActions());
+		int numNodesToRemove = MathOperations.getRandomInt(avgNodesToRemove, variance, 1, mdp.countActions());
 		
-		// remove nodes
+		while (numNodesToRemove > 0)
+		{
+			// remove an arbitrary unpopulated node
+			if (agent != null)
+				mdp.removeRandomState(agent.getCurrentState());
+			else
+				mdp.removeRandomState();
+			
+			numNodesToRemove--;
+		}
+		
+		
 	}
 	
 	private void changeProbabilities() 
 	{
 		// obtain the average amount of QEdges from which to change the probability
-		int avgNodesToChangeProbability = avgNodesToChange(mdp, settings.getDGamma());
+		int avgNodesToChangeProbability = avgNodesToChange(mdp, Settings.D_GAMMA);
 		
 		int numNodesToChangeProbability = 
-				MathOperations.getRandomInt(avgNodesToChangeProbability, variance, 0, mdp.countQEdges());
+				MathOperations.getRandomInt(
+						avgNodesToChangeProbability, Settings.ACTION_VARIANCE, 0, mdp.countQEdges());
 		
 		// change probabilities here
 	}
@@ -106,17 +124,18 @@ public class MDPChanger extends MDPOperation
 	private void changeRewards()
 	{
 		// obtain the average amount of QEdges from which to change the rewards
-		int avgNodesToChangeReward = avgNodesToChange(mdp, settings.getDGamma());
+		int avgNodesToChangeReward = avgNodesToChange(mdp, Settings.D_GAMMA);
 		
 		int numNodesToChangeReward =
-				MathOperations.getRandomInt(avgNodesToChangeReward, variance, 0, mdp.countQEdges());	
+				MathOperations.getRandomInt(
+						avgNodesToChangeReward, Settings.ACTION_VARIANCE, 0, mdp.countQEdges());	
 	}
 	
 	// Note: nodeToAdd(MDP) and nodeToRemove(MDP) are currently identical, 
 	// but they could be altered to implement for instance a growing or shrinking MDP.
 	private int avgNodesToChange(MDP mdp, double gamma) 
 	{
-		double dynamicity = settings.getDynamicity(); 
+		double dynamicity = Settings.DYNAMICITY; 
 		int numStates = mdp.countStates();
 		
 		return (int) (dynamicity * numStates * gamma);

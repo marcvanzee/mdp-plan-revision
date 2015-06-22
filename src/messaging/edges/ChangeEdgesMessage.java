@@ -8,17 +8,17 @@ import model.mdp.Edge;
 import model.mdp.Vertex;
 import edu.uci.ics.jung.graph.Graph;
 
-public abstract class ChangeEdgesMessage<S,T> implements ChangeMessage 
+public abstract class ChangeEdgesMessage<E> implements ChangeMessage 
 {
-	List<Edge<S,T>> edges = new LinkedList<Edge<S,T>>();
+	List<E> edges = new LinkedList<E>();
 	
 	public abstract void modifyGraph(Graph<Vertex<?>,Edge<?,?>> g);
 	
-	public ChangeEdgesMessage(List<Edge<S,T>> edges) {
+	public ChangeEdgesMessage(List<E> edges) {
 		this.edges.addAll(edges);
 	}
 	
-	public ChangeEdgesMessage(Edge<S,T> e) {
+	public ChangeEdgesMessage(E e) {
 		this.edges.add(e);
 	}
 }

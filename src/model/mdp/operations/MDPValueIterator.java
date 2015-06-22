@@ -3,6 +3,7 @@ package model.mdp.operations;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import model.Settings;
 import model.mdp.Action;
 import model.mdp.ActionEdge;
 import model.mdp.MDP;
@@ -23,8 +24,8 @@ public class MDPValueIterator extends MDPOperation
 	// the optimal policy will be stored, simply mapping state indices to actions
 	Action policy[];
 	
-	double theta = settings.getTheta(),
-			gamma = settings.getGamma();
+	double theta = Settings.THETA,
+			gamma = Settings.GAMMA; 
 		
 	//
 	// CONSTRUCTORS
@@ -85,7 +86,7 @@ public class MDPValueIterator extends MDPOperation
 					finished = false;
 				
 			}
-		} while (!finished && k < settings.getValueIterations());
+		} while (!finished && k < Settings.ITERATIONS);
 		
 		setOptimalVerticesAndEdges();
 	}

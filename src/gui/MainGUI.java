@@ -21,7 +21,7 @@ import javax.swing.JSlider;
 import javax.swing.JTextField;
 
 import model.Model;
-import model.SimulationSettings;
+import model.Settings;
 import constants.SimulationConstants;
 
 /**
@@ -52,7 +52,6 @@ public class MainGUI implements ItemListener {
 	private final Model model = new Model();
 	private final JFrame frame = new JFrame();
 	private final DrawPanel drawPanel = new DrawPanel(this);
-	private final SimulationSettings settings = SimulationSettings.getInstance();
 	
 	// TODO: make them public for now so we can change them easily in the DrawPanel
 	public JTextField textFieldRewards = new JTextField(), 
@@ -73,7 +72,7 @@ public class MainGUI implements ItemListener {
 	private final JLabel lblSpeed = new JLabel("speed:");
 	
 	final JButton btnPlay = new JButton("|>"),
-			btnPause = new JButton("||"),
+			btnStop = new JButton("[]"),
 			btnNewModel = new JButton("New Model");
 			
 	/**
@@ -194,11 +193,11 @@ public class MainGUI implements ItemListener {
 		
 		pNavBottom.add(btnStep);
 		
-		btnPause.setMaximumSize(new Dimension(60, 20));
+		btnStop.setMaximumSize(new Dimension(60, 20));
 		btnPlay.setMaximumSize(new Dimension(60, 20));
 		
 		pNavBottom.add(btnPlay);
-		pNavBottom.add(btnPause);
+		pNavBottom.add(btnStop);
 		pNavBottom.add(Box.createHorizontalStrut(10));
 		
 		pNavBottom.add(new JLabel("total steps"));
@@ -257,10 +256,10 @@ public class MainGUI implements ItemListener {
 			}
 		});
 		
-		btnPause.addMouseListener(new MouseAdapter() {
+		btnStop.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
-				MainGUI.this.pauseSimulation();	
+				MainGUI.this.stopSimulation();	
 			}
 		});
 		
@@ -297,10 +296,10 @@ public class MainGUI implements ItemListener {
 	}
 	
 	private void startSimulation() {
-		model.startSimulation();
+		model.startSimulation(drawPanel.getTaskScheduler());
 	}
 	
-	private void pauseSimulation() {
+	private void stopSimulation() {
 		model.stopSimulation();
 	}
 	
@@ -310,15 +309,17 @@ public class MainGUI implements ItemListener {
 	
 	private void initializeParametersInGUI() 
 	{
-		int numActions = settings.getNumActions(),
-				numStates = settings.getNumStates(),
-				avgActionsState = settings.getAvgActionsState();
-		double dynamicity = settings.getDynamicity();
+		int numActions = Settings.NUM_ACTIONS,
+				numStates = Settings.NUM_STATES,
+				avgActionsState = Settings.AVG_ACTIONS_STATE;
+		double dynamicity = Settings.DYNAMICITY;
+		boolean allowCycles = Settings.CYCLES_ALLOWED;
 		
 		textFieldNumActions.setText(Integer.toString(numActions));
 		textFieldNumStates.setText(Integer.toString(numStates));
 		textFieldAvgActionsState.setText(Integer.toString(avgActionsState));
 		textFieldDynamicity.setText(Double.toString(dynamicity));
+		chckbxAllowCycles.setSelected(allowCycles);
 	}
 
 	private void getParametersFromGUI() throws Exception 
@@ -329,16 +330,16 @@ public class MainGUI implements ItemListener {
 		
 		boolean cycles = chckbxAllowCycles.isSelected();
 		
-		settings.setNumStates(numStates);
-		settings.setNumActions(numActions);
-		settings.setAvgActionsState(avgActionsState);
-		settings.setCyclic(cycles);
+		Settings.NUM_STATES = numStates;
+		Settings.NUM_ACTIONS = numActions;
+		Settings.AVG_ACTIONS_STATE = avgActionsState;
+		Settings.CYCLES_ALLOWED = cycles;
 		
 		validateConstraints();
 	}
 	
 	private void validateConstraints() throws Exception {
-		if (settings.getMinReward() > settings.getMaxReward()) {
+		if (Settings.MIN_REWARD > Settings.MAX_REWARD) {
 			throw new Exception("Constraints not satisfied");
 		}
 	}

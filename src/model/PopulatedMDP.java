@@ -3,6 +3,7 @@ package model;
 import java.util.ArrayList;
 
 import messaging.ChangeMessageBuffer;
+import model.mdp.Action;
 import model.mdp.MDP;
 import model.mdp.QEdge;
 import model.mdp.QState;
@@ -18,7 +19,7 @@ import model.mdp.operations.MDPChanger;
 public class PopulatedMDP extends MDP
 {
 	Agent agent;
-	MDPChanger mdpChanger = new MDPChanger();
+	MDPChanger mdpChanger = new MDPChanger(agent);
 	
 	//
 	// CONSTRUCTORS
@@ -40,7 +41,7 @@ public class PopulatedMDP extends MDP
 	
 	public void addAgent() {
 		agent = new Agent(this);
-		states.get(getStateIndex(agent.getCurrentState())).setVisited(true);
+		setVertexColor();
 	}
 	
 	/**
@@ -56,22 +57,20 @@ public class PopulatedMDP extends MDP
 		mBuffer = new ChangeMessageBuffer();
 		
 		// get the next choice by the agent
-		int agentChoice = agent.step();
+		if (agent != null)
+			agent.step();
 		
-		// change the MDP
-		mdpChanger.setAgentChoice(agentChoice);
+		// change the MDP (the mdp changer holds a reference to our agent)
 		mdpChanger.run(this);
 
 		// if the agent acted, move the agent and compute its reward
-		if (agent.getNextAction() != null)
-			moveAgent();
+		if (agent != null && agent.getNextAction() != null)
+			moveAgent(agent.getCurrentState(), agent.getNextAction());
 	}
 	
-	private void moveAgent() 
+	private void moveAgent(State currentState, Action selectedAction) 
 	{
-		
-		State currentState = agent.getCurrentState();
-		QState qState = getQState(currentState, agent.getNextAction());
+		QState qState = getQState(currentState, selectedAction);
 		
 		ArrayList<QEdge> qEdges = getQEdges(qState);
 		
@@ -91,6 +90,14 @@ public class PopulatedMDP extends MDP
 		QEdge qEdge = qEdges.get(i);
 		
 		agent.reward(qEdge.getReward());
+		
+		agent.getCurrentState().setVisited(false);
 		agent.setCurrentState(qEdge.getToVertex());
+		
+		setVertexColor();
+	}
+	
+	private void setVertexColor() {
+		agent.getCurrentState().setVisited(true);
 	}
 }

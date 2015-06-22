@@ -7,8 +7,12 @@ import model.mdp.State;
 import model.mdp.Vertex;
 import edu.uci.ics.jung.graph.Graph;
 
-public abstract class RemoveStatesMessage extends ChangeVerticesMessage<State>
+public class RemoveStatesMessage extends ChangeVerticesMessage<State>
 {
+	public RemoveStatesMessage(State s) {
+		super(s);
+	}
+	
 	public RemoveStatesMessage(List<State> vertices) {
 		super(vertices);
 	}

@@ -3,7 +3,7 @@ package UNUSED.old;
 import java.util.HashSet;
 import java.util.Random;
 
-import model.SimulationSettings;
+import model.Settings;
 
 public class MDPBuilder {
    

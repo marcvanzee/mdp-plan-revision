@@ -7,10 +7,14 @@ import model.mdp.QState;
 import model.mdp.Vertex;
 import edu.uci.ics.jung.graph.Graph;
 
-public abstract class RemoveQStatesMessage extends ChangeVerticesMessage<QState>
+public class RemoveQStatesMessage extends ChangeVerticesMessage<QState>
 {
 	public RemoveQStatesMessage(List<QState> vertices) {
 		super(vertices);
+	}
+	
+	public RemoveQStatesMessage(QState qState) {
+		super(qState);
 	}
 
 	@Override

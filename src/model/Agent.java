@@ -35,7 +35,6 @@ public class Agent
 	private Action nextAction = null;
 	private MDPValueIterator valueIterator = new MDPValueIterator();
 	private MDP mdp = null;
-	private SimulationSettings settings = SimulationSettings.getInstance();
 	private double reward = 0;
 	private int deliberations = 0, acts = 0;
 	
@@ -95,7 +94,7 @@ public class Agent
 				(mdp.getActionEdge(currentState, policy[index]) == null) ||
 						
 			// deliberate with probability pDeliberate
-			MathOperations.throw_dice(settings.getPDeliberate()))
+			MathOperations.throw_dice(Settings.P_DELIBERATE))
 		{
 			System.out.println("<Agent> I will deliberate");
 			deliberate();

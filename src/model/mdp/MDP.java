@@ -7,12 +7,14 @@ import java.util.Random;
 
 import messaging.ChangeMessage;
 import messaging.ChangeMessageBuffer;
-import messaging.ClearGraphMessage;
 import messaging.edges.AddActionEdgesMessage;
 import messaging.edges.AddQEdgesMessage;
+import messaging.edges.RemoveActionEdgesMessage;
+import messaging.edges.RemoveQEdgesMessage;
 import messaging.states.AddQStatesMessage;
 import messaging.states.AddStatesMessage;
-import model.SimulationSettings;
+import messaging.states.RemoveQStatesMessage;
+import messaging.states.RemoveStatesMessage;
 import model.mdp.operations.MDPTransitionGenerator;
 
 /**
@@ -52,7 +54,6 @@ public class MDP
 	protected final ArrayList<ActionEdge> actionEdges = new ArrayList<ActionEdge>();
 	protected final ArrayList<QEdge> qEdges = new ArrayList<QEdge>();
 	protected final ArrayList<Action> actions = new ArrayList<Action>();	
-	protected final SimulationSettings settings = SimulationSettings.getInstance();
 	protected final MDPTransitionGenerator tGenerator = new MDPTransitionGenerator(this);
 	protected final Random r = new Random();
 
@@ -117,43 +118,25 @@ public class MDP
 		return mBuffer;
 	}
 	
-	/***********************
-	 * PUBLIC METHODS
-	 ***********************
-	 */
-	
-	public String toString() {
-		String str = "printing MDP.\n";
-		str += "number of states: " + states.size() + "\n";
-		str += "number of actions: " + actions.size() + "\n";
-		str += "number of action edges: " + actionEdges.size() + "\n";
-		str += "number of q edges: " + qEdges.size() + "\n";
-		
-		return str;
-	}
-		
-	public void reset() {
-		states.clear();
-		qStates.clear();
-		actionEdges.clear();
-		qEdges.clear();
-		
-		// TOOD: this should also be final at some point
-		mBuffer = new ChangeMessageBuffer();
-	}
-	
-	public void clearMessageBuffer() {
-		mBuffer.clear();
-	}
-		
 	public Action getRandomAction()
 	{
 		int index = r.nextInt(actions.size());
 		return actions.get(index);
 	}
 	
+	public State getRandomState(State exclude)
+	{
+		State s0 = null;
+		
+		while (s0 != exclude)
+			s0 = getRandomState();
+		
+		return s0;
+	}
+	
 	public State getRandomState()
 	{
+		System.out.println(states.size());
 		int index = r.nextInt(states.size());
 		return states.get(index);
 	}
@@ -175,60 +158,6 @@ public class MDP
 		}
 		
 		return new ArrayList<State>(randomStates);
-	}
-	
-	public void addState(State state) {
-		states.add(state);
-		
-		addMessage(new AddStatesMessage(state));
-	}
-	
-	public void addStates(List<State> states) {
-		this.states.addAll(states);		
-		
-		addMessage(new AddStatesMessage(states));
-	}
-	
-	public void addAction(Action a) {
-		actions.add(a);
-	}
-	
-	public void addActions(ArrayList<Action> actions) {
-		this.actions.addAll(actions);
-	}
-	
-	// add a new state and return it so it can directly be used
-	public State addState()
-	{
-		State s = new State(states.size() + "");
-		states.add(s);
-		
-		addMessage(new AddStatesMessage(s));
-		
-		return s;
-	}
-	
-	// add a number of new states and return the states themselves in a list
-	public ArrayList<State> addStates(int numStates) 
-	{
-		ArrayList<State> newStates = new ArrayList<State>();
-		
-		for (int i=0; i<numStates; i++) {
-			newStates.add(addState());
-		}
-		
-		return newStates;
-	}
-	
-	public void addNumActions(int numActions) 
-	{
-		int currentActions = actions.size();
-		
-		for (int i=0; i<numActions; i++) 
-		{
-			int actionID= currentActions + i;
-			actions.add(new Action(Integer.toString(actionID)));
-		}
 	}
 	
 	public ActionEdge getActionEdge(State s, Action a) 
@@ -275,7 +204,49 @@ public class MDP
 		
 		return null;
 	}
-
+	
+	public QState getQState(State s, Action a) {
+		for (ActionEdge edge : s.getEdges()) {
+			
+			if (edge.getAction() == a)
+				return edge.getToVertex();
+		}
+		
+		return null;
+	}
+	
+	/***********************
+	 * OTHER PUBLIC METHODS
+	 ***********************
+	 */
+	
+	//
+	// MESSAGING METHODS
+	//
+	
+	public void addState(State state) {
+		states.add(state);
+		
+		addMessage(new AddStatesMessage(state));
+	}
+	
+	public void addStates(List<State> states) {
+		this.states.addAll(states);		
+		
+		addMessage(new AddStatesMessage(states));
+	}
+	
+	// add a new state and return it so it can directly be used
+	public State addState()
+	{
+		State s = new State(states.size() + "");
+		states.add(s);
+		
+		addMessage(new AddStatesMessage(s));
+		
+		return s;
+	}
+	
 	public QState createQState() {
 		QState qState = new QState();
 		this.qStates.add(qState);
@@ -305,7 +276,103 @@ public class MDP
 		
 		return qEdge;
 	}
-
+	
+	public void removeState(State s) 
+	{
+		System.out.println("Removing state " + s);
+		ArrayList<ActionEdge> aes = s.getEdges();
+		
+		for (ActionEdge ae : aes)
+		{
+			QState qs = ae.getToVertex();
+			ArrayList<QEdge> qes = qs.getEdges();
+			
+			qStates.remove(qs);
+			
+			qEdges.removeAll(qes);
+			
+			addMessage(new RemoveQStatesMessage(qs));
+			addMessage(new RemoveQEdgesMessage(qes));
+		}
+		
+		actionEdges.removeAll(aes);
+		states.remove(s);
+		
+		addMessage(new RemoveActionEdgesMessage(aes));
+		addMessage(new RemoveStatesMessage(s));
+				
+	}
+	
+	public void removeRandomState() {
+		removeState(getRandomState());
+	}
+	
+	public void removeRandomState(State exclude) 
+	{
+		State s = getRandomState(exclude);
+		removeState(s);
+	}
+		
+		
+	//
+	// OTHER METHODS
+	//
+		
+	public String toString() {
+		String str = "printing MDP.\n";
+		str += "number of states: " + states.size() + "\n";
+		str += "number of actions: " + actions.size() + "\n";
+		str += "number of action edges: " + actionEdges.size() + "\n";
+		str += "number of q edges: " + qEdges.size() + "\n";
+		
+		return str;
+	}
+		
+	public void reset() {
+		states.clear();
+		qStates.clear();
+		actionEdges.clear();
+		qEdges.clear();
+		
+		// TOOD: this should also be final at some point
+		mBuffer = new ChangeMessageBuffer();
+	}
+	
+	public void clearMessageBuffer() {
+		mBuffer.clear();
+	}
+	
+	public void addAction(Action a) {
+		actions.add(a);
+	}
+	
+	public void addActions(ArrayList<Action> actions) {
+		this.actions.addAll(actions);
+	}
+	
+	// add a number of new states and return the states themselves in a list
+	public ArrayList<State> addStates(int numStates) 
+	{
+		ArrayList<State> newStates = new ArrayList<State>();
+		
+		for (int i=0; i<numStates; i++) {
+			newStates.add(addState());
+		}
+		
+		return newStates;
+	}
+	
+	public void addNumActions(int numActions) 
+	{
+		int currentActions = actions.size();
+		
+		for (int i=0; i<numActions; i++) 
+		{
+			int actionID= currentActions + i;
+			actions.add(new Action(Integer.toString(actionID)));
+		}
+	}
+	
 	public void addTransition(State s, Action a, State nextState) {
 		tGenerator.add(s, a, nextState);
 	}
@@ -314,16 +381,6 @@ public class MDP
 		tGenerator.add(s, a, nextStates);
 	}
 	
-	public QState getQState(State s, Action a) {
-		for (ActionEdge edge : s.getEdges()) {
-			
-			if (edge.getAction() == a)
-				return edge.getToVertex();
-		}
-		
-		return null;
-	}
-
 	/***********************
 	 * PRIVATE METHODS
 	 ***********************

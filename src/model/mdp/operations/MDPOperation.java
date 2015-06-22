@@ -1,6 +1,5 @@
 package model.mdp.operations;
 
-import model.SimulationSettings;
 import model.mdp.MDP;
 
 /**
@@ -14,7 +13,6 @@ import model.mdp.MDP;
 public abstract class MDPOperation 
 {	
 	protected MDP mdp = null;
-	protected SimulationSettings settings = SimulationSettings.getInstance();
 	
 	public abstract void run(MDP mdp); // run the operation
 }
