@@ -45,6 +45,7 @@ import constants.SimulationConstants;
  *   By implementing the method "update(Observable model, Object arg)", it can respond to changes in the model and display thme.
  * 
  * @author marc.vanzee
+ * 
  *
  */
 public class MainGUI implements ItemListener {
