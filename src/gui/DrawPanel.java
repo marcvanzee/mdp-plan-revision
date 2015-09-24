@@ -9,14 +9,6 @@ import java.util.TimerTask;
 
 import javax.swing.JPanel;
 
-import messaging.ChangeMessage;
-import messaging.ChangeMessageBuffer;
-import messaging.ClearGraphMessage;
-import model.Agent;
-import model.MDPSimulation;
-import model.Settings;
-import model.mdp.Edge;
-import model.mdp.Vertex;
 import edu.uci.ics.jung.algorithms.layout.AbstractLayout;
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.algorithms.layout.SpringLayout;
@@ -31,6 +23,14 @@ import edu.uci.ics.jung.graph.util.Graphs;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.layout.LayoutTransition;
 import edu.uci.ics.jung.visualization.util.Animator;
+import messaging.ChangeMessage;
+import messaging.ChangeMessageBuffer;
+import messaging.ClearGraphMessage;
+import model.Agent;
+import model.Settings;
+import model.TileWorldSimulation;
+import model.mdp.Edge;
+import model.mdp.Vertex;
 
 /**
  * This is the VIEWPOINT
@@ -54,7 +54,7 @@ class DrawPanel extends JPanel implements Observer
     private final VisualizationViewer<Vertex<?>,Edge<?,?>> vv = new JUNGRendering(layout, staticLayout);
     	
 	private final MainGUI mainApp;
-	private final MDPSimulation model;
+	private final TileWorldSimulation model;
 	
 	private boolean animate = true;
 	

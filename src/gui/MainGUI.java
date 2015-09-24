@@ -20,9 +20,9 @@ import javax.swing.JSeparator;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 
-import model.MDPSimulation;
-import model.Settings;
 import constants.SimulationConstants;
+import model.Settings;
+import model.TileWorldSimulation;
 
 /**
  * This is the main application. 
@@ -50,7 +50,8 @@ import constants.SimulationConstants;
  */
 public class MainGUI implements ItemListener {
 	
-	private final MDPSimulation model = new MDPSimulation();
+	//private final MDPSimulation model = new MDPSimulation();
+	private final TileWorldSimulation model = new TileWorldSimulation();
 	private final JFrame frame = new JFrame();
 	private final DrawPanel drawPanel = new DrawPanel(this);
 	
@@ -100,7 +101,7 @@ public class MainGUI implements ItemListener {
 		}
 	}
 	
-	public MDPSimulation getModel() {
+	public TileWorldSimulation getModel() {
 		return model;
 	}
 

@@ -1,14 +1,14 @@
 package model;
 
-import gui.DrawTaskScheduler;
-
 import java.util.Observable;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import gui.DrawTaskScheduler;
 import model.mdp.State;
 import model.mdp.operations.MDPGenerator;
 import model.mdp.operations.MDPValueIterator;
+import model.mdp.operations.TileWorldGenerator;
 
 /**
  * A TileWorldSimulation consists of a TileWorld (i.e. an MDP and an Agent) and models the evolution of this TileWorld over time.
@@ -18,9 +18,9 @@ import model.mdp.operations.MDPValueIterator;
  */
 public class TileWorldSimulation extends Observable 
 {
-	private final PopulatedMDP populatedMDP = new PopulatedMDP();
+	private final TileWorld tileworld = new TileWorld();
 	private final MDPValueIterator valueIterator = new MDPValueIterator();
-	private final MDPGenerator mdpGenerator = new MDPGenerator();
+	private final TileWorldGenerator tileWorldGenerator = new TileWorldGenerator();
 	
 	private int steps = 0;
 	
@@ -32,16 +32,16 @@ public class TileWorldSimulation extends Observable
 	// GETTERS AND SETTERS
 	//
 	
-	public PopulatedMDP getPopulatedMDP() {
-		return populatedMDP;
+	public TileWorld getTileWorld() {
+		return this.tileworld;
 	}
 	
 	public Agent getAgent() {
-		return populatedMDP.getAgent();
+		return this.tileworld.getAgent();
 	}
 	
 	public double getValue(State s) {
-		return valueIterator.getValue(populatedMDP.getStates().indexOf(s));
+		return valueIterator.getValue(this.tileworld.getStates().indexOf(s));
 	}
 	
 	//
@@ -53,14 +53,14 @@ public class TileWorldSimulation extends Observable
 		if (isRunning)
 			timer.cancel();
 		
-		populatedMDP.reset();
+		this.tileworld.reset();
 		
 		// try adding an observer so that the MDP can send its changes directly to the GUI
 				
-		mdpGenerator.run(populatedMDP);
+		this.tileWorldGenerator.run(this.tileworld);
 		
 		if (Settings.ADD_AGENT)
-			populatedMDP.addAgent();
+			this.tileworld.addAgent();
 		
 		steps = 0;
 		
@@ -88,7 +88,7 @@ public class TileWorldSimulation extends Observable
 	{
 		steps++;
 		
-		populatedMDP.step();
+		this.tileworld.step();
 		
 		notifyGUI();
 	}
@@ -99,7 +99,7 @@ public class TileWorldSimulation extends Observable
 	
 	public void notifyGUI() {
 		setChanged();
-	    notifyObservers(populatedMDP.getMessageBuffer());
+	    notifyObservers(this.tileworld.getMessageBuffer());
 	}
 		
 	class StepTask extends TimerTask
