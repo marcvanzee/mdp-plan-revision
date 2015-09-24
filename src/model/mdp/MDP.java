@@ -382,12 +382,14 @@ public class MDP
 		tGenerator.add(s, a, nextStates);
 	}
 	
+	public void addMessage(ChangeMessage cm) {
+		mBuffer.addMessage(cm);
+	}
+	
 	/***********************
 	 * PRIVATE METHODS
 	 ***********************
 	 */
 
-	private void addMessage(ChangeMessage cm) {
-		mBuffer.addMessage(cm);
-	}
+	
 }

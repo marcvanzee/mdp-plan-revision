@@ -27,7 +27,7 @@ public class Settings
 	/*
 	 * AGENT SETTINGS
 	 */
-	public static boolean ADD_AGENT = false;
+	public static boolean ADD_AGENT = true;
 	public static double P_DELIBERATE = 0.5;       // the probability with which the agent deliberates
 	
 	/*

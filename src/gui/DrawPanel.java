@@ -10,8 +10,8 @@ import java.util.TimerTask;
 import javax.swing.JPanel;
 
 import edu.uci.ics.jung.algorithms.layout.AbstractLayout;
+import edu.uci.ics.jung.algorithms.layout.KKLayout;
 import edu.uci.ics.jung.algorithms.layout.Layout;
-import edu.uci.ics.jung.algorithms.layout.SpringLayout;
 import edu.uci.ics.jung.algorithms.layout.StaticLayout;
 import edu.uci.ics.jung.algorithms.layout.util.Relaxer;
 import edu.uci.ics.jung.algorithms.layout.util.VisRunner;
@@ -21,6 +21,7 @@ import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.ObservableGraph;
 import edu.uci.ics.jung.graph.util.Graphs;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
+import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.uci.ics.jung.visualization.layout.LayoutTransition;
 import edu.uci.ics.jung.visualization.util.Animator;
 import messaging.ChangeMessage;
@@ -47,7 +48,7 @@ class DrawPanel extends JPanel implements Observer
 
     private final Graph<Vertex<?>,Edge<?,?>> g = new ObservableGraph<Vertex<?>,Edge<?,?>>(ig);;
     
-    private final AbstractLayout<Vertex<?>,Edge<?,?>> layout = new SpringLayout<Vertex<?>,Edge<?,?>>(g);
+    private final AbstractLayout<Vertex<?>,Edge<?,?>> layout = new KKLayout<Vertex<?>,Edge<?,?>>(g);
 	
     private final Layout<Vertex<?>,Edge<?,?>> staticLayout = new StaticLayout<Vertex<?>,Edge<?,?>>(g, layout);
     
@@ -74,6 +75,9 @@ class DrawPanel extends JPanel implements Observer
         setSize(new Dimension(600, 600));
 
         add(vv);
+        
+        vv.getRenderContext().setEdgeShapeTransformer(new EdgeShape.QuadCurve<Vertex<?>,Edge<?,?>>());
+        
         vv.repaint();
    }
 

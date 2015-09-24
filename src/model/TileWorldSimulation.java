@@ -1,12 +1,16 @@
 package model;
 
+import java.util.List;
 import java.util.Observable;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import gui.DrawTaskScheduler;
+import messaging.edges.AddStateEdgesMessage;
+import messaging.states.AddStatesMessage;
+import model.mdp.ActionEdge;
 import model.mdp.State;
-import model.mdp.operations.MDPGenerator;
+import model.mdp.StateEdge;
 import model.mdp.operations.MDPValueIterator;
 import model.mdp.operations.TileWorldGenerator;
 
@@ -50,19 +54,39 @@ public class TileWorldSimulation extends Observable
 	
 	public void buildNewModel() 
 	{
+		TileWorld tw = this.tileworld;
+		
 		if (isRunning)
 			timer.cancel();
 		
-		this.tileworld.reset();
+		tw.reset();
 		
 		// try adding an observer so that the MDP can send its changes directly to the GUI
 				
-		this.tileWorldGenerator.run(this.tileworld);
+		this.tileWorldGenerator.run(tw);
 		
 		if (Settings.ADD_AGENT)
-			this.tileworld.addAgent();
+			tw.addAgent();
 		
 		steps = 0;
+		
+		// clear the buffer
+		tw.clearMessageBuffer();
+		
+		List<State> states = tw.getStates();
+		
+		// now only add states and transltions, leave out qstates because the domain is deterministic
+		tw.addMessage(new AddStatesMessage(states));
+		
+		for (State s : states) {
+			for (ActionEdge ae : s.getEdges()) {
+				if (ae.getToVertex().getEdges().size() != 1) continue;
+				
+				StateEdge se = new StateEdge(s, ae.getToVertex().getEdges().get(0).getToVertex(), ae.getAction());
+				
+				tw.addMessage(new AddStateEdgesMessage(se));
+			}
+		}
 		
 		notifyGUI();
 	}
