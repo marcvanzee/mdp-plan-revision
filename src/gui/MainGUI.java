@@ -20,7 +20,7 @@ import javax.swing.JSeparator;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 
-import model.Model;
+import model.MDPSimulation;
 import model.Settings;
 import constants.SimulationConstants;
 
@@ -50,7 +50,7 @@ import constants.SimulationConstants;
  */
 public class MainGUI implements ItemListener {
 	
-	private final Model model = new Model();
+	private final MDPSimulation model = new MDPSimulation();
 	private final JFrame frame = new JFrame();
 	private final DrawPanel drawPanel = new DrawPanel(this);
 	
@@ -100,7 +100,7 @@ public class MainGUI implements ItemListener {
 		}
 	}
 	
-	public Model getModel() {
+	public MDPSimulation getModel() {
 		return model;
 	}
 

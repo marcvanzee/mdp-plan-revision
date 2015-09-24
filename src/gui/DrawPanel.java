@@ -13,7 +13,7 @@ import messaging.ChangeMessage;
 import messaging.ChangeMessageBuffer;
 import messaging.ClearGraphMessage;
 import model.Agent;
-import model.Model;
+import model.MDPSimulation;
 import model.Settings;
 import model.mdp.Edge;
 import model.mdp.Vertex;
@@ -54,7 +54,7 @@ class DrawPanel extends JPanel implements Observer
     private final VisualizationViewer<Vertex<?>,Edge<?,?>> vv = new JUNGRendering(layout, staticLayout);
     	
 	private final MainGUI mainApp;
-	private final Model model;
+	private final MDPSimulation model;
 	
 	private boolean animate = true;
 	

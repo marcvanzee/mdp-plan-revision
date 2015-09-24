@@ -9,6 +9,7 @@ import model.mdp.QEdge;
 import model.mdp.QState;
 import model.mdp.State;
 import model.mdp.operations.MDPChanger;
+import model.mdp.operations.MDPOperation;
 
 /**
  * A PopulatedMDP consists of an MDP and an agent, and the interaction between these two entities.
@@ -19,7 +20,7 @@ import model.mdp.operations.MDPChanger;
 public class PopulatedMDP extends MDP
 {
 	Agent agent;
-	MDPChanger mdpChanger = new MDPChanger(agent);
+	MDPOperation mdpChanger = new MDPChanger(agent);
 	
 	//
 	// CONSTRUCTORS
@@ -68,7 +69,7 @@ public class PopulatedMDP extends MDP
 			moveAgent(agent.getCurrentState(), agent.getNextAction());
 	}
 	
-	private void moveAgent(State currentState, Action selectedAction) 
+	protected void moveAgent(State currentState, Action selectedAction) 
 	{
 		QState qState = getQState(currentState, selectedAction);
 		

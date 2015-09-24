@@ -15,6 +15,7 @@ import messaging.states.AddQStatesMessage;
 import messaging.states.AddStatesMessage;
 import messaging.states.RemoveQStatesMessage;
 import messaging.states.RemoveStatesMessage;
+import model.mdp.operations.MDPChanger;
 import model.mdp.operations.MDPTransitionGenerator;
 
 /**

@@ -11,12 +11,12 @@ import model.mdp.operations.MDPGenerator;
 import model.mdp.operations.MDPValueIterator;
 
 /**
- * A Model consists of a PopulatedMDP (i.e. an MDP and an Agent) and models the evolution of this MDP over time.
+ * A TileWorldSimulation consists of a TileWorld (i.e. an MDP and an Agent) and models the evolution of this TileWorld over time.
  * 
  * @author marc.vanzee
  *
  */
-public class Model extends Observable 
+public class TileWorldSimulation extends Observable 
 {
 	private final PopulatedMDP populatedMDP = new PopulatedMDP();
 	private final MDPValueIterator valueIterator = new MDPValueIterator();
