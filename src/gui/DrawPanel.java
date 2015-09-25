@@ -125,9 +125,9 @@ class DrawPanel extends JPanel implements Observer
     	
     	if (ag != null)
     	{
-    		mainApp.textFieldRewards.setText(model.getAgent().getReward()+"");
-    		mainApp.textFieldDeliberations.setText(model.getAgent().getDeliberations()+"");
-    		mainApp.textFieldActs.setText(model.getAgent().getActs()+"");
+    		//mainApp.textFieldRewards.setText(model.getAgent().getReward()+"");
+    		//mainApp.textFieldDeliberations.setText(model.getAgent().getDeliberations()+"");
+    		//mainApp.textFieldActs.setText(model.getAgent().getActs()+"");
     	}
     	
     	mainApp.textFieldSteps.setText(model.getSteps()+"");

@@ -1,13 +1,17 @@
 package model.mdp.operations;
 
+import java.util.List;
+
+import model.Settings;
 import model.mdp.Action;
 import model.mdp.MDP;
+import model.mdp.QEdge;
 import model.mdp.State;
+
 
 public class TileWorldGenerator extends MDPOperation
 {
-	private static final int WORLD_SIZE = 5,
-			UP = 0, RIGHT = 1, DOWN = 2, LEFT = 3;
+	private static final int UP = 0, RIGHT = 1, DOWN = 2, LEFT = 3;
 	
 	@Override
 	public void run(MDP tileWorld) {
@@ -24,12 +28,14 @@ public class TileWorldGenerator extends MDPOperation
 			tileWorld.addAction(a);
 		}
 		
-		// add states and store them in a two-dimensional array
-		State[][] stateArr = new State[WORLD_SIZE][WORLD_SIZE];
+		int worldSize = Settings.WORLD_SIZE;
 		
-		for (int i=0; i<WORLD_SIZE; i++) 
+		// add states and store them in a two-dimensional array
+		State[][] stateArr = new State[worldSize][worldSize];
+		
+		for (int i=0; i<worldSize; i++) 
 		{
-			for (int j=0; j<WORLD_SIZE; j++) 
+			for (int j=0; j<worldSize; j++) 
 			{
 				stateArr[i][j] = new State("(" + i + "," + j + ")");
 				tileWorld.addState(stateArr[i][j]);
@@ -38,16 +44,34 @@ public class TileWorldGenerator extends MDPOperation
 		
 		// then add all transitions
 		// since the domain is completely deterministic, we only have probabilities of 1
-		for (int i=0; i<WORLD_SIZE; i++) 
+		for (int i=0; i<worldSize; i++) 
 		{
-			for (int j=0; j<WORLD_SIZE; j++) 
+			for (int j=0; j<worldSize; j++) 
 			{
 				if (i > 0) tileWorld.addTransition(stateArr[i][j], actionArr[LEFT] , stateArr[i-1][j]);
 				if (j > 0) tileWorld.addTransition(stateArr[i][j], actionArr[UP] , stateArr[i][j-1]);
-				if (i < WORLD_SIZE-1) tileWorld.addTransition(stateArr[i][j], actionArr[RIGHT] , stateArr[i+1][j]);
-				if (j < WORLD_SIZE-1) tileWorld.addTransition(stateArr[i][j], actionArr[DOWN] , stateArr[i][j+1]);
+				if (i < worldSize-1) tileWorld.addTransition(stateArr[i][j], actionArr[RIGHT] , stateArr[i+1][j]);
+				if (j < worldSize-1) tileWorld.addTransition(stateArr[i][j], actionArr[DOWN] , stateArr[i][j+1]);
 			}
 		}
+		
+		int numObstacles = ((int)(Settings.OBSTACLE_RATE * tileWorld.countStates()));
+		List<State> obstacles = tileWorld.getRandomStates(numObstacles);
+		
+		for (State obstacle : obstacles) {
+			obstacle.setObstacle(true);
+		}
+		
+		// set rewards
+		// everything to 0, except for obstacles, they are unreachable
+		for (QEdge qe : tileWorld.getQEdges()) {
+			if (obstacles.contains(qe.getToVertex())) {
+				qe.setReward(Integer.MIN_VALUE);
+			} else {
+				qe.setReward(0);
+			}
+		}
+		
 	}
 	
 		

@@ -24,5 +24,9 @@ public class QEdge extends Edge<QState,State> {
 	public double getReward() {
 		return reward;
 	}
+	
+	public void setReward(double reward) {
+		this.reward = reward;
+	}
 
 }

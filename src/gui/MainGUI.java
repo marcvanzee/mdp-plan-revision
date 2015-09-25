@@ -56,26 +56,39 @@ public class MainGUI implements ItemListener {
 	private final DrawPanel drawPanel = new DrawPanel(this);
 	
 	// TODO: make them public for now so we can change them easily in the DrawPanel
-	public JTextField textFieldRewards = new JTextField(), 
-			textFieldActs = new JTextField(), 
-			textFieldDeliberations = new JTextField(),
-			textFieldNumStates = new JTextField(), 
-			textFieldNumActions = new JTextField(),
-			textFieldAvgActionsState = new JTextField(),
+	public JTextField textFieldPoints = new JTextField(),
+			textFieldWorldsize = new JTextField(),
 			textFieldDynamicity = new JTextField(),
 			textFieldSteps	 = new JTextField();
-	
-	
-	private final JCheckBox chckbxAllowCycles = new JCheckBox("allow cycles"),
-			chckbxAnimate = new JCheckBox("dynamic nodes");
 	private final JButton btnStep = new JButton("Step");
-	private final JSlider slider = new JSlider();
 	private final Component horizontalStrut = Box.createHorizontalStrut(10);
-	private final JLabel lblSpeed = new JLabel("speed:");
 	
 	final JButton btnPlay = new JButton("|>"),
 			btnStop = new JButton("[]"),
-			btnNewModel = new JButton("New Model");
+			btnNewModel = new JButton("New Tileworld");
+	private final JLabel lblHoleLifeExpectancy = new JLabel("hole life expectancy");
+	private final JTextField textFieldLifeExpectancy = new JTextField();
+	private final Component horizontalStrut_1 = Box.createHorizontalStrut(10);
+	private final JLabel lblGestationPeriod = new JLabel("gestation period:");
+	private final JTextField textFieldGestationPeriod = new JTextField();
+	private final Component horizontalStrut_2 = Box.createHorizontalStrut(10);
+	private final Component horizontalStrut_3 = Box.createHorizontalStrut(10);
+	private final JLabel lblEffectiveness = new JLabel("effectiveness");
+	private final Component horizontalStrut_4 = Box.createHorizontalStrut(10);
+	private final JTextField textFieldEffectiveness = new JTextField();
+	private final JLabel lblPlanningTime = new JLabel("planning time:");
+	private final JTextField textFieldPlanningTime = new JTextField();
+	private final Component horizontalStrut_5 = Box.createHorizontalStrut(10);
+	private final JLabel lblBoldness = new JLabel("boldness:");
+	private final JTextField textFieldBoldness = new JTextField();
+	private final Component horizontalStrut_6 = Box.createHorizontalStrut(10);
+	private final Component horizontalStrut_7 = Box.createHorizontalStrut(10);
+	private final JLabel lblMaxPoints = new JLabel("max points");
+	private final Component horizontalStrut_8 = Box.createHorizontalStrut(10);
+	private final JTextField textFieldMaxPoints = new JTextField();
+	private final Component horizontalStrut_9 = Box.createHorizontalStrut(10);
+	private final JLabel lblObstacleRate = new JLabel("obstacle rate");
+	private final JTextField textFieldObstacleRate = new JTextField();
 			
 	/**
 	 * Launch the application.
@@ -136,22 +149,10 @@ public class MainGUI implements ItemListener {
 		
 		pNavTop.setLayout(new BoxLayout(pNavTop, BoxLayout.X_AXIS));
 		pNavTop.add(Box.createHorizontalStrut(5));
-		pNavTop.add(new JLabel("states"));
+		pNavTop.add(new JLabel("world size"));
 		
-		textFieldNumStates.setMaximumSize( new Dimension(30, 20) );
-		pNavTop.add(textFieldNumStates);
-		pNavTop.add(Box.createHorizontalStrut(10));
-		
-		pNavTop.add(new JLabel("actions"));
-		textFieldNumActions.setMaximumSize( new Dimension(30, 20) );
-		pNavTop.add(textFieldNumActions);
-		
-		pNavTop.add(Box.createHorizontalStrut(10));
-		pNavTop.add(new JLabel("avg. actions/state"));
-		
-		textFieldAvgActionsState.setMaximumSize(new Dimension(30, 20));
-		pNavTop.add(textFieldAvgActionsState);
-		
+		textFieldWorldsize.setMaximumSize( new Dimension(30, 20) );
+		pNavTop.add(textFieldWorldsize);
 		pNavTop.add(Box.createHorizontalStrut(10));
 		
 		jSep1.setMaximumSize(new Dimension(2, 25));
@@ -162,14 +163,6 @@ public class MainGUI implements ItemListener {
 		
 		pNavTop.add(jSep2);
 		
-		pNavTop.add(chckbxAllowCycles);
-		
-		chckbxAnimate.addItemListener(this);
-		
-		pNavTop.add(chckbxAnimate);
-		
-		pNavTop.add(Box.createHorizontalStrut(10));
-		
 		pNavTop.add(new JLabel("dynamicity:"));
 		
 		textFieldDynamicity.setText("0.5");
@@ -178,11 +171,45 @@ public class MainGUI implements ItemListener {
 		
 		pNavTop.add(horizontalStrut);
 		
-		pNavTop.add(lblSpeed);
+		pNavTop.add(lblHoleLifeExpectancy);
+		textFieldLifeExpectancy.setText("10");
+		textFieldLifeExpectancy.setMaximumSize(new Dimension(50, 20));
 		
-		slider.setMaximumSize(new Dimension(200, 20));
+		pNavTop.add(textFieldLifeExpectancy);
 		
-		pNavTop.add(slider);
+		pNavTop.add(horizontalStrut_9);
+		
+		pNavTop.add(lblObstacleRate);
+		textFieldObstacleRate.setText("10");
+		textFieldObstacleRate.setMaximumSize(new Dimension(50, 20));
+		
+		pNavTop.add(textFieldObstacleRate);
+		
+		pNavTop.add(horizontalStrut_1);
+		
+		pNavTop.add(lblGestationPeriod);
+		textFieldGestationPeriod.setText("30");
+		textFieldGestationPeriod.setMaximumSize(new Dimension(50, 20));
+		
+		pNavTop.add(textFieldGestationPeriod);
+		
+		pNavTop.add(horizontalStrut_2);
+		
+		pNavTop.add(lblPlanningTime);
+		textFieldPlanningTime.setText("3");
+		textFieldPlanningTime.setMaximumSize(new Dimension(50, 20));
+		
+		pNavTop.add(textFieldPlanningTime);
+		
+		pNavTop.add(horizontalStrut_5);
+		
+		pNavTop.add(lblBoldness);
+		textFieldBoldness.setText("1");
+		textFieldBoldness.setMaximumSize(new Dimension(50, 20));
+		
+		pNavTop.add(textFieldBoldness);
+		
+		pNavTop.add(horizontalStrut_6);
 		
 		pNavContainer.add(pNavBottom, BorderLayout.SOUTH);
 	
@@ -211,30 +238,36 @@ public class MainGUI implements ItemListener {
 		
 		pNavBottom.add(Box.createHorizontalStrut(10));
 		
-		pNavBottom.add(new JLabel("deliberations"));
-		
-		textFieldDeliberations.setEditable(false);
-		textFieldDeliberations.setText("0");
-		textFieldDeliberations.setMaximumSize(new Dimension(50, 20));
-		pNavBottom.add(textFieldDeliberations);
+		pNavBottom.add(new JLabel("points"));
 		
 		pNavBottom.add(Box.createHorizontalStrut(10));
 		
-		pNavBottom.add(new JLabel("acts"));
+		textFieldPoints.setEditable(false);
+		textFieldPoints.setText("0");
+		textFieldPoints.setMaximumSize(new Dimension(50, 20));
+		pNavBottom.add(textFieldPoints);
 		
-		textFieldActs.setEditable(false);
-		textFieldActs.setText("0");
-		textFieldActs.setMaximumSize(new Dimension(50, 20));
-		pNavBottom.add(textFieldActs);
+		pNavBottom.add(horizontalStrut_7);
 		
-		pNavBottom.add(new JLabel("reward"));
+		pNavBottom.add(lblMaxPoints);
 		
-		pNavBottom.add(Box.createHorizontalStrut(10));
+		pNavBottom.add(horizontalStrut_8);
+		textFieldMaxPoints.setText("0");
+		textFieldMaxPoints.setMaximumSize(new Dimension(50, 20));
+		textFieldMaxPoints.setEditable(false);
 		
-		textFieldRewards.setEditable(false);
-		textFieldRewards.setText("0");
-		textFieldRewards.setMaximumSize(new Dimension(50, 20));
-		pNavBottom.add(textFieldRewards);
+		pNavBottom.add(textFieldMaxPoints);
+		
+		pNavBottom.add(horizontalStrut_3);
+		
+		pNavBottom.add(lblEffectiveness);
+		
+		pNavBottom.add(horizontalStrut_4);
+		textFieldEffectiveness.setText("0");
+		textFieldEffectiveness.setMaximumSize(new Dimension(50, 20));
+		textFieldEffectiveness.setEditable(false);
+		
+		pNavBottom.add(textFieldEffectiveness);
 
 		cPane.add(drawPanel);
 		
@@ -311,33 +344,42 @@ public class MainGUI implements ItemListener {
 	
 	private void initializeParametersInGUI() 
 	{
-		int numActions = Settings.NUM_ACTIONS,
-				numStates = Settings.NUM_STATES,
-				avgActionsState = Settings.AVG_ACTIONS_STATE;
-		double dynamicity = Settings.DYNAMICITY;
-		boolean allowCycles = Settings.CYCLES_ALLOWED;
+		int worldSize = Settings.WORLD_SIZE,
+				lifeExpectancy = Settings.LIFE_EXPECTANCY,
+				gestationPeriod = Settings.GESTATION_PERIOD,
+				planningTime = Settings.PLANNING_TIME,
+				boldness = Settings.BOLDNESS;
+		double dynamicity = Settings.DYNAMICITY,
+				obstacleRate = Settings.OBSTACLE_RATE;
 		
-		textFieldNumActions.setText(Integer.toString(numActions));
-		textFieldNumStates.setText(Integer.toString(numStates));
-		textFieldAvgActionsState.setText(Integer.toString(avgActionsState));
+		textFieldWorldsize.setText(Integer.toString(worldSize));
+		textFieldLifeExpectancy.setText(Integer.toString(lifeExpectancy));
 		textFieldDynamicity.setText(Double.toString(dynamicity));
-		chckbxAllowCycles.setSelected(allowCycles);
+		textFieldGestationPeriod.setText(Integer.toString(gestationPeriod));
+		textFieldPlanningTime.setText(Integer.toString(planningTime));
+		textFieldBoldness.setText(Integer.toString(boldness));
+		textFieldObstacleRate.setText(Double.toString(obstacleRate));
 	}
 
 	private void getParametersFromGUI() throws Exception 
 	{
-		int numActions = validateInt(textFieldNumActions,1,SimulationConstants.MAX_ALLOWED_ACTIONS),
-				numStates = validateInt(textFieldNumStates,1,SimulationConstants.MAX_ALLOWED_STATES),
-				avgActionsState = validateInt(textFieldAvgActionsState, 1, numStates);
+		int worldSize = validateInt(textFieldWorldsize,1,20),
+				lifeExpectancy = validateInt(textFieldWorldsize,1,1000),
+				gestationPeriod = validateInt(textFieldWorldsize,1,1000),
+				planningTime = validateInt(textFieldWorldsize,1,1000),
+				boldness = validateInt(textFieldWorldsize,1,1000);
+		double dynamicity = validateDouble(textFieldDynamicity, 0, 1),
+				obstacleRate = validateDouble(textFieldObstacleRate, 0, 1);
 		
-		boolean cycles = chckbxAllowCycles.isSelected();
+		Settings.WORLD_SIZE = worldSize;
+		Settings.LIFE_EXPECTANCY = lifeExpectancy;
+		Settings.GESTATION_PERIOD = gestationPeriod;
+		Settings.PLANNING_TIME = planningTime;
+		Settings.BOLDNESS = boldness;
+		Settings.DYNAMICITY = dynamicity;
+		Settings.OBSTACLE_RATE = obstacleRate;
 		
-		Settings.NUM_STATES = numStates;
-		Settings.NUM_ACTIONS = numActions;
-		Settings.AVG_ACTIONS_STATE = avgActionsState;
-		Settings.CYCLES_ALLOWED = cycles;
-		
-		validateConstraints();
+		//validateConstraints();
 	}
 	
 	private void validateConstraints() throws Exception {
@@ -366,9 +408,5 @@ public class MainGUI implements ItemListener {
 
 	@Override
 	public void itemStateChanged(ItemEvent e) {
-		// TODO Auto-generated method stub
-		if (e.getItem() == chckbxAnimate) {
-			drawPanel.toggleAnimate();
-		}
 	}
 }

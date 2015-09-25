@@ -48,4 +48,14 @@ public class Settings
 	 */
 	public static int REPAINT_DELAY = 300;					// repaint delay in ms
 	public static boolean ANIMATE = true;					// whether to animate the steps
+	
+	/*
+	 * TILEWORLD SETTINGS
+	 */
+	public static int WORLD_SIZE = 5;
+	public static int LIFE_EXPECTANCY = 10;
+	public static int GESTATION_PERIOD = 30;
+	public static int PLANNING_TIME = 3;
+	public static int BOLDNESS = 1;
+	public static double OBSTACLE_RATE = 0.1;
 }

@@ -61,8 +61,7 @@ public class TileWorldSimulation extends Observable
 		
 		tw.reset();
 		
-		// try adding an observer so that the MDP can send its changes directly to the GUI
-				
+		// generate a tileworld	
 		this.tileWorldGenerator.run(tw);
 		
 		if (Settings.ADD_AGENT)
