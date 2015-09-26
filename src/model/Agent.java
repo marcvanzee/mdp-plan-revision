@@ -82,7 +82,7 @@ public class Agent
 	 */
 	public int step() 
 	{
-		int index = mdp.getStateIndex(currentState);
+		/*int index = mdp.getStateIndex(currentState);
 		State currentState = mdp.getState(index);
 		
 		if 
@@ -102,6 +102,16 @@ public class Agent
 		}
 		else {
 			System.out.println("<Agent> I will act");
+			act();
+			return SimulationConstants.AGENT_CHOICE_ACT;
+		}*/
+		
+		if (policy == null) {
+			System.out.println("deliberating");
+			deliberate();
+			return SimulationConstants.AGENT_CHOICE_DELIBERATE;
+		} else {
+			System.out.println("acting");
 			act();
 			return SimulationConstants.AGENT_CHOICE_ACT;
 		}
@@ -132,6 +142,10 @@ public class Agent
 		reward = 0;
 		deliberations = 0;
 		acts = 0;
+	}
+	
+	public void clearPolicy() {
+		this.policy = null;
 	}
 	
 	/**

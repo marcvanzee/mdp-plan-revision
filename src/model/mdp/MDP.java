@@ -129,8 +129,9 @@ public class MDP
 	{
 		State s0 = null;
 		
-		while (s0 != exclude)
+		do {
 			s0 = getRandomState();
+		} while (s0 == exclude || s0 == null);
 		
 		return s0;
 	}

@@ -363,11 +363,11 @@ public class MainGUI implements ItemListener {
 
 	private void getParametersFromGUI() throws Exception 
 	{
-		int worldSize = validateInt(textFieldWorldsize,1,20),
-				lifeExpectancy = validateInt(textFieldWorldsize,1,1000),
-				gestationPeriod = validateInt(textFieldWorldsize,1,1000),
-				planningTime = validateInt(textFieldWorldsize,1,1000),
-				boldness = validateInt(textFieldWorldsize,1,1000);
+		int worldSize = validateInt(textFieldWorldsize,1,1000),
+				lifeExpectancy = validateInt(textFieldLifeExpectancy,1,1000),
+				gestationPeriod = validateInt(textFieldGestationPeriod,1,1000),
+				planningTime = validateInt(textFieldPlanningTime,1,1000),
+				boldness = validateInt(textFieldBoldness,1,1000);
 		double dynamicity = validateDouble(textFieldDynamicity, 0, 1),
 				obstacleRate = validateDouble(textFieldObstacleRate, 0, 1);
 		

@@ -87,7 +87,6 @@ class DrawPanel extends JPanel implements Observer
     @Override
 	public void update(Observable m, Object type) 
     {
-    	System.out.println("received message");
     	// schedule to execute the message by adding it to the queue
     	taskScheduler.add((ChangeMessageBuffer)type);
     }

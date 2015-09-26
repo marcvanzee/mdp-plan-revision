@@ -2,6 +2,7 @@ package model;
 
 import java.util.List;
 import java.util.Observable;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -9,6 +10,7 @@ import gui.DrawTaskScheduler;
 import messaging.edges.AddStateEdgesMessage;
 import messaging.states.AddStatesMessage;
 import model.mdp.ActionEdge;
+import model.mdp.QEdge;
 import model.mdp.State;
 import model.mdp.StateEdge;
 import model.mdp.operations.MDPValueIterator;
@@ -26,7 +28,7 @@ public class TileWorldSimulation extends Observable
 	private final MDPValueIterator valueIterator = new MDPValueIterator();
 	private final TileWorldGenerator tileWorldGenerator = new TileWorldGenerator();
 	
-	private int steps = 0;
+	private int steps, nextHole;
 	
 	boolean isRunning = false;
 	
@@ -84,6 +86,8 @@ public class TileWorldSimulation extends Observable
 				StateEdge se = new StateEdge(s, ae.getToVertex().getEdges().get(0).getToVertex(), ae.getAction());
 				
 				tw.addMessage(new AddStateEdgesMessage(se));
+				
+				tw.addStateEdge(se);
 			}
 		}
 		
@@ -95,6 +99,8 @@ public class TileWorldSimulation extends Observable
 		if (isRunning) {
 			timer.cancel();
 		}
+				
+		setNextHole();
 		
 		timer = new Timer(true);
 		
@@ -110,6 +116,34 @@ public class TileWorldSimulation extends Observable
 	public void step() 
 	{
 		steps++;
+		nextHole--;
+		
+		if (nextHole <= 0) {
+			// generate a hole
+			State hole = tileworld.getRandomEmptyState();
+			hole.setHole(true);
+			
+			tileworld.addHole(hole);
+			
+			Random r = new Random();
+			
+			int low = Settings.SCORE - Settings.SCORE_SD;
+			int high = Settings.SCORE + Settings.SCORE_SD;
+			
+			int score = r.nextInt(high-low) + low;
+			
+			for (QEdge qe : tileworld.getQEdges()) {
+				if (qe.getToVertex() == hole) {
+					qe.setReward(score);
+				}
+			}
+			
+			System.out.println("added hole at " + hole.toString() + ", lifetime: " + hole.getLifetime() + ", score: " + score);
+			
+			setNextHole();
+			
+			tileworld.getAgent().clearPolicy();
+		}
 		
 		this.tileworld.step();
 		
@@ -123,6 +157,18 @@ public class TileWorldSimulation extends Observable
 	public void notifyGUI() {
 		setChanged();
 	    notifyObservers(this.tileworld.getMessageBuffer());
+	}
+	
+	private void setNextHole()
+	{
+		Random r = new Random();
+		
+		int low = Settings.GESTATION_PERIOD - Settings.GESTATION_PERIOD_SD;
+		int high = Settings.GESTATION_PERIOD + Settings.GESTATION_PERIOD_SD;
+		
+		nextHole = r.nextInt(high-low) + low;
+		
+		System.out.println("adding a hole in " + nextHole);
 	}
 		
 	class StepTask extends TimerTask

@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import model.Settings;
+import model.TileWorld;
 import model.mdp.Action;
 import model.mdp.ActionEdge;
 import model.mdp.MDP;
 import model.mdp.QEdge;
 import model.mdp.QState;
 import model.mdp.State;
+import model.mdp.StateEdge;
 import constants.MathOperations;
 
 public class MDPValueIterator extends MDPOperation
@@ -82,15 +84,47 @@ public class MDPValueIterator extends MDPOperation
 				prevV[i] = V[i];
 				setMaxValue(i);
 				
-				if ((V[i] - prevV[i]) >= theta) 
-					finished = false;
+				//if ((V[i] - prevV[i]) >= theta) 
+				//	finished = false;
 				
 			}
-		} while (!finished && k < Settings.ITERATIONS);
+		} while (k < Settings.ITERATIONS);
 		
 		setOptimalVerticesAndEdges();
 	}
 	
+	private void setMaxValue(int i) 
+	{
+		double max = Integer.MIN_VALUE;
+		Action a = null;
+		
+		State s = mdp.getState(i);
+		
+		if (stateToActionEdges.size() == 0)
+			return;
+		
+		for (ActionEdge ae : stateToActionEdges.get(s)) 
+		{
+			double sum = 0;
+			QState toState = ae.getToVertex();
+			
+			if (!qStateToQEdges.containsKey(toState))
+				continue;
+			
+			for (QEdge qe : qStateToQEdges.get(toState))
+			{
+				sum += qe.getProbability() * (qe.getReward() + gamma * prevV[i]);
+			}
+			
+			if (sum > max) {
+				max = sum;
+				a = ae.getAction();
+			}
+		}
+		
+		V[i] = max;
+		policy[i] = a;
+	}
 	
 	private void removeHighlights() {
 		for (ActionEdge ae : mdp.getActionEdges())
@@ -98,6 +132,12 @@ public class MDPValueIterator extends MDPOperation
 		
 		for (QEdge qe : mdp.getQEdges())
 			qe.setOptimal(false);
+		
+		if (mdp instanceof TileWorld) {
+			for (StateEdge se : ((TileWorld)mdp).getStateEdges()) {
+				se.setOptimal(false);
+			}
+		}
 		
 	}
 
@@ -134,38 +174,6 @@ public class MDPValueIterator extends MDPOperation
 		}
 	}
 	
-	private void setMaxValue(int i) 
-	{
-		double max = Integer.MIN_VALUE;
-		Action a = null;
-		
-		State s = mdp.getState(i);
-		
-		if (stateToActionEdges.size() == 0)
-			return;
-		
-		for (ActionEdge ae : stateToActionEdges.get(s)) 
-		{
-			double sum = 0;
-			QState toState = ae.getToVertex();
-			
-			if (!qStateToQEdges.containsKey(toState))
-				continue;
-			
-			for (QEdge qe : qStateToQEdges.get(toState))
-			{
-				sum += qe.getProbability() * (qe.getReward() + gamma * prevV[i]);
-			}
-			
-			if (sum > max) {
-				max = sum;
-				a = ae.getAction();
-			}
-		}
-		
-		V[i] = max;
-		policy[i] = a;
-	}
 	
 	private void setOptimalVerticesAndEdges() 
 	{
@@ -197,6 +205,10 @@ public class MDPValueIterator extends MDPOperation
 			
 			if (qEdge != null) 
 				qEdge.setOptimal(true);
+			
+			if (mdp instanceof TileWorld) {
+				((TileWorld)mdp).getStateEdge(s, qEdge.getToVertex()).setOptimal(true);
+			}
 		}
 	}
 	

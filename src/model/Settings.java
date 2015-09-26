@@ -35,7 +35,7 @@ public class Settings
 	 */
 	public static double THETA = 0.5;						// parameters for value iteration
 	public static double GAMMA = 0.9;						// see http://artint.info/html/ArtInt_227.html
-	public static int ITERATIONS = 100; 			// the number of iterations for value iteration
+	public static int ITERATIONS = 1000; 			// the number of iterations for value iteration
 	
 	/*
 	 * MDP DYNAMICS SETTINGS
@@ -46,15 +46,22 @@ public class Settings
 	/*
 	 * VISUALIZATION SETTINGS
 	 */
-	public static int REPAINT_DELAY = 300;					// repaint delay in ms
+	public static int REPAINT_DELAY = 100;					// repaint delay in ms
 	public static boolean ANIMATE = true;					// whether to animate the steps
 	
 	/*
 	 * TILEWORLD SETTINGS
 	 */
 	public static int WORLD_SIZE = 5;
-	public static int LIFE_EXPECTANCY = 10;
-	public static int GESTATION_PERIOD = 30;
+	public static int LIFE_EXPECTANCY = 12;
+	public static int LIFE_EXPECTANCY_SD = 5;
+	
+	public static int GESTATION_PERIOD = 10;
+	public static int GESTATION_PERIOD_SD = 5;
+	
+	public static int SCORE = 30;
+	public static int SCORE_SD = 10;
+	
 	public static int PLANNING_TIME = 3;
 	public static int BOLDNESS = 1;
 	public static double OBSTACLE_RATE = 0.1;

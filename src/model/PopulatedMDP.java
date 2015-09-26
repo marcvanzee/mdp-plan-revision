@@ -95,6 +95,11 @@ public class PopulatedMDP extends MDP
 		agent.getCurrentState().setVisited(false);
 		agent.setCurrentState(qEdge.getToVertex());
 		
+		if (agent.getCurrentState().isHole()) {
+			agent.getCurrentState().setHole(false);
+			agent.clearPolicy();
+		}
+		
 		setVertexColor();
 	}
 	
