@@ -1,4 +1,4 @@
-package messaging.states;
+package messaging.jung.states;
 
 import java.util.List;
 

@@ -1,12 +1,12 @@
-package messaging.edges;
+package messaging.jung.edges;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import messaging.ChangeMessage;
 import edu.uci.ics.jung.graph.Graph;
 import mdps.elements.Edge;
 import mdps.elements.Vertex;
+import messaging.jung.ChangeMessage;
 
 public abstract class ChangeEdgesMessage<E> implements ChangeMessage 
 {

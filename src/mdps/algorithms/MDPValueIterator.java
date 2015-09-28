@@ -1,4 +1,4 @@
-package mdps.modifiers;
+package mdps.algorithms;
 
 import java.util.ArrayList;
 import java.util.HashMap;

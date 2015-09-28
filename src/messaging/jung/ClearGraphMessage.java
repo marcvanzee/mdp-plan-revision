@@ -1,4 +1,4 @@
-package messaging;
+package messaging.jung;
 
 import java.util.ArrayList;
 

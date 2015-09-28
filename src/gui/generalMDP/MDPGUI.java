@@ -1,4 +1,4 @@
-package gui;
+package gui.generalMDP;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -19,6 +19,7 @@ import javax.swing.JSeparator;
 import javax.swing.JTextField;
 
 import constants.Settings;
+import simulations.MDPSimulation;
 import simulations.TileWorldSimulation;
 
 /**
@@ -45,12 +46,12 @@ import simulations.TileWorldSimulation;
  * 
  *
  */
-public class MainGUI implements ItemListener {
+public class MDPGUI implements ItemListener {
 	
 	//private final MDPSimulation model = new MDPSimulation();
-	private final TileWorldSimulation model = new TileWorldSimulation();
+	private final MDPSimulation simulation = new MDPSimulation();
 	private final JFrame frame = new JFrame();
-	private final DrawPanel drawPanel = new DrawPanel(this);
+	private final MDPDrawer drawPanel = new MDPDrawer(this);
 	
 	// TODO: make them public for now so we can change them easily in the DrawPanel
 	public JTextField textFieldPoints = new JTextField(),
@@ -91,7 +92,7 @@ public class MainGUI implements ItemListener {
 	 * Launch the application.
 	 */
 	public static void main(String args[]) {
-		(new MainGUI()).go();
+		(new MDPGUI()).go();
 	}
 	
 	public void go() {
@@ -102,7 +103,7 @@ public class MainGUI implements ItemListener {
 			addListeners();
 			initializeParametersInGUI();
 			
-			model.addObserver(drawPanel);
+			simulation.addObserver(drawPanel);
 						
 			frame.setVisible(true);
 			
@@ -111,8 +112,8 @@ public class MainGUI implements ItemListener {
 		}
 	}
 	
-	public TileWorldSimulation getModel() {
-		return model;
+	public MDPSimulation getSimulation() {
+		return simulation;
 	}
 
 	/**
@@ -277,28 +278,28 @@ public class MainGUI implements ItemListener {
 		btnNewModel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
-				MainGUI.this.buildNewModel();			
+				MDPGUI.this.buildNewModel();			
 			}
 		});
 		
 		btnPlay.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
-				MainGUI.this.startSimulation();		
+				MDPGUI.this.startSimulation();		
 			}
 		});
 		
 		btnStop.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
-				MainGUI.this.stopSimulation();	
+				MDPGUI.this.stopSimulation();	
 			}
 		});
 		
 		btnStep.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
-				MainGUI.this.step();		
+				MDPGUI.this.step();		
 			}
 		});
 		
@@ -320,7 +321,7 @@ public class MainGUI implements ItemListener {
 			
 			// build the model according to the new settings.
 			getParametersFromGUI();
-			model.buildNewModel();
+			simulation.buildNewModel();
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -328,15 +329,15 @@ public class MainGUI implements ItemListener {
 	}
 	
 	private void startSimulation() {
-		model.startSimulation(drawPanel.getTaskScheduler());
+		simulation.startSimulation(drawPanel.getTaskScheduler());
 	}
 	
 	private void stopSimulation() {
-		model.stopSimulation();
+		simulation.stopSimulation();
 	}
 	
 	private void step() {
-		model.step();
+		simulation.step();
 	}
 	
 	private void initializeParametersInGUI() 

@@ -1,4 +1,4 @@
-package messaging.edges;
+package messaging.jung.edges;
 
 import java.util.List;
 

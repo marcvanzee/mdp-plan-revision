@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import mdps.PopulatedMDP;
+import mdps.algorithms.MDPValueIterator;
 import mdps.elements.Action;
 import mdps.elements.Agent;
 import mdps.elements.QEdge;
@@ -12,7 +13,6 @@ import mdps.elements.State;
 import mdps.factories.MDPType;
 import mdps.generators.GeneralMDPGenerator;
 import mdps.modifiers.GeneralMDPModifier;
-import mdps.modifiers.MDPValueIterator;
 
 /**
  * A Model consists of a PopulatedMDP (i.e. an MDP and an Agent) and models the evolution of this MDP over time.
@@ -40,6 +40,10 @@ public class MDPSimulation extends BasicSimulation
 	//	
 	public double getValue(State s) {
 		return valueIterator.getValue(mdp.getStates().indexOf(s));
+	}
+	
+	public Agent getAgent() {
+		return this.agent;
 	}
 	
 	//

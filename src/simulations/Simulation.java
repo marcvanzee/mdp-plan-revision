@@ -1,6 +1,6 @@
 package simulations;
 
-import gui.DrawTaskScheduler;
+import gui.generalMDP.DrawTaskScheduler;
 import mdps.MDP;
 
 public interface Simulation

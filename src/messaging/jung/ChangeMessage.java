@@ -1,4 +1,4 @@
-package messaging;
+package messaging.jung;
 
 import edu.uci.ics.jung.graph.Graph;
 import mdps.elements.Edge;

@@ -1,4 +1,4 @@
-package gui;
+package gui.generalMDP;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -28,10 +28,10 @@ import edu.uci.ics.jung.visualization.util.Animator;
 import mdps.elements.Agent;
 import mdps.elements.Edge;
 import mdps.elements.Vertex;
-import messaging.ChangeMessage;
-import messaging.ChangeMessageBuffer;
-import messaging.ClearGraphMessage;
-import simulations.TileWorldSimulation;
+import messaging.jung.ChangeMessage;
+import messaging.jung.ChangeMessageBuffer;
+import messaging.jung.ClearGraphMessage;
+import simulations.MDPSimulation;
 
 /**
  * This is the VIEWPOINT
@@ -39,11 +39,8 @@ import simulations.TileWorldSimulation;
  * @author marc.vanzee
  *
  */
-class MDPDrawer extends DrawPanel
+class MDPDrawer extends JPanel implements Observer 
 {	
-	public MDPDrawer(MainGUI mainApp) {
-		super(mainApp);
-	}
 
 	private static final long serialVersionUID = -5345319851341875800L;
 	
@@ -58,17 +55,17 @@ class MDPDrawer extends DrawPanel
     
     private final VisualizationViewer<Vertex<?>,Edge<?,?>> vv = new JUNGRendering(layout, staticLayout);
     	
-	private final MainGUI mainApp;
-	private final TileWorldSimulation model;
+	private final MDPGUI mdpGUI;
+	private final MDPSimulation simulation;
 	
 	private boolean animate = true;
 	
 	private DrawTaskScheduler taskScheduler = new DrawTaskScheduler(this);
 	
-	public DrawPanel(MainGUI mainApp) 
+	public MDPDrawer(MDPGUI mdpGUI) 
 	{
-		this.mainApp = mainApp;
-		model = mainApp.getModel();
+		this.mdpGUI = mdpGUI;
+		this.simulation = mdpGUI.getSimulation();
 		// set a preferred size for the custom panel.
 		setPreferredSize(new Dimension(400,250));
 		
@@ -124,7 +121,7 @@ class MDPDrawer extends DrawPanel
     {
     	change.modifyGraph(g);
 		
-    	Agent ag = model.getAgent();
+    	Agent ag = this.simulation.getAgent();
     	
     	if (ag != null)
     	{
@@ -133,7 +130,7 @@ class MDPDrawer extends DrawPanel
     		//mainApp.textFieldActs.setText(model.getAgent().getActs()+"");
     	}
     	
-    	mainApp.textFieldSteps.setText(model.getSteps()+"");
+    	mdpGUI.textFieldSteps.setText(simulation.getSteps()+"");
     	
     	animate();
     }

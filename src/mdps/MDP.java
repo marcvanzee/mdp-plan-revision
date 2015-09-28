@@ -11,16 +11,16 @@ import mdps.elements.QEdge;
 import mdps.elements.QState;
 import mdps.elements.State;
 import mdps.generators.MDPTransitionGenerator;
-import messaging.ChangeMessage;
-import messaging.ChangeMessageBuffer;
-import messaging.edges.AddActionEdgesMessage;
-import messaging.edges.AddQEdgesMessage;
-import messaging.edges.RemoveActionEdgesMessage;
-import messaging.edges.RemoveQEdgesMessage;
-import messaging.states.AddQStatesMessage;
-import messaging.states.AddStatesMessage;
-import messaging.states.RemoveQStatesMessage;
-import messaging.states.RemoveStatesMessage;
+import messaging.jung.ChangeMessage;
+import messaging.jung.ChangeMessageBuffer;
+import messaging.jung.edges.AddActionEdgesMessage;
+import messaging.jung.edges.AddQEdgesMessage;
+import messaging.jung.edges.RemoveActionEdgesMessage;
+import messaging.jung.edges.RemoveQEdgesMessage;
+import messaging.jung.states.AddQStatesMessage;
+import messaging.jung.states.AddStatesMessage;
+import messaging.jung.states.RemoveQStatesMessage;
+import messaging.jung.states.RemoveStatesMessage;
 
 /**
  * A Markov Decision Process (S,A,T,Pr,R) is structure containing:
@@ -142,7 +142,6 @@ public class MDP
 	
 	public State getRandomState()
 	{
-		System.out.println(states.size());
 		int index = r.nextInt(states.size());
 		return states.get(index);
 	}
@@ -285,7 +284,6 @@ public class MDP
 	
 	public void removeState(State s) 
 	{
-		System.out.println("Removing state " + s);
 		ArrayList<ActionEdge> aes = s.getEdges();
 		
 		for (ActionEdge ae : aes)

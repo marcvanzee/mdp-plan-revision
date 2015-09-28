@@ -6,6 +6,7 @@ import java.util.Random;
 
 import constants.Settings;
 import mdps.TileWorld;
+import mdps.algorithms.MDPValueIterator;
 import mdps.elements.Action;
 import mdps.elements.ActionEdge;
 import mdps.elements.Agent;
@@ -15,9 +16,8 @@ import mdps.elements.State;
 import mdps.elements.StateEdge;
 import mdps.factories.MDPType;
 import mdps.generators.GeneralMDPGenerator;
-import mdps.modifiers.MDPValueIterator;
-import messaging.edges.AddStateEdgesMessage;
-import messaging.states.AddStatesMessage;
+import messaging.jung.edges.AddStateEdgesMessage;
+import messaging.jung.states.AddStatesMessage;
 
 /**
  * A TileWorldSimulation consists of a TileWorld (i.e. an MDP and an Agent) and models the evolution of this TileWorld over time.

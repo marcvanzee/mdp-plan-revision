@@ -1,4 +1,4 @@
-package gui;
+package gui.generalMDP;
 
 import java.awt.BasicStroke;
 import java.awt.Color;

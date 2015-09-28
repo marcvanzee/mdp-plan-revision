@@ -1,4 +1,4 @@
-package gui;
+package gui.generalMDP;
 
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
@@ -6,7 +6,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import constants.Settings;
-import messaging.ChangeMessage;
+import messaging.jung.ChangeMessage;
 
 public class DrawTaskScheduler 
 {
@@ -14,13 +14,13 @@ public class DrawTaskScheduler
     // this is to avoid concurrent modification of our graph.
 	private final LinkedList<ChangeMessage> taskList = new LinkedList<ChangeMessage>();
 	private Timer timer;
-	private final DrawPanel parent;
+	private final MDPDrawer parent;
 	
 	private boolean running = false;
 	
 	private boolean wait = false;
 	
-	public DrawTaskScheduler(DrawPanel parent) {
+	public DrawTaskScheduler(MDPDrawer parent) {
 		this.parent = parent;
 	}
 		

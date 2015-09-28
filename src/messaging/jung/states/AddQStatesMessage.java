@@ -1,4 +1,4 @@
-package messaging.states;
+package messaging.jung.states;
 
 import java.util.List;
 
@@ -7,21 +7,21 @@ import mdps.elements.Edge;
 import mdps.elements.QState;
 import mdps.elements.Vertex;
 
-public class RemoveQStatesMessage extends ChangeVerticesMessage<QState>
+public class AddQStatesMessage extends ChangeVerticesMessage<QState>
 {
-	public RemoveQStatesMessage(List<QState> vertices) {
+	public AddQStatesMessage(List<QState> vertices) {
 		super(vertices);
 	}
 	
-	public RemoveQStatesMessage(QState qState) {
-		super(qState);
+	public AddQStatesMessage(QState v) {
+		super(v);
 	}
 
 	@Override
 	public void modifyGraph(Graph<Vertex<?>,Edge<?,?>> g) 
 	{
 		for (QState v : vertices) {
-			g.removeVertex(v);
+			g.addVertex(v);
 		}
 	}
 }

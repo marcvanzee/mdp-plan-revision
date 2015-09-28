@@ -4,7 +4,7 @@ import java.util.Observable;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import gui.DrawTaskScheduler;
+import gui.generalMDP.DrawTaskScheduler;
 import mdps.MDP;
 import mdps.factories.MDPFactory;
 import mdps.factories.MDPType;

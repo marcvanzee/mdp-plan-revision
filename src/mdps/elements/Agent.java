@@ -3,7 +3,7 @@ package mdps.elements;
 import constants.MathOperations;
 import constants.SimulationConstants;
 import mdps.MDP;
-import mdps.modifiers.MDPValueIterator;
+import mdps.algorithms.MDPValueIterator;
 
 /**
  * An agent resides in an MDP. It has two action:
