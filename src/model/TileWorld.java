@@ -46,7 +46,6 @@ public class TileWorld extends PopulatedMDP
 			moveAgent(agent.getCurrentState(), agent.getNextAction());
 		
 		
-		
 		decreaseLifetimeHoles();		
 	}
 	
@@ -68,16 +67,22 @@ public class TileWorld extends PopulatedMDP
 	
 	private void decreaseLifetimeHoles() {
 		List<State> toRemove = new LinkedList<State>();
+		
+		State agState = agent.getCurrentState();
+		
+		if (agState.isHole()) 
+			agent.clearPolicy();
+		
 		for (State hole : holes) {
 			hole.decreaseLifetime();
 			
-			if (hole.getLifetime() <= 0) {
-				hole.setHole(false);
+			if (hole.getLifetime() <= 0 || hole == agState) {
 				toRemove.add(hole);
 			}
 		}
-		
+
 		for (State hole : toRemove) {
+			hole.setHole(false);
 			this.holes.remove(hole);
 			
 			for (QEdge qe : getQEdges()) {

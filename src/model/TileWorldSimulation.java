@@ -1,11 +1,11 @@
 package model;
 
 import java.util.List;
-import java.util.Observable;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import factories.MDPType;
 import gui.DrawTaskScheduler;
 import messaging.edges.AddStateEdgesMessage;
 import messaging.states.AddStatesMessage;
@@ -14,7 +14,6 @@ import model.mdp.QEdge;
 import model.mdp.State;
 import model.mdp.StateEdge;
 import model.mdp.operations.MDPValueIterator;
-import model.mdp.operations.TileWorldGenerator;
 
 /**
  * A TileWorldSimulation consists of a TileWorld (i.e. an MDP and an Agent) and models the evolution of this TileWorld over time.
@@ -22,28 +21,22 @@ import model.mdp.operations.TileWorldGenerator;
  * @author marc.vanzee
  *
  */
-public class TileWorldSimulation extends Observable 
+public class TileWorldSimulation extends BasicSimulation
 {
-	private final TileWorld tileworld = new TileWorld();
+	public TileWorldSimulation() {
+		super(MDPType.TILEWORLD);
+	}
+
 	private final MDPValueIterator valueIterator = new MDPValueIterator();
-	private final TileWorldGenerator tileWorldGenerator = new TileWorldGenerator();
 	
-	private int steps, nextHole;
-	
-	boolean isRunning = false;
-	
-	private Timer timer;
-	
+	private int nextHole;
+		
 	//
 	// GETTERS AND SETTERS
 	//
 	
-	public TileWorld getTileWorld() {
-		return this.tileworld;
-	}
-	
 	public Agent getAgent() {
-		return this.tileworld.getAgent();
+		return this.mdp.getAgent();
 	}
 	
 	public double getValue(State s) {
@@ -76,7 +69,7 @@ public class TileWorldSimulation extends Observable
 		
 		List<State> states = tw.getStates();
 		
-		// now only add states and transltions, leave out qstates because the domain is deterministic
+		// now add states and transltions for GUI, leave out qstates because the domain is deterministic
 		tw.addMessage(new AddStatesMessage(states));
 		
 		for (State s : states) {
@@ -92,6 +85,8 @@ public class TileWorldSimulation extends Observable
 		}
 		
 		notifyGUI();
+		
+		nextHole = 0;
 	}
 	
 	public void startSimulation(DrawTaskScheduler scheduler)
@@ -100,7 +95,8 @@ public class TileWorldSimulation extends Observable
 			timer.cancel();
 		}
 				
-		setNextHole();
+		//setNextHole();
+		nextHole = 0;
 		
 		timer = new Timer(true);
 		

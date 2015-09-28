@@ -1,13 +1,8 @@
 package model;
 
-import gui.DrawTaskScheduler;
-
-import java.util.Observable;
-import java.util.Timer;
-import java.util.TimerTask;
-
+import factories.MDPType;
 import model.mdp.State;
-import model.mdp.operations.MDPGenerator;
+import model.mdp.operations.GeneralMDPGenerator;
 import model.mdp.operations.MDPValueIterator;
 
 /**
@@ -16,32 +11,20 @@ import model.mdp.operations.MDPValueIterator;
  * @author marc.vanzee
  *
  */
-public class MDPSimulation extends Observable 
+public class MDPSimulation extends BasicSimulation
 {
-	private final PopulatedMDP populatedMDP = new PopulatedMDP();
 	private final MDPValueIterator valueIterator = new MDPValueIterator();
-	private final MDPGenerator mdpGenerator = new MDPGenerator();
+	private final GeneralMDPGenerator mdpGenerator = new GeneralMDPGenerator();
 	
-	private int steps = 0;
-	
-	boolean isRunning = false;
-	
-	private Timer timer;
+	public MDPSimulation() {
+		super(MDPType.POPULATED_MDP);
+	}
 	
 	//
 	// GETTERS AND SETTERS
-	//
-	
-	public PopulatedMDP getPopulatedMDP() {
-		return populatedMDP;
-	}
-	
-	public Agent getAgent() {
-		return populatedMDP.getAgent();
-	}
-	
+	//	
 	public double getValue(State s) {
-		return valueIterator.getValue(populatedMDP.getStates().indexOf(s));
+		return valueIterator.getValue(mdp.getStates().indexOf(s));
 	}
 	
 	//
@@ -53,68 +36,17 @@ public class MDPSimulation extends Observable
 		if (isRunning)
 			timer.cancel();
 		
-		populatedMDP.reset();
+		mdp.reset();
 		
 		// try adding an observer so that the MDP can send its changes directly to the GUI
 				
-		mdpGenerator.run(populatedMDP);
+		mdpGenerator.run(mdp);
 		
 		if (Settings.ADD_AGENT)
-			populatedMDP.addAgent();
+			((PopulatedMDP) mdp).addAgent();
 		
 		steps = 0;
 		
 		notifyGUI();
-	}
-	
-	public void startSimulation(DrawTaskScheduler scheduler)
-	{
-		if (isRunning) {
-			timer.cancel();
-		}
-		
-		timer = new Timer(true);
-		
-		// try to step every 100 ms, this will only work when the GUI has finished drawing
-		timer.schedule(new StepTask(scheduler), 100, 100); 
-	}
-	
-	public void stopSimulation()
-	{
-		timer.cancel();
-	}
-		
-	public void step() 
-	{
-		steps++;
-		
-		populatedMDP.step();
-		
-		notifyGUI();
-	}
-	
-	public int getSteps() {
-		return steps;
-	}
-	
-	public void notifyGUI() {
-		setChanged();
-	    notifyObservers(populatedMDP.getMessageBuffer());
-	}
-		
-	class StepTask extends TimerTask
-	{
-		DrawTaskScheduler scheduler;
-		
-		public StepTask(DrawTaskScheduler s) {
-			this.scheduler = s;
-		}
-		
-		public void run() 
-		{
-			if (scheduler.hasFinished())
-				step();
-		}
-			// wait until the GUI has finished drawing
 	}
 }

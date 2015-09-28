@@ -39,10 +39,10 @@ import constants.MathOperations;
  * @author marc.vanzee
  *
  */
-public class MDPChanger extends MDPOperation 
+public class MDPChanger extends MDPGenerator 
 {
 	private Agent agent;
-	private final MDPGenerator mdpGenerator = new MDPGenerator();
+	private final GeneralMDPGenerator mdpGenerator = new GeneralMDPGenerator();
 	
 	public MDPChanger(Agent agent) {
 		this.agent = agent;

@@ -35,7 +35,7 @@ public class Settings
 	 */
 	public static double THETA = 0.5;						// parameters for value iteration
 	public static double GAMMA = 0.9;						// see http://artint.info/html/ArtInt_227.html
-	public static int ITERATIONS = 1000; 			// the number of iterations for value iteration
+	public static int ITERATIONS = 100; 			// the number of iterations for value iteration
 	
 	/*
 	 * MDP DYNAMICS SETTINGS

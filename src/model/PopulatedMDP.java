@@ -9,7 +9,7 @@ import model.mdp.QEdge;
 import model.mdp.QState;
 import model.mdp.State;
 import model.mdp.operations.MDPChanger;
-import model.mdp.operations.MDPOperation;
+import model.mdp.operations.MDPGenerator;
 
 /**
  * A PopulatedMDP consists of an MDP and an agent, and the interaction between these two entities.
@@ -20,7 +20,7 @@ import model.mdp.operations.MDPOperation;
 public class PopulatedMDP extends MDP
 {
 	Agent agent;
-	MDPOperation mdpChanger = new MDPChanger(agent);
+	MDPGenerator mdpChanger = new MDPChanger(agent);
 	
 	//
 	// CONSTRUCTORS
@@ -94,11 +94,6 @@ public class PopulatedMDP extends MDP
 		
 		agent.getCurrentState().setVisited(false);
 		agent.setCurrentState(qEdge.getToVertex());
-		
-		if (agent.getCurrentState().isHole()) {
-			agent.getCurrentState().setHole(false);
-			agent.clearPolicy();
-		}
 		
 		setVertexColor();
 	}

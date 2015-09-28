@@ -14,7 +14,7 @@ import model.mdp.State;
 import model.mdp.StateEdge;
 import constants.MathOperations;
 
-public class MDPValueIterator extends MDPOperation
+public class MDPValueIterator extends MDPGenerator
 {	
 	// use these mappings for efficiency so we don't have to look them up every time
 	HashMap<State,ArrayList<ActionEdge>> stateToActionEdges = new HashMap<State,ArrayList<ActionEdge>>();
@@ -73,7 +73,7 @@ public class MDPValueIterator extends MDPOperation
 		V = new double[countStates];
 		prevV = new double[countStates];
 		policy = new Action[countStates];
-				
+
 		int k = 0;
 		boolean finished = true;
 		
@@ -84,11 +84,11 @@ public class MDPValueIterator extends MDPOperation
 				prevV[i] = V[i];
 				setMaxValue(i);
 				
-				//if ((V[i] - prevV[i]) >= theta) 
-				//	finished = false;
+				if ((V[i] - prevV[i]) >= theta) 
+					finished = false;
 				
 			}
-		} while (k < Settings.ITERATIONS);
+		} while (k < Settings.ITERATIONS && !finished);
 		
 		setOptimalVerticesAndEdges();
 	}
@@ -113,7 +113,8 @@ public class MDPValueIterator extends MDPOperation
 			
 			for (QEdge qe : qStateToQEdges.get(toState))
 			{
-				sum += qe.getProbability() * (qe.getReward() + gamma * prevV[i]);
+				int index = mdp.getStateIndex(qe.getToVertex());
+				sum += qe.getProbability() * (qe.getReward() + gamma * prevV[index]);
 			}
 			
 			if (sum > max) {

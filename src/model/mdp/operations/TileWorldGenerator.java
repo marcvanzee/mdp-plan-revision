@@ -9,7 +9,7 @@ import model.mdp.QEdge;
 import model.mdp.State;
 
 
-public class TileWorldGenerator extends MDPOperation
+public class TileWorldGenerator extends MDPGenerator
 {
 	private static final int UP = 0, RIGHT = 1, DOWN = 2, LEFT = 3;
 	
@@ -66,7 +66,7 @@ public class TileWorldGenerator extends MDPOperation
 		// everything to 0, except for obstacles, they are unreachable
 		for (QEdge qe : tileWorld.getQEdges()) {
 			if (obstacles.contains(qe.getToVertex())) {
-				qe.setReward(Integer.MIN_VALUE);
+				qe.setReward(-Settings.SCORE-Settings.SCORE_SD);
 			} else {
 				qe.setReward(0);
 			}

@@ -39,8 +39,12 @@ import model.mdp.Vertex;
  * @author marc.vanzee
  *
  */
-abstract class DrawPanel extends JPanel implements Observer 
+class MDPDrawer extends DrawPanel
 {	
+	public MDPDrawer(MainGUI mainApp) {
+		super(mainApp);
+	}
+
 	private static final long serialVersionUID = -5345319851341875800L;
 	
 	private final Graph<Vertex<?>,Edge<?,?>> ig = 

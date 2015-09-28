@@ -7,7 +7,7 @@ import model.Settings;
 
 public class State extends Vertex<ActionEdge> 
 {
-	boolean visited = false;
+	boolean isVisited = false;
 	boolean isObstacle = false;
 	boolean isHole = false;
 	int lifeTime;
@@ -17,31 +17,40 @@ public class State extends Vertex<ActionEdge>
 		this.color = Color.RED;
 	}
 	
-	public void setVisited(boolean visited) {
-		this.visited = visited;
+	public void setVisited(boolean isVisited) {
+		this.isVisited = isVisited;
 		
-		this.color = visited ? Color.YELLOW : Color.RED;
+		setColor();
 	}
 	
 	public void setObstacle(boolean isObstacle) {
 		this.isObstacle = isObstacle;
 		
-		this.color = isObstacle ? Color.BLACK : Color.RED;
-		
-		System.out.println("obstacle: " + isObstacle);
+		setColor();
 	}
 	
 	public void setHole(boolean isHole) {
 		this.isHole = isHole;
-		
-		this.color = isHole ? Color.GREEN : Color.RED;
-				
+			
 		Random r = new Random();
 	
 		int low = Settings.LIFE_EXPECTANCY - Settings.LIFE_EXPECTANCY_SD,
 				high = Settings.LIFE_EXPECTANCY + Settings.LIFE_EXPECTANCY_SD;
 		
 		this.lifeTime = r.nextInt(high-low) + low;
+		
+		setColor();
+	}
+	
+	private void setColor() {
+		this.color = isVisited ? Color.YELLOW : 
+			(isObstacle ? Color.BLACK :
+				(isHole ? Color.GREEN : Color.RED) 
+			);
+	}
+	
+	public void setLifeTime(int lifeTime) {
+		this.lifeTime = lifeTime;
 	}
 		
 	public void decreaseLifetime() {
