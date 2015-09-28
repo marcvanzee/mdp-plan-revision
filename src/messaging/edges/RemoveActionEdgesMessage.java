@@ -2,10 +2,10 @@ package messaging.edges;
 
 import java.util.List;
 
-import model.mdp.ActionEdge;
-import model.mdp.Edge;
-import model.mdp.Vertex;
 import edu.uci.ics.jung.graph.Graph;
+import mdps.elements.ActionEdge;
+import mdps.elements.Edge;
+import mdps.elements.Vertex;
 
 public class RemoveActionEdgesMessage extends ChangeEdgesMessage<ActionEdge>
 {

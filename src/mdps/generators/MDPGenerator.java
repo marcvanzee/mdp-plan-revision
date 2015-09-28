@@ -1,6 +1,6 @@
-package model.mdp.operations;
+package mdps.generators;
 
-import model.mdp.MDP;
+import mdps.MDP;
 
 /**
  * The MDPOperation abstract class can be inherited by any class that implements a operation on an MDP.

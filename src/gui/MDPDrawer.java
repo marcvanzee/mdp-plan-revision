@@ -9,6 +9,7 @@ import java.util.TimerTask;
 
 import javax.swing.JPanel;
 
+import constants.Settings;
 import edu.uci.ics.jung.algorithms.layout.AbstractLayout;
 import edu.uci.ics.jung.algorithms.layout.KKLayout;
 import edu.uci.ics.jung.algorithms.layout.Layout;
@@ -24,14 +25,13 @@ import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.uci.ics.jung.visualization.layout.LayoutTransition;
 import edu.uci.ics.jung.visualization.util.Animator;
+import mdps.elements.Agent;
+import mdps.elements.Edge;
+import mdps.elements.Vertex;
 import messaging.ChangeMessage;
 import messaging.ChangeMessageBuffer;
 import messaging.ClearGraphMessage;
-import model.Agent;
-import model.Settings;
-import model.TileWorldSimulation;
-import model.mdp.Edge;
-import model.mdp.Vertex;
+import simulations.TileWorldSimulation;
 
 /**
  * This is the VIEWPOINT

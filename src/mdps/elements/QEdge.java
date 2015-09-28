@@ -1,4 +1,4 @@
-package model.mdp;
+package mdps.elements;
 
 import constants.MathOperations;
 

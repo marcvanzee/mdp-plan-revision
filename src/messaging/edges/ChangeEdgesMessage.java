@@ -4,9 +4,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import messaging.ChangeMessage;
-import model.mdp.Edge;
-import model.mdp.Vertex;
 import edu.uci.ics.jung.graph.Graph;
+import mdps.elements.Edge;
+import mdps.elements.Vertex;
 
 public abstract class ChangeEdgesMessage<E> implements ChangeMessage 
 {

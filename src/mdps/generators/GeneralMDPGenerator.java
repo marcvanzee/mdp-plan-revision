@@ -1,15 +1,15 @@
-package model.mdp.operations;
+package mdps.generators;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Random;
 
-import model.Settings;
-import model.mdp.Action;
-import model.mdp.MDP;
-import model.mdp.State;
 import constants.MathOperations;
+import constants.Settings;
+import mdps.MDP;
+import mdps.elements.Action;
+import mdps.elements.State;
 
 /**
  * This class generates an arbitrary MDP in the method run(MDP), based on the settings in constants.SimulationSettings.

@@ -1,9 +1,9 @@
-package model.mdp;
+package mdps.elements;
 
 import java.awt.Color;
 import java.util.Random;
 
-import model.Settings;
+import constants.Settings;
 
 public class State extends Vertex<ActionEdge> 
 {

@@ -18,8 +18,8 @@ import javax.swing.JLabel;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 
-import model.Settings;
-import model.TileWorldSimulation;
+import constants.Settings;
+import simulations.TileWorldSimulation;
 
 /**
  * This is the main application. 

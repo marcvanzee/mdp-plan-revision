@@ -1,11 +1,11 @@
-package factories;
+package mdps.factories;
 
-import model.PopulatedMDP;
-import model.TileWorld;
-import model.mdp.MDP;
-import model.mdp.operations.GeneralMDPGenerator;
-import model.mdp.operations.MDPGenerator;
-import model.mdp.operations.TileWorldGenerator;
+import mdps.MDP;
+import mdps.PopulatedMDP;
+import mdps.TileWorld;
+import mdps.generators.GeneralMDPGenerator;
+import mdps.generators.MDPGenerator;
+import mdps.generators.TileWorldGenerator;
 
 public class MDPFactory 
 {		

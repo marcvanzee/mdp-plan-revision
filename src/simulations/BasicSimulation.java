@@ -1,14 +1,14 @@
-package model;
+package simulations;
 
 import java.util.Observable;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import factories.MDPFactory;
-import factories.MDPType;
 import gui.DrawTaskScheduler;
-import model.mdp.MDP;
-import model.mdp.operations.MDPGenerator;
+import mdps.MDP;
+import mdps.factories.MDPFactory;
+import mdps.factories.MDPType;
+import mdps.generators.MDPGenerator;
 
 public abstract class BasicSimulation extends Observable implements Simulation
 {

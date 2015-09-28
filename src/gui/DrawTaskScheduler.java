@@ -5,8 +5,8 @@ import java.util.NoSuchElementException;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import constants.Settings;
 import messaging.ChangeMessage;
-import model.Settings;
 
 public class DrawTaskScheduler 
 {

@@ -1,12 +1,12 @@
-package model.mdp.operations;
+package mdps.generators;
 
 import java.util.List;
 
-import model.Settings;
-import model.mdp.Action;
-import model.mdp.MDP;
-import model.mdp.QEdge;
-import model.mdp.State;
+import constants.Settings;
+import mdps.MDP;
+import mdps.elements.Action;
+import mdps.elements.QEdge;
+import mdps.elements.State;
 
 
 public class TileWorldGenerator extends MDPGenerator

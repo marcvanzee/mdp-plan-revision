@@ -1,18 +1,19 @@
-package model.mdp.operations;
+package mdps.modifiers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import model.Settings;
-import model.TileWorld;
-import model.mdp.Action;
-import model.mdp.ActionEdge;
-import model.mdp.MDP;
-import model.mdp.QEdge;
-import model.mdp.QState;
-import model.mdp.State;
-import model.mdp.StateEdge;
 import constants.MathOperations;
+import constants.Settings;
+import mdps.MDP;
+import mdps.TileWorld;
+import mdps.elements.Action;
+import mdps.elements.ActionEdge;
+import mdps.elements.QEdge;
+import mdps.elements.QState;
+import mdps.elements.State;
+import mdps.elements.StateEdge;
+import mdps.generators.MDPGenerator;
 
 public class MDPValueIterator extends MDPGenerator
 {	

@@ -8,8 +8,6 @@ import java.awt.geom.Rectangle2D;
 
 import javax.swing.JPanel;
 
-import model.Settings;
-
 import org.jgraph.JGraph;
 import org.jgraph.graph.AttributeMap;
 import org.jgraph.graph.DefaultGraphCell;
@@ -20,6 +18,8 @@ import org.jgrapht.ext.JGraphModelAdapter;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DefaultListenableGraph;
 import org.jgrapht.graph.DirectedMultigraph;
+
+import constants.Settings;
 
 class DrawPanel_old extends JPanel {
 	

@@ -2,10 +2,10 @@ package messaging.states;
 
 import java.util.List;
 
-import model.mdp.Edge;
-import model.mdp.QState;
-import model.mdp.Vertex;
 import edu.uci.ics.jung.graph.Graph;
+import mdps.elements.Edge;
+import mdps.elements.QState;
+import mdps.elements.Vertex;
 
 public class RemoveQStatesMessage extends ChangeVerticesMessage<QState>
 {

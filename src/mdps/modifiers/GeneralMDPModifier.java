@@ -1,11 +1,12 @@
-package model.mdp.operations;
+package mdps.modifiers;
 
-import model.Agent;
-import model.Settings;
-import model.mdp.Action;
-import model.mdp.MDP;
-import model.mdp.State;
 import constants.MathOperations;
+import constants.Settings;
+import mdps.MDP;
+import mdps.elements.Action;
+import mdps.elements.Agent;
+import mdps.elements.State;
+import mdps.generators.GeneralMDPGenerator;
 
 /**
  * This class can make the following changes to an MDP:
@@ -39,12 +40,13 @@ import constants.MathOperations;
  * @author marc.vanzee
  *
  */
-public class MDPChanger extends MDPGenerator 
+public class GeneralMDPModifier
 {
+	protected MDP mdp = null;
 	private Agent agent;
 	private final GeneralMDPGenerator mdpGenerator = new GeneralMDPGenerator();
 	
-	public MDPChanger(Agent agent) {
+	public GeneralMDPModifier(Agent agent) {
 		this.agent = agent;
 	}
 	

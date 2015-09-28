@@ -1,11 +1,9 @@
-package model;
+package mdps.elements;
 
-import model.mdp.Action;
-import model.mdp.MDP;
-import model.mdp.State;
-import model.mdp.operations.MDPValueIterator;
 import constants.MathOperations;
 import constants.SimulationConstants;
+import mdps.MDP;
+import mdps.modifiers.MDPValueIterator;
 
 /**
  * An agent resides in an MDP. It has two action:

@@ -1,8 +1,7 @@
-package model;
+package simulations;
 
 import gui.DrawTaskScheduler;
-import model.mdp.MDP;
-import model.mdp.State;
+import mdps.MDP;
 
 public interface Simulation
 {

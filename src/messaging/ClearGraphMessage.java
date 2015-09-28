@@ -2,9 +2,9 @@ package messaging;
 
 import java.util.ArrayList;
 
-import model.mdp.Edge;
-import model.mdp.Vertex;
 import edu.uci.ics.jung.graph.Graph;
+import mdps.elements.Edge;
+import mdps.elements.Vertex;
 
 public class ClearGraphMessage implements ChangeMessage {
 

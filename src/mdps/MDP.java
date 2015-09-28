@@ -1,10 +1,16 @@
-package model.mdp;
+package mdps;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
+import mdps.elements.Action;
+import mdps.elements.ActionEdge;
+import mdps.elements.QEdge;
+import mdps.elements.QState;
+import mdps.elements.State;
+import mdps.generators.MDPTransitionGenerator;
 import messaging.ChangeMessage;
 import messaging.ChangeMessageBuffer;
 import messaging.edges.AddActionEdgesMessage;
@@ -15,8 +21,6 @@ import messaging.states.AddQStatesMessage;
 import messaging.states.AddStatesMessage;
 import messaging.states.RemoveQStatesMessage;
 import messaging.states.RemoveStatesMessage;
-import model.mdp.operations.MDPChanger;
-import model.mdp.operations.MDPTransitionGenerator;
 
 /**
  * A Markov Decision Process (S,A,T,Pr,R) is structure containing:

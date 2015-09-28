@@ -1,4 +1,4 @@
-package model.mdp;
+package mdps.elements;
 
 public class StateEdge extends Edge<State,State> {
 	Action a;

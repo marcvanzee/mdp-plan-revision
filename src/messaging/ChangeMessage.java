@@ -1,8 +1,8 @@
 package messaging;
 
-import model.mdp.Edge;
-import model.mdp.Vertex;
 import edu.uci.ics.jung.graph.Graph;
+import mdps.elements.Edge;
+import mdps.elements.Vertex;
 
 
 /**

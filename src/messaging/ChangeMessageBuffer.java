@@ -4,9 +4,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import model.mdp.Edge;
-import model.mdp.Vertex;
 import edu.uci.ics.jung.graph.Graph;
+import mdps.elements.Edge;
+import mdps.elements.Vertex;
 
 /**
  * A complex change is simply a list of changes to the graph that have to be carried out in order.

@@ -1,4 +1,4 @@
-package model;
+package constants;
 
 /**
  * Contains the settings for the entire project

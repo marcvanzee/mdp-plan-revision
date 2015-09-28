@@ -9,10 +9,6 @@ import java.awt.Stroke;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
-import model.mdp.Edge;
-import model.mdp.State;
-import model.mdp.Vertex;
-
 import org.apache.commons.collections15.Transformer;
 
 import edu.uci.ics.jung.algorithms.layout.AbstractLayout;
@@ -24,6 +20,9 @@ import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.uci.ics.jung.visualization.decorators.EllipseVertexShapeTransformer;
 import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 import edu.uci.ics.jung.visualization.renderers.Renderer;
+import mdps.elements.Edge;
+import mdps.elements.State;
+import mdps.elements.Vertex;
 
 /**
  * Task care of all the settings that are necessary to make sure that JUNG works correctly.
