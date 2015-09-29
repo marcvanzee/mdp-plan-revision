@@ -39,7 +39,7 @@ import simulations.MDPSimulation;
  * @author marc.vanzee
  *
  */
-class MDPDrawer extends JPanel implements Observer 
+public class MDPDrawer extends JPanel implements Observer 
 {	
 
 	private static final long serialVersionUID = -5345319851341875800L;

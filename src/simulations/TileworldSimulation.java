@@ -5,19 +5,15 @@ import java.util.List;
 import java.util.Random;
 
 import constants.Settings;
-import mdps.TileWorld;
+import mdps.Tileworld;
 import mdps.algorithms.MDPValueIterator;
 import mdps.elements.Action;
-import mdps.elements.ActionEdge;
 import mdps.elements.Agent;
 import mdps.elements.QEdge;
 import mdps.elements.QState;
 import mdps.elements.State;
-import mdps.elements.StateEdge;
 import mdps.factories.MDPType;
-import mdps.generators.GeneralMDPGenerator;
-import messaging.jung.edges.AddStateEdgesMessage;
-import messaging.jung.states.AddStatesMessage;
+import mdps.generators.TileworldGenerator;
 
 /**
  * A TileWorldSimulation consists of a TileWorld (i.e. an MDP and an Agent) and models the evolution of this TileWorld over time.
@@ -25,19 +21,20 @@ import messaging.jung.states.AddStatesMessage;
  * @author marc.vanzee
  *
  */
-public class TileWorldSimulation extends BasicSimulation
+public class TileworldSimulation extends BasicSimulation
 {
 	private final MDPValueIterator valueIterator = new MDPValueIterator();
-	private final GeneralMDPGenerator tileWorldGenerator = new GeneralMDPGenerator();
+	private final TileworldGenerator tileWorldGenerator = new TileworldGenerator();
 	private final Agent agent;
-	private final TileWorld tileworld;
+	private final Tileworld tileworld;
 	
 	private int nextHole;
 	
-	public TileWorldSimulation() {
+	public TileworldSimulation() 
+	{
 		super(MDPType.TILEWORLD);
-		agent = ((TileWorld) mdp).getAgent();
-		tileworld = (TileWorld) mdp;
+		agent = ((Tileworld) mdp).getAgent();
+		tileworld = (Tileworld) mdp;
 	}
 	
 	//
@@ -53,7 +50,6 @@ public class TileWorldSimulation extends BasicSimulation
 	
 	public void buildNewModel() 
 	{
-		final List<State> states = mdp.getStates();
 		steps = 0;
 		
 		if (isRunning)
@@ -63,22 +59,7 @@ public class TileWorldSimulation extends BasicSimulation
 		
 		// generate a tileworld	
 		this.tileWorldGenerator.run(mdp);
-					
-		// now add states and transltions for GUI, leave out qstates because the domain is deterministic
-		mdp.addMessage(new AddStatesMessage(states));
-		
-		for (State s : states) {
-			for (ActionEdge ae : s.getEdges()) {
-				if (ae.getToVertex().getEdges().size() != 1) continue;
 				
-				StateEdge se = new StateEdge(s, ae.getToVertex().getEdges().get(0).getToVertex(), ae.getAction());
-				
-				mdp.addMessage(new AddStateEdgesMessage(se));
-				
-				((TileWorld)mdp).addStateEdge(se);
-			}
-		}
-		
 		notifyGUI();
 		
 		nextHole = 0;

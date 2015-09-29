@@ -1,16 +1,20 @@
 package mdps.elements;
 
 import java.awt.Color;
+import java.awt.Point;
 import java.util.Random;
 
 import constants.Settings;
 
 public class State extends Vertex<ActionEdge> 
 {
+	final Point coord = new Point();
+	
 	boolean isVisited = false;
 	boolean isObstacle = false;
 	boolean isHole = false;
 	int lifeTime;
+	
 	
 	public State(String name) {
 		super(name);
@@ -40,6 +44,10 @@ public class State extends Vertex<ActionEdge>
 		this.lifeTime = r.nextInt(high-low) + low;
 		
 		setColor();
+	}
+	
+	public void setCoord(int x, int y) {
+		coord.setLocation(x, y);
 	}
 	
 	private void setColor() {
@@ -73,5 +81,13 @@ public class State extends Vertex<ActionEdge>
 	public int getSize() {
 		// TODO Auto-generated method stub
 		return isHole? 40 : 20;
-	}	
+	}
+	
+	public int getX() {
+		return coord.x;
+	}
+	
+	public int getY() {
+		return coord.y;
+	}
 }

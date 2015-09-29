@@ -50,8 +50,7 @@ public class Agent
 	public void setMDP(MDP newMDP) {
 		this.mdp = newMDP;
 
-		// position ourselves on the first state
-		currentState = mdp.getRandomState();
+		
 	}
 	
 	public void setCurrentState(State newState) {
@@ -64,6 +63,11 @@ public class Agent
 	
 	public State getCurrentState() {
 		return currentState;
+	}
+	
+	public void setCurrentStateRandomly() {
+		// position ourselves on the first state
+		currentState = mdp.getRandomState();
 	}
 
 	

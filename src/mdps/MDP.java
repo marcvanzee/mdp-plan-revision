@@ -66,6 +66,12 @@ public class MDP
 	// TOOD: change this.
 	protected ChangeMessageBuffer mBuffer = new ChangeMessageBuffer();
 	
+	public MDP() 
+	{
+		
+	}
+	
+	
 	/***********************
 	 * GETTERS AND SETTERS
 	 ***********************

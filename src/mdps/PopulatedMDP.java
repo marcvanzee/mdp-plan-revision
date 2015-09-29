@@ -25,4 +25,8 @@ public class PopulatedMDP extends MDP
 	public Agent getAgent() {
 		return agent;
 	}
+	
+	public void addAgentRandomly() {
+		agent.setCurrentStateRandomly();
+	}
 }

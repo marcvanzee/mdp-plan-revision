@@ -26,11 +26,14 @@ public class MDPSimulation extends BasicSimulation
 	private final GeneralMDPGenerator mdpGenerator = new GeneralMDPGenerator();
 	private final GeneralMDPModifier mdpChanger;
 	private final Agent agent;
+	private final PopulatedMDP populatedMDP;
 	
 	public MDPSimulation() {
 		super(MDPType.POPULATED_MDP);
 		
-		agent = ((PopulatedMDP) mdp).getAgent();
+		populatedMDP = ((PopulatedMDP) mdp);
+		
+		agent = populatedMDP.getAgent();
 		
 		mdpChanger = new GeneralMDPModifier(agent);
 	}
@@ -39,7 +42,7 @@ public class MDPSimulation extends BasicSimulation
 	// GETTERS AND SETTERS
 	//	
 	public double getValue(State s) {
-		return valueIterator.getValue(mdp.getStates().indexOf(s));
+		return valueIterator.getValue(populatedMDP.getStates().indexOf(s));
 	}
 	
 	public Agent getAgent() {
@@ -55,11 +58,13 @@ public class MDPSimulation extends BasicSimulation
 		if (isRunning)
 			timer.cancel();
 		
-		mdp.reset();
+		populatedMDP.reset();
 		
 		// try adding an observer so that the MDP can send its changes directly to the GUI
 				
-		mdpGenerator.run(mdp);
+		mdpGenerator.run(populatedMDP);
+		
+		populatedMDP.addAgentRandomly();
 		
 		steps = 0;
 		
@@ -79,7 +84,7 @@ public class MDPSimulation extends BasicSimulation
 		mdp.clearMessageBuffer();
 		
 		// get the next choice by the agent
-		final Agent agent = ((PopulatedMDP) mdp).getAgent();
+		final Agent agent = populatedMDP.getAgent();
 		
 		if (agent != null)
 			agent.step();

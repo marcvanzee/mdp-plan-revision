@@ -20,7 +20,7 @@ import javax.swing.JTextField;
 
 import constants.Settings;
 import simulations.MDPSimulation;
-import simulations.TileWorldSimulation;
+import simulations.TileworldSimulation;
 
 /**
  * This is the main application. 
@@ -91,10 +91,6 @@ public class MDPGUI implements ItemListener {
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String args[]) {
-		(new MDPGUI()).go();
-	}
-	
 	public void go() {
 		try 
 		{			

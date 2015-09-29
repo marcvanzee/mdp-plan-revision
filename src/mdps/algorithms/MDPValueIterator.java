@@ -6,13 +6,11 @@ import java.util.HashMap;
 import constants.MathOperations;
 import constants.Settings;
 import mdps.MDP;
-import mdps.TileWorld;
 import mdps.elements.Action;
 import mdps.elements.ActionEdge;
 import mdps.elements.QEdge;
 import mdps.elements.QState;
 import mdps.elements.State;
-import mdps.elements.StateEdge;
 import mdps.generators.MDPGenerator;
 
 public class MDPValueIterator extends MDPGenerator
@@ -133,14 +131,7 @@ public class MDPValueIterator extends MDPGenerator
 			ae.setOptimal(false);
 		
 		for (QEdge qe : mdp.getQEdges())
-			qe.setOptimal(false);
-		
-		if (mdp instanceof TileWorld) {
-			for (StateEdge se : ((TileWorld)mdp).getStateEdges()) {
-				se.setOptimal(false);
-			}
-		}
-		
+			qe.setOptimal(false);		
 	}
 
 	//
@@ -207,10 +198,6 @@ public class MDPValueIterator extends MDPGenerator
 			
 			if (qEdge != null) 
 				qEdge.setOptimal(true);
-			
-			if (mdp instanceof TileWorld) {
-				((TileWorld)mdp).getStateEdge(s, qEdge.getToVertex()).setOptimal(true);
-			}
 		}
 	}
 	

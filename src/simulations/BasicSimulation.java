@@ -88,7 +88,7 @@ public abstract class BasicSimulation extends Observable implements Simulation
 		
 		public void run() 
 		{
-			if (scheduler.hasFinished())
+			if (scheduler == null || scheduler.hasFinished())
 				step();
 		}
 			// wait until the GUI has finished drawing
