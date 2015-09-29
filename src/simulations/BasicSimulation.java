@@ -71,8 +71,7 @@ public abstract class BasicSimulation extends Observable implements Simulation
 	}
 
 	public MDP getMDP() {
-		// TODO Auto-generated method stub
-		return null;
+		return mdp;
 	}
 	
 	/*

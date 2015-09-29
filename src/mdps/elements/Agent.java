@@ -1,6 +1,7 @@
 package mdps.elements;
 
-import constants.MathOperations;
+import java.util.Map;
+
 import constants.SimulationConstants;
 import mdps.MDP;
 import mdps.algorithms.MDPValueIterator;
@@ -28,30 +29,30 @@ import mdps.algorithms.MDPValueIterator;
  */
 public class Agent 
 {
+	private final MDPValueIterator valueIterator;
+	private final Map<State,Action> policy;
+	private final MDP mdp;
+	
 	private State currentState = null;
-	private Action[] policy = null;
 	private Action nextAction = null;
-	private MDPValueIterator valueIterator = new MDPValueIterator();
-	private MDP mdp = null;
 	private double reward = 0;
 	private int deliberations = 0, acts = 0;
+	private boolean delib = true;
 	
 	//
 	// CONSTRUCTORS
 	//
 	public Agent(MDP mdp) {
-		setMDP(mdp);
+		this.mdp = mdp;
+		
+		this.valueIterator = new MDPValueIterator(mdp);
+		
+		this.policy = valueIterator.getPolicy();
 	}
 	
 	//
 	// GETTERS AND SETTERS
 	//
-	
-	public void setMDP(MDP newMDP) {
-		this.mdp = newMDP;
-
-		
-	}
 	
 	public void setCurrentState(State newState) {
 		this.currentState = newState;
@@ -108,9 +109,10 @@ public class Agent
 			return SimulationConstants.AGENT_CHOICE_ACT;
 		}*/
 		
-		if (policy == null) {
+		if (delib) {
 			System.out.println("deliberating");
 			deliberate();
+			delib = false;
 			return SimulationConstants.AGENT_CHOICE_DELIBERATE;
 		} else {
 			System.out.println("acting");
@@ -135,21 +137,18 @@ public class Agent
 		return acts;
 	}
 	
-	public void reset() 
-	{
-		currentState = null;
-		policy = null;
-		nextAction = null;
-		mdp = null;
-		reward = 0;
-		deliberations = 0;
-		acts = 0;
+	public void recomputePolicy() {
+		delib = true;
 	}
 	
-	public void clearPolicy() {
-		this.policy = null;
+	public double getValue(State s) {
+		return valueIterator.getValue(s);
 	}
 	
+	public void update() {
+		valueIterator.update();
+	}
+		
 	/**
 	 * Compute a new policy through value iteration.
 	 * 
@@ -159,7 +158,6 @@ public class Agent
 	{
 		deliberations++;
 		valueIterator.run(mdp);
-		policy = valueIterator.getPolicy();
 		nextAction = null; // don't move
 	}
 	
@@ -169,6 +167,6 @@ public class Agent
 	private void act() 
 	{
 		acts++;
-		nextAction = policy[mdp.getStateIndex(currentState)];
+		nextAction = policy.get(currentState);
 	}
 }

@@ -14,6 +14,7 @@ public class State extends Vertex<ActionEdge>
 	boolean isObstacle = false;
 	boolean isHole = false;
 	int lifeTime;
+	double value;
 	
 	
 	public State(String name) {
@@ -44,6 +45,10 @@ public class State extends Vertex<ActionEdge>
 		this.lifeTime = r.nextInt(high-low) + low;
 		
 		setColor();
+	}
+	
+	public void setValue(double d) {
+		this.value = d;
 	}
 	
 	public void setCoord(int x, int y) {

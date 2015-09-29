@@ -1,7 +1,9 @@
 package mdps;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import mdps.elements.State;
 
@@ -16,6 +18,7 @@ public class Tileworld extends PopulatedMDP
 	final List<State> holes = new LinkedList<State>();	
 	final List<State> obstacles = new LinkedList<State>();	
 	private State[][] stateArr = null;
+	final Map<State,State> statePolicy = new HashMap<State,State>();
 	
 	public Tileworld() {
 		super();
@@ -46,6 +49,14 @@ public class Tileworld extends PopulatedMDP
 		obstacles.remove(o);
 	}
 	
+	public void addStatePolicy(State s1, State s2) {
+		statePolicy.put(s1, s2);
+	}
+	
+	public Map<State,State> getStatePolicy() {
+		return statePolicy;
+	}
+	
 	public List<State> getObstacles() {
 		return obstacles;
 	}
@@ -71,6 +82,14 @@ public class Tileworld extends PopulatedMDP
 		} while (ret == null);
 		
 		return ret;
+	}
+	
+	public void reset() {
+		holes.clear();
+		obstacles.clear();
+		stateArr = null;
+		statePolicy.clear();
+		super.reset();
 	}
 	
 }

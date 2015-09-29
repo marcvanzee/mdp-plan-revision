@@ -2,29 +2,43 @@ package mdps.algorithms;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import constants.MathOperations;
 import constants.Settings;
 import mdps.MDP;
+import mdps.Tileworld;
 import mdps.elements.Action;
 import mdps.elements.ActionEdge;
 import mdps.elements.QEdge;
 import mdps.elements.QState;
 import mdps.elements.State;
-import mdps.generators.MDPGenerator;
 
-public class MDPValueIterator extends MDPGenerator
+/**
+ * TODO: This is now completely optimized for Tileworld!
+ * 
+ * @author marc.vanzee
+ *
+ */
+public class MDPValueIterator
 {	
+	final protected MDP mdp;
+	
 	// use these mappings for efficiency so we don't have to look them up every time
-	HashMap<State,ArrayList<ActionEdge>> stateToActionEdges = new HashMap<State,ArrayList<ActionEdge>>();
-	HashMap<QState,ArrayList<QEdge>> qStateToQEdges = new HashMap<QState,ArrayList<QEdge>>();
+	final Map<State,ArrayList<ActionEdge>> stateToActionEdges = new HashMap<State,ArrayList<ActionEdge>>();
+	
+	// only works in deterministic domain
+	// we create a hashmap from s -> map(a,s)
+	final Map<State,Map<Action,State>> stateActionToState = new HashMap<State,Map<Action,State>>();
+	final Map<QState,ArrayList<QEdge>> qStateToQEdges = new HashMap<QState,ArrayList<QEdge>>();
 		
 	// V contains the V values for each node, while prevV contains those of the previous iteration
-	double V[], prevV[];
+	final Map<State, Double> V = new HashMap<State,Double>(), 
+			prevV = new HashMap<State,Double>();
 	
-	// the optimal policy will be stored, simply mapping state indices to actions
-	Action policy[];
-	
+	// the optimal policy will be stored, simply mapping states to actions
+	final Map<State,Action> policy = new HashMap<State,Action>();
+		
 	double theta = Settings.THETA,
 			gamma = Settings.GAMMA; 
 		
@@ -32,58 +46,56 @@ public class MDPValueIterator extends MDPGenerator
 	// CONSTRUCTORS
 	//
 	
-	public MDPValueIterator()
+	public MDPValueIterator(MDP mdp)
 	{
+		this.mdp = mdp;		
 	}
 	
 	//
 	// GETTERS AND SETTERS
 	//
 	
-	public Action[] getPolicy() {
+	public Map<State,Action> getPolicy() {
 		return this.policy;
 	}
 	
-	public Action getPolicy(int i) {
-		return policy[i];
+	public Action getPolicy(State s) {
+		return policy.get(s);
 	}
 	
-	public double getValue(int i) {
-		return V[i];
+	public double getValue(State s) {
+		return V.get(s);
 	}
 	
 	//
 	// OTHER PUBLIC METHODS
 	//
 	
+	public void update() {
+		initializeMappings();
+	}
+	
 	public void run(MDP mdp) 
 	{
-		this.mdp = mdp;
+		// in the tileworld we do not have to recompute the mappings because the environment is static
+		if (! (mdp instanceof Tileworld))
+			initializeMappings();
 		
-		initializeMappings();
+		// we don't use highlights
+		// removeHighlights();
 		
-		removeHighlights();
-		
-		int countStates = mdp.countStates();
-		
-		// V:S->R is a function from states to rational numbers
-		// we implement this simply as an array of doubles.
-		// all doubles are initialized to 0 by default.
-		V = new double[countStates];
-		prevV = new double[countStates];
-		policy = new Action[countStates];
-
 		int k = 0;
 		boolean finished = true;
 		
 		do {
 			k++;
-			for (int i=0; i<countStates; i++)
+			for (State s : mdp.getStates())
 			{
-				prevV[i] = V[i];
-				setMaxValue(i);
+				prevV.put(s, V.get(s));
 				
-				if ((V[i] - prevV[i]) >= theta) 
+				setMaxValue(s);
+				
+				if ((V.get(s) - prevV.get(s)) >= theta) 
 					finished = false;
 				
 			}
@@ -92,12 +104,10 @@ public class MDPValueIterator extends MDPGenerator
 		setOptimalVerticesAndEdges();
 	}
 	
-	private void setMaxValue(int i) 
+	private void setMaxValue(State s) 
 	{
 		double max = Integer.MIN_VALUE;
 		Action a = null;
-		
-		State s = mdp.getState(i);
 		
 		if (stateToActionEdges.size() == 0)
 			return;
@@ -112,8 +122,9 @@ public class MDPValueIterator extends MDPGenerator
 			
 			for (QEdge qe : qStateToQEdges.get(toState))
 			{
-				int index = mdp.getStateIndex(qe.getToVertex());
-				sum += qe.getProbability() * (qe.getReward() + gamma * prevV[index]);
+				State s2 = qe.getToVertex();
+				double v = prevV.containsKey(s2) ? prevV.get(s2) : V.get(s2);
+				sum += qe.getProbability() * (qe.getReward() + gamma * v);
 			}
 			
 			if (sum > max) {
@@ -122,9 +133,13 @@ public class MDPValueIterator extends MDPGenerator
 			}
 		}
 		
-		V[i] = max;
-		policy[i] = a;
+		V.put(s, max);
+		policy.put(s, a);
 	}
+	
+	//
+	// PRIVATE METHODS
+	//
 	
 	private void removeHighlights() {
 		for (ActionEdge ae : mdp.getActionEdges())
@@ -134,25 +149,43 @@ public class MDPValueIterator extends MDPGenerator
 			qe.setOptimal(false);		
 	}
 
-	//
-	// PRIVATE METHODS
-	//
 	
+	// we compute mappings in advance so we have constant lookup time during execution
 	private void initializeMappings() 
 	{
+		// state to action edges mappings
+		// and (state->(action->state) mappings (for deterministic domains)
+		// and initial values for value iteration
 		for (State s : mdp.getStates()) 
 		{
+			// value iteration
+			V.put(s, 0.0);
+			
 			ArrayList<ActionEdge> actionEdges = new ArrayList<ActionEdge>();
+			Map<Action,State> asMap = new HashMap<Action,State>();
 			
 			for (ActionEdge ae : mdp.getActionEdges())
 			{
 				if (ae.getFromVertex() == s) 
+				{
 					actionEdges.add(ae);
+					
+					Action a = ae.getAction();
+					QState qs = ae.getToVertex();
+					List<QEdge> qes = qs.getEdges();
+					
+					if (qes.size() == 1) {
+						State s2 = qes.get(0).getToVertex();
+						asMap.put(a, s2);
+					}
+				}					
 			}
 			
+			stateActionToState.put(s, asMap);
 			stateToActionEdges.put(s, actionEdges);
 		}
 		
+		// qstate to qedges mappings
 		for (QState qs: mdp.getQStates())
 		{
 			ArrayList<QEdge> qEdges = new ArrayList<QEdge>();
@@ -167,24 +200,23 @@ public class MDPValueIterator extends MDPGenerator
 		}
 	}
 	
-	
+	// TODO: optimized for tileworld, change again for general setting
 	private void setOptimalVerticesAndEdges() 
 	{
-		for (int i=0; i<mdp.countStates(); i++)
+		for (State s : mdp.getStates())
 		{
-			// set the name of the state to its value obtained from value iteration
-			State s = mdp.getState(i);
-			double stateValue = V[i];
-			
-			s.setName((stateValue < 0.01 ? 0 : MathOperations.round(stateValue,2))+"");
+			s.setValue(V.get(s));
 			
 			// highlight the actions that are chosen by the policy
-			Action a = policy[i];
+			Action a = policy.get(s);
 			
+			((Tileworld) mdp).addStatePolicy(s, stateActionToState.get(s).get(a));
+			
+			/*
 			if (a == null)
 				continue;
 			
-			ActionEdge ae = mdp.getActionEdge(s, a);
+			ActionEdge ae = stateToActionEdges.get(s);
 			
 			if (ae != null)
 				ae.setOptimal(true);
@@ -197,7 +229,7 @@ public class MDPValueIterator extends MDPGenerator
 			QEdge qEdge = getMostProbableQEdge(qEdges);
 			
 			if (qEdge != null) 
-				qEdge.setOptimal(true);
+				qEdge.setOptimal(true);*/
 		}
 	}
 	

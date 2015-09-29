@@ -22,7 +22,7 @@ import mdps.modifiers.GeneralMDPModifier;
  */
 public class MDPSimulation extends BasicSimulation
 {
-	private final MDPValueIterator valueIterator = new MDPValueIterator();
+	private final MDPValueIterator valueIterator;
 	private final GeneralMDPGenerator mdpGenerator = new GeneralMDPGenerator();
 	private final GeneralMDPModifier mdpChanger;
 	private final Agent agent;
@@ -36,13 +36,15 @@ public class MDPSimulation extends BasicSimulation
 		agent = populatedMDP.getAgent();
 		
 		mdpChanger = new GeneralMDPModifier(agent);
+		
+		valueIterator = new MDPValueIterator(mdp);
 	}
 	
 	//
 	// GETTERS AND SETTERS
 	//	
 	public double getValue(State s) {
-		return valueIterator.getValue(populatedMDP.getStates().indexOf(s));
+		return valueIterator.getValue(s);
 	}
 	
 	public Agent getAgent() {

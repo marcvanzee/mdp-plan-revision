@@ -44,6 +44,7 @@ public class TileworldGenerator extends MDPGenerator
 			{
 				State s = new State("state at (" + i + "," + j + ")");
 				s.setCoord(i, j);
+				stateArr[i][j] = s;
 				
 				tileworld.addState(stateArr[i][j], i, j);
 			}
@@ -62,6 +63,7 @@ public class TileworldGenerator extends MDPGenerator
 			}
 		}
 		
+		// add obstacles
 		int numObstacles = ((int)(Settings.OBSTACLE_RATE * tileworld.countStates()));
 		List<State> obstacles = tileworld.getRandomStates(numObstacles);
 		
@@ -79,6 +81,8 @@ public class TileworldGenerator extends MDPGenerator
 				qe.setReward(0);
 			}
 		}
+		
+		tileworld.updateAgent();
 		
 	}
 	

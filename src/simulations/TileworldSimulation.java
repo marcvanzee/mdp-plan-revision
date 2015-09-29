@@ -1,12 +1,12 @@
 package simulations;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
 import constants.Settings;
 import mdps.Tileworld;
-import mdps.algorithms.MDPValueIterator;
 import mdps.elements.Action;
 import mdps.elements.Agent;
 import mdps.elements.QEdge;
@@ -23,7 +23,6 @@ import mdps.generators.TileworldGenerator;
  */
 public class TileworldSimulation extends BasicSimulation
 {
-	private final MDPValueIterator valueIterator = new MDPValueIterator();
 	private final TileworldGenerator tileWorldGenerator = new TileworldGenerator();
 	private final Agent agent;
 	private final Tileworld tileworld;
@@ -41,7 +40,7 @@ public class TileworldSimulation extends BasicSimulation
 	// GETTERS AND SETTERS
 	//	
 	public double getValue(State s) {
-		return valueIterator.getValue(this.mdp.getStates().indexOf(s));
+		return agent.getValue(s);
 	}
 	
 	//
@@ -55,10 +54,13 @@ public class TileworldSimulation extends BasicSimulation
 		if (isRunning)
 			timer.cancel();
 		
-		mdp.reset();
+		tileworld.reset();
 		
 		// generate a tileworld	
 		this.tileWorldGenerator.run(mdp);
+		
+		// add agent
+		tileworld.addAgentRandomly(new HashSet<State>(tileworld.getObstacles()));
 				
 		notifyGUI();
 		
@@ -125,7 +127,7 @@ public class TileworldSimulation extends BasicSimulation
 		}
 		
 		setNextHole();
-		agent.clearPolicy();
+		agent.recomputePolicy();
 	}
 	
 	
@@ -145,7 +147,7 @@ public class TileworldSimulation extends BasicSimulation
 		final List<State> holes = tileworld.getHoles();
 		
 		if (agState.isHole()) 
-			agent.clearPolicy();
+			agent.recomputePolicy();
 		
 		for (State hole : holes) {
 			hole.decreaseLifetime();

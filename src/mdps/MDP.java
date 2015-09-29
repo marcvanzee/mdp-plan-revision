@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import mdps.elements.Action;
 import mdps.elements.ActionEdge;
@@ -133,6 +134,20 @@ public class MDP
 	{
 		int index = r.nextInt(actions.size());
 		return actions.get(index);
+	}
+	
+	public State getRandomState(Set<State> exclude)
+	{
+		if (exclude.size() >= states.size())
+			return null;
+		
+		State s0 = null;
+		
+		do {
+			s0 = getRandomState();
+		} while (exclude.contains(s0) || s0 == null);
+		
+		return s0;
 	}
 	
 	public State getRandomState(State exclude)

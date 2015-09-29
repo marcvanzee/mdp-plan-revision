@@ -43,7 +43,7 @@ public class MDPTransitionGenerator
 		}
 	}
 
-	public void add(State s1, Action a, State s2, double probability) 
+	private void add(State s1, Action a, State s2, double probability) 
 	{
 		double minReward = Settings.MIN_REWARD;
 		double maxReward = Settings.MAX_REWARD;
@@ -53,7 +53,7 @@ public class MDPTransitionGenerator
 		add(s1, a, s2, probability, reward);
 	}
 	
-	public void add(State s1, Action a, State s2, double probability, double reward) 
+	private void add(State s1, Action a, State s2, double probability, double reward) 
 	{
 		if (s1 == null || a == null || s2 == null) {
 			System.err.println("Trying to add a transition and reward but one of the arguments is null.");
