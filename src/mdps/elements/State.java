@@ -37,10 +37,7 @@ public class State extends Vertex<ActionEdge>
 	
 	public void setHole(boolean isHole) {
 		this.isHole = isHole;
-			
-		this.lifeTime = MathOperations.getRandomInt(
-				TileworldSettings.HOLE_LIFE_EXP_MIN, TileworldSettings.HOLE_LIFE_EXP_MAX);
-		
+				
 		setColor();
 	}
 	

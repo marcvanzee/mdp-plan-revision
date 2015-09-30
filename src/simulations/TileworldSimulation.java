@@ -3,7 +3,6 @@ package simulations;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 
 import constants.MathOperations;
 import mdps.Tileworld;
@@ -14,7 +13,6 @@ import mdps.elements.QState;
 import mdps.elements.State;
 import mdps.factories.MDPType;
 import mdps.generators.TileworldGenerator;
-import settings.GeneralMDPSettings;
 import settings.TileworldSettings;
 
 /**
@@ -66,7 +64,7 @@ public class TileworldSimulation extends BasicSimulation
 				
 		notifyGUI();
 		
-		nextHole = 0;
+		setNextHole();
 	}
 		
 	public void step() 
@@ -114,11 +112,18 @@ public class TileworldSimulation extends BasicSimulation
 		final State hole = tileworld.getRandomEmptyState();
 		
 		hole.setHole(true);
+		
+		int lifetime = MathOperations.getRandomInt(
+				TileworldSettings.HOLE_LIFE_EXP_MIN, TileworldSettings.HOLE_LIFE_EXP_MAX);
+	
+		hole.setLifeTime(lifetime);
 
 		tileworld.addHole(hole);
 				
 		int score = MathOperations.getRandomInt(
 				TileworldSettings.HOLE_SCORE_MIN, TileworldSettings.HOLE_SCORE_MAX);
+		
+		System.out.println("added hole, score: " + score + ", life exp: " + lifetime);
 
 		for (QEdge qe : tileworld.getQEdges()) {
 			if (qe.getToVertex() == hole) {
@@ -135,6 +140,7 @@ public class TileworldSimulation extends BasicSimulation
 	{
 		nextHole = MathOperations.getRandomInt(
 				TileworldSettings.HOLE_GESTATION_TIME_MIN, TileworldSettings.HOLE_GESTATION_TIME_MAX);
+		System.out.println("next hole in: " + nextHole);
 	}
 	
 	private void decreaseLifetimeHoles() 

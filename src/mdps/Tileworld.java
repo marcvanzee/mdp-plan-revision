@@ -5,7 +5,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import constants.MathOperations;
 import mdps.elements.State;
+import settings.TileworldSettings;
 
 /**
  * This is the Kinny and Georgeff TileWorld
@@ -39,6 +41,15 @@ public class Tileworld extends PopulatedMDP
 	
 	public List<State> getHoles() {
 		return holes;
+	}
+	
+	public State getState(int x, int y)
+	{
+		return 
+				stateArr != null && stateArr[0] != null &&
+				x >= 0 && y >= 0 &&
+				x < stateArr.length && y < stateArr[0].length ? 
+						stateArr[x][y] : null;
 	}
 	
 	public void addObstacle(State o) {
@@ -82,6 +93,27 @@ public class Tileworld extends PopulatedMDP
 		} while (ret == null);
 		
 		return ret;
+	}
+	
+	public State getRandomEmptyNeighbor(State s)
+	{
+		int x = s.getX(),
+				y = s.getY();
+		
+		List<State> neighbors = new LinkedList<State>();
+		
+		State l = getState(x-1,y), r = getState(x+1,y),
+				a = getState(x,y-1), b = getState(x,y+1);
+		
+		
+		if (l != null && !l.isObstacle()) neighbors.add(getState(x-1,y));
+		if (r != null && !r.isObstacle()) neighbors.add(getState(x+1, y));
+		if (a != null && !a.isObstacle()) neighbors.add(getState(x,y-1));
+		if (b != null && !b.isObstacle()) neighbors.add(getState(x, y+1));
+		
+		return neighbors.size() > 0 ?
+				neighbors.get(MathOperations.getRandomInt(0, neighbors.size())) : null;
+		
 	}
 	
 	public void reset() {
