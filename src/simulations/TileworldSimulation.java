@@ -27,6 +27,8 @@ public class TileworldSimulation extends BasicSimulation
 	private final Agent agent;
 	private final Tileworld tileworld;
 	
+	private int agentSteps = 0;
+	
 	private int nextHole;
 	
 	public TileworldSimulation() 
@@ -50,6 +52,7 @@ public class TileworldSimulation extends BasicSimulation
 	public void buildNewModel() 
 	{
 		steps = 0;
+		agentSteps = 0;
 		
 		if (isRunning)
 			timer.cancel();
@@ -78,14 +81,18 @@ public class TileworldSimulation extends BasicSimulation
 		
 		// first clear the message buffer
 		mdp.clearMessageBuffer();
-				
-		// get the next choice by the agent
-		if (agent != null)
-			agent.step();
-				
-		// if the agent acted, move the agent and compute its reward
-		if (agent != null && agent.getNextAction() != null)
-			moveAgent(agent.getCurrentState(), agent.getNextAction());
+		
+		if (steps % TileworldSettings.DYNAMISM == 0) {
+			agentSteps++;
+			
+			// get the next choice by the agent
+			if (agent != null)
+				agent.step();
+					
+			// if the agent acted, move the agent and compute its reward
+			if (agent != null && agent.getNextAction() != null)
+				moveAgent(agent.getCurrentState(), agent.getNextAction());
+		}
 				
 				
 		decreaseLifetimeHoles();	
