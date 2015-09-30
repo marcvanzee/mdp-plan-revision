@@ -12,7 +12,6 @@ import mdps.elements.ActionEdge;
 import mdps.elements.QEdge;
 import mdps.elements.QState;
 import mdps.elements.State;
-import settings.GeneralMDPSettings;
 import settings.ValueIterationSettings;
 
 /**
@@ -82,6 +81,9 @@ public class MDPValueIterator
 		if (! (mdp instanceof Tileworld))
 			initializeMappings();
 		
+		for (State s : mdp.getStates())
+			V.put(s, 0.0);
+		
 		// we don't use highlights
 		// removeHighlights();
 		
@@ -100,13 +102,16 @@ public class MDPValueIterator
 					finished = false;
 				
 			}
-		} while (k < ValueIterationSettings.ITERATIONS && !finished);
+		} while (!finished); //k < ValueIterationSettings.ITERATIONS && !finished);
+		
+		computePolicy();
 		
 		setOptimalVerticesAndEdges();
 	}
 	
 	private void setMaxValue(State s) 
 	{
+		// first compute values
 		double max = Integer.MIN_VALUE;
 		Action a = null;
 		
@@ -128,28 +133,12 @@ public class MDPValueIterator
 				sum += qe.getProbability() * (qe.getReward() + gamma * v);
 			}
 			
-			if (sum > max && !qStateToQEdges.get(toState).get(0).getToVertex().isObstacle()) {
+			if (sum > max)
 				max = sum;
-				a = ae.getAction();
-			}
 		}
 		
 		V.put(s, max);
-		policy.put(s, a);
 	}
-	
-	//
-	// PRIVATE METHODS
-	//
-	
-	private void removeHighlights() {
-		for (ActionEdge ae : mdp.getActionEdges())
-			ae.setOptimal(false);
-		
-		for (QEdge qe : mdp.getQEdges())
-			qe.setOptimal(false);		
-	}
-
 	
 	// we compute mappings in advance so we have constant lookup time during execution
 	private void initializeMappings() 
@@ -169,15 +158,16 @@ public class MDPValueIterator
 			{
 				if (ae.getFromVertex() == s) 
 				{
-					actionEdges.add(ae);
-					
 					Action a = ae.getAction();
 					QState qs = ae.getToVertex();
 					List<QEdge> qes = qs.getEdges();
 					
 					if (qes.size() == 1) {
 						State s2 = qes.get(0).getToVertex();
-						asMap.put(a, s2);
+						if (!s2.isObstacle()) {
+							asMap.put(a, s2);
+							actionEdges.add(ae);
+						}
 					}
 				}					
 			}
@@ -198,6 +188,34 @@ public class MDPValueIterator
 			}
 			
 			qStateToQEdges.put(qs, qEdges);
+		}
+	}
+	
+	private void computePolicy()
+	{
+		for (State s : mdp.getStates()) 
+		{
+			if (s.isObstacle())
+				continue;
+			
+			s.setValue(V.get(s));
+			
+			double max = Double.MIN_VALUE;
+			Action a = null;
+			
+			for (Map.Entry<Action, State> entry : stateActionToState.get(s).entrySet()) 
+			{
+				State s2 = entry.getValue();
+				double value = V.get(s2);
+				
+				if (value > max) 
+				{
+					max = value;
+					a = entry.getKey();
+				}
+			}
+			
+			policy.put(s, a);
 		}
 	}
 	

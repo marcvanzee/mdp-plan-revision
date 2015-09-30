@@ -41,6 +41,10 @@ public class State extends Vertex<ActionEdge>
 		setColor();
 	}
 	
+	public double getValue() {
+		return this.value;
+	}
+	
 	public void setValue(double d) {
 		this.value = d;
 	}

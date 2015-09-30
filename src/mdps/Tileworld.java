@@ -7,7 +7,6 @@ import java.util.Map;
 
 import constants.MathOperations;
 import mdps.elements.State;
-import settings.TileworldSettings;
 
 /**
  * This is the Kinny and Georgeff TileWorld

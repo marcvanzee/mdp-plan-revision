@@ -111,15 +111,9 @@ public class TileworldSimulation extends BasicSimulation
 	{
 		final State hole = tileworld.getRandomEmptyState();
 		
-		hole.setHole(true);
-		
 		int lifetime = MathOperations.getRandomInt(
 				TileworldSettings.HOLE_LIFE_EXP_MIN, TileworldSettings.HOLE_LIFE_EXP_MAX);
 	
-		hole.setLifeTime(lifetime);
-
-		tileworld.addHole(hole);
-				
 		int score = MathOperations.getRandomInt(
 				TileworldSettings.HOLE_SCORE_MIN, TileworldSettings.HOLE_SCORE_MAX);
 		
@@ -131,7 +125,14 @@ public class TileworldSimulation extends BasicSimulation
 			}
 		}
 		
+		hole.setLifeTime(lifetime);
+
+		tileworld.addHole(hole);
+		hole.setHole(true);
+				
 		setNextHole();
+		
+		System.out.println("number of holes: " + tileworld.getHoles().size());
 		agent.recomputePolicy();
 	}
 	

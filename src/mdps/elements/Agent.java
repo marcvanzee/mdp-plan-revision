@@ -110,7 +110,7 @@ public class Agent
 		}*/
 		
 		if (delib) {
-			//System.out.println("deliberating");
+			System.out.println("deliberating");
 			deliberate();
 			delib = false;
 			return SimulationConstants.AGENT_CHOICE_DELIBERATE;
