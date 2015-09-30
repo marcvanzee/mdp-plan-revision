@@ -45,4 +45,8 @@ public class MathOperations
 		
 		return r.nextInt((maxValue - minValue) + 1) + minValue;
 	}
+	
+	public static int getRandomInt(int min, int max) {
+		return r.nextInt(max-min) + min;
+	}
 }

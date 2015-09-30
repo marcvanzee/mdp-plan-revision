@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import constants.Settings;
 import mdps.MDP;
 import mdps.Tileworld;
 import mdps.elements.Action;
@@ -13,6 +12,8 @@ import mdps.elements.ActionEdge;
 import mdps.elements.QEdge;
 import mdps.elements.QState;
 import mdps.elements.State;
+import settings.GeneralMDPSettings;
+import settings.ValueIterationSettings;
 
 /**
  * TODO: This is now completely optimized for Tileworld!
@@ -39,8 +40,8 @@ public class MDPValueIterator
 	// the optimal policy will be stored, simply mapping states to actions
 	final Map<State,Action> policy = new HashMap<State,Action>();
 		
-	double theta = Settings.THETA,
-			gamma = Settings.GAMMA; 
+	double theta = ValueIterationSettings.THETA,
+			gamma = ValueIterationSettings.GAMMA; 
 		
 	//
 	// CONSTRUCTORS
@@ -99,7 +100,7 @@ public class MDPValueIterator
 					finished = false;
 				
 			}
-		} while (k < Settings.ITERATIONS && !finished);
+		} while (k < ValueIterationSettings.ITERATIONS && !finished);
 		
 		setOptimalVerticesAndEdges();
 	}
@@ -127,7 +128,7 @@ public class MDPValueIterator
 				sum += qe.getProbability() * (qe.getReward() + gamma * v);
 			}
 			
-			if (sum > max) {
+			if (sum > max && !qStateToQEdges.get(toState).get(0).getToVertex().isObstacle()) {
 				max = sum;
 				a = ae.getAction();
 			}

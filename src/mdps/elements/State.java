@@ -4,7 +4,8 @@ import java.awt.Color;
 import java.awt.Point;
 import java.util.Random;
 
-import constants.Settings;
+import constants.MathOperations;
+import settings.TileworldSettings;
 
 public class State extends Vertex<ActionEdge> 
 {
@@ -37,12 +38,8 @@ public class State extends Vertex<ActionEdge>
 	public void setHole(boolean isHole) {
 		this.isHole = isHole;
 			
-		Random r = new Random();
-	
-		int low = Settings.LIFE_EXPECTANCY - Settings.LIFE_EXPECTANCY_SD,
-				high = Settings.LIFE_EXPECTANCY + Settings.LIFE_EXPECTANCY_SD;
-		
-		this.lifeTime = r.nextInt(high-low) + low;
+		this.lifeTime = MathOperations.getRandomInt(
+				TileworldSettings.HOLE_LIFE_EXP_MIN, TileworldSettings.HOLE_LIFE_EXP_MAX);
 		
 		setColor();
 	}

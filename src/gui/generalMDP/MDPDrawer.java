@@ -9,7 +9,6 @@ import java.util.TimerTask;
 
 import javax.swing.JPanel;
 
-import constants.Settings;
 import edu.uci.ics.jung.algorithms.layout.AbstractLayout;
 import edu.uci.ics.jung.algorithms.layout.KKLayout;
 import edu.uci.ics.jung.algorithms.layout.Layout;
@@ -31,6 +30,7 @@ import mdps.elements.Vertex;
 import messaging.jung.ChangeMessage;
 import messaging.jung.ChangeMessageBuffer;
 import messaging.jung.ClearGraphMessage;
+import settings.GeneralMDPSettings;
 import simulations.MDPSimulation;
 
 /**
@@ -147,7 +147,7 @@ public class MDPDrawer extends JPanel implements Observer
     	
     	layout.initialize();
 
-    	if (Settings.ANIMATE) {
+    	if (GeneralMDPSettings.ANIMATE) {
 	    	Relaxer relaxer = new VisRunner((IterativeContext)layout);
 			relaxer.stop();
 			relaxer.prerelax();
@@ -166,7 +166,7 @@ public class MDPDrawer extends JPanel implements Observer
     	repaint();
     	
     	// resume scheduling after 200ms, give the visualization some time to draw before editing the graph again
-    	resumeTaskScheduler(Settings.REPAINT_DELAY-100); 
+    	resumeTaskScheduler(GeneralMDPSettings.REPAINT_DELAY-100); 
     }
     
     private void resumeTaskScheduler(int ms) {

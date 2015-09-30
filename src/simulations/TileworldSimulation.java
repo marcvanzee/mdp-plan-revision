@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-import constants.Settings;
+import constants.MathOperations;
 import mdps.Tileworld;
 import mdps.elements.Action;
 import mdps.elements.Agent;
@@ -14,6 +14,8 @@ import mdps.elements.QState;
 import mdps.elements.State;
 import mdps.factories.MDPType;
 import mdps.generators.TileworldGenerator;
+import settings.GeneralMDPSettings;
+import settings.TileworldSettings;
 
 /**
  * A TileWorldSimulation consists of a TileWorld (i.e. an MDP and an Agent) and models the evolution of this TileWorld over time.
@@ -110,16 +112,14 @@ public class TileworldSimulation extends BasicSimulation
 	private void addHole() 
 	{
 		final State hole = tileworld.getRandomEmptyState();
-		final Random r = new Random();
 		
 		hole.setHole(true);
 
 		tileworld.addHole(hole);
 				
-		final int low = Settings.SCORE - Settings.SCORE_SD,
-				high = Settings.SCORE + Settings.SCORE_SD,
-				score = r.nextInt(high-low) + low;
-		
+		int score = MathOperations.getRandomInt(
+				TileworldSettings.HOLE_SCORE_MIN, TileworldSettings.HOLE_SCORE_MAX);
+
 		for (QEdge qe : tileworld.getQEdges()) {
 			if (qe.getToVertex() == hole) {
 				qe.setReward(score);
@@ -133,11 +133,8 @@ public class TileworldSimulation extends BasicSimulation
 	
 	private void setNextHole()
 	{
-		final Random r = new Random();
-		final int low = Settings.GESTATION_PERIOD - Settings.GESTATION_PERIOD_SD,
-				high = Settings.GESTATION_PERIOD + Settings.GESTATION_PERIOD_SD;
-		
-		nextHole = r.nextInt(high-low) + low;
+		nextHole = MathOperations.getRandomInt(
+				TileworldSettings.HOLE_GESTATION_TIME_MIN, TileworldSettings.HOLE_GESTATION_TIME_MAX);
 	}
 	
 	private void decreaseLifetimeHoles() 

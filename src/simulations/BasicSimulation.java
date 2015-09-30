@@ -9,6 +9,7 @@ import mdps.MDP;
 import mdps.factories.MDPFactory;
 import mdps.factories.MDPType;
 import mdps.generators.MDPGenerator;
+import settings.SimulationSettings;
 
 public abstract class BasicSimulation extends Observable implements Simulation
 {
@@ -45,7 +46,8 @@ public abstract class BasicSimulation extends Observable implements Simulation
 		timer = new Timer(true);
 		
 		// try to step every 100 ms, this will only work when the GUI has finished drawing
-		timer.schedule(new StepTask(scheduler), 100, 100); 
+		timer.schedule(new StepTask(scheduler), 
+				SimulationSettings.REPAINT_DELAY, SimulationSettings.REPAINT_DELAY); 
 	}
 
 	public void stopSimulation() {

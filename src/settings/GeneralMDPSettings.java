@@ -1,4 +1,4 @@
-package constants;
+package settings;
 
 /**
  * Contains the settings for the entire project
@@ -6,7 +6,7 @@ package constants;
  * @author marc.vanzee
  *
  */
-public class Settings 
+public class GeneralMDPSettings 
 {
 	/*
 	 * MDP GENERATOR SETTINGS 
@@ -29,19 +29,6 @@ public class Settings
 	 */
 	public static boolean ADD_AGENT = true;
 	public static double P_DELIBERATE = 0.5;       // the probability with which the agent deliberates
-	
-	/*
-	 * VALUE ITERATION SETTINGS
-	 */
-	public static double THETA = 0.5;						// parameters for value iteration
-	public static double GAMMA = 0.9;						// see http://artint.info/html/ArtInt_227.html
-	public static int ITERATIONS = 100; 			// the number of iterations for value iteration
-	
-	/*
-	 * MDP DYNAMICS SETTINGS
-	 */
-	public static double DYNAMICITY = 0.2,
-			D_GAMMA = 0.1;					// the dynamicity gamma (see model.mdp.operations.MDPChanger for details)
 
 	/*
 	 * VISUALIZATION SETTINGS
@@ -50,19 +37,7 @@ public class Settings
 	public static boolean ANIMATE = true;					// whether to animate the steps
 	
 	/*
-	 * TILEWORLD SETTINGS
+	 * MDP MODIFICATION SETTINGS
 	 */
-	public static int WORLD_SIZE = 5;
-	public static int LIFE_EXPECTANCY = 12;
-	public static int LIFE_EXPECTANCY_SD = 5;
-	
-	public static int GESTATION_PERIOD = 10;
-	public static int GESTATION_PERIOD_SD = 5;
-	
-	public static int SCORE = 30;
-	public static int SCORE_SD = 10;
-	
-	public static int PLANNING_TIME = 3;
-	public static int BOLDNESS = 1;
-	public static double OBSTACLE_RATE = 0.1;
+	public static double D_GAMMA = 0.5;
 }

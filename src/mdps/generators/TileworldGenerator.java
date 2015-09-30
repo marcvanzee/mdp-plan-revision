@@ -2,12 +2,12 @@ package mdps.generators;
 
 import java.util.List;
 
-import constants.Settings;
 import mdps.MDP;
 import mdps.Tileworld;
 import mdps.elements.Action;
 import mdps.elements.QEdge;
 import mdps.elements.State;
+import settings.TileworldSettings;
 
 
 public class TileworldGenerator extends MDPGenerator
@@ -31,7 +31,7 @@ public class TileworldGenerator extends MDPGenerator
 			tileworld.addAction(a);
 		}
 		
-		int worldSize = Settings.WORLD_SIZE;
+		int worldSize = TileworldSettings.WORLD_SIZE;
 		
 		// add states and store them in a two-dimensional array
 		State[][] stateArr = new State[worldSize][worldSize];
@@ -64,7 +64,7 @@ public class TileworldGenerator extends MDPGenerator
 		}
 		
 		// add obstacles
-		int numObstacles = ((int)(Settings.OBSTACLE_RATE * tileworld.countStates()));
+		int numObstacles = TileworldSettings.INITIAL_NR_WALLS;
 		List<State> obstacles = tileworld.getRandomStates(numObstacles);
 		
 		for (State obstacle : obstacles) {
@@ -75,11 +75,7 @@ public class TileworldGenerator extends MDPGenerator
 		// set rewards
 		// everything to 0, except for obstacles, they are unreachable
 		for (QEdge qe : tileworld.getQEdges()) {
-			if (obstacles.contains(qe.getToVertex())) {
-				qe.setReward(-Settings.SCORE-Settings.SCORE_SD);
-			} else {
-				qe.setReward(0);
-			}
+			qe.setReward(0);
 		}
 		
 		tileworld.updateAgent();

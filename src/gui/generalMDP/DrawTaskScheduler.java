@@ -5,8 +5,8 @@ import java.util.NoSuchElementException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import constants.Settings;
 import messaging.jung.ChangeMessage;
+import settings.GeneralMDPSettings;
 
 public class DrawTaskScheduler 
 {
@@ -41,8 +41,8 @@ public class DrawTaskScheduler
 		if (!running) {
 			running = true;
 			timer = new Timer();
-			timer.schedule(new ExecuteTask(), Settings.REPAINT_DELAY, 
-					Settings.REPAINT_DELAY); 
+			timer.schedule(new ExecuteTask(), GeneralMDPSettings.REPAINT_DELAY, 
+					GeneralMDPSettings.REPAINT_DELAY); 
 		}
 	}
 		      

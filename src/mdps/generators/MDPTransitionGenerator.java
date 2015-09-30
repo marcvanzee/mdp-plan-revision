@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.Random;
 
 import constants.MathOperations;
-import constants.Settings;
 import mdps.MDP;
 import mdps.elements.Action;
 import mdps.elements.ActionEdge;
 import mdps.elements.QEdge;
 import mdps.elements.QState;
 import mdps.elements.State;
+import settings.GeneralMDPSettings;
 
 public class MDPTransitionGenerator 
 {
@@ -45,8 +45,8 @@ public class MDPTransitionGenerator
 
 	private void add(State s1, Action a, State s2, double probability) 
 	{
-		double minReward = Settings.MIN_REWARD;
-		double maxReward = Settings.MAX_REWARD;
+		double minReward = GeneralMDPSettings.MIN_REWARD;
+		double maxReward = GeneralMDPSettings.MAX_REWARD;
 		
 		double reward = r.nextDouble() * (maxReward - minReward) + minReward;
 		

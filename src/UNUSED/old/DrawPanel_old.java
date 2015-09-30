@@ -19,7 +19,7 @@ import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DefaultListenableGraph;
 import org.jgrapht.graph.DirectedMultigraph;
 
-import constants.Settings;
+import settings.GeneralMDPSettings;
 
 class DrawPanel_old extends JPanel {
 	

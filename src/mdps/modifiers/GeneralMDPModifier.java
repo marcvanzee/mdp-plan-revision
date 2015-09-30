@@ -1,12 +1,12 @@
 package mdps.modifiers;
 
 import constants.MathOperations;
-import constants.Settings;
 import mdps.MDP;
 import mdps.elements.Action;
 import mdps.elements.Agent;
 import mdps.elements.State;
 import mdps.generators.GeneralMDPGenerator;
+import settings.GeneralMDPSettings;
 
 /**
  * This class can make the following changes to an MDP:
@@ -55,7 +55,7 @@ public class GeneralMDPModifier
 		this.mdp = mdp;
 		
 		// only add and remove nodes when the MDP is a tree
-		if (!Settings.CYCLES_ALLOWED) 
+		if (!GeneralMDPSettings.CYCLES_ALLOWED) 
 		{
 			// first remove nodes, so we make sure we won't remove nodes we just have added
 			removeNodes();
@@ -68,11 +68,11 @@ public class GeneralMDPModifier
 	
 	private void addNodes() 
 	{
-		int avgNodesToAdd = avgNodesToChange(mdp, Settings.D_GAMMA);
+		int avgNodesToAdd = avgNodesToChange(mdp, GeneralMDPSettings.D_GAMMA);
 		
 		// there's no limit on the number of nodes to add
 		int numNodesToAdd = MathOperations.getRandomInt(
-				avgNodesToAdd, Settings.ACTION_VARIANCE, 0, Integer.MAX_VALUE);
+				avgNodesToAdd, GeneralMDPSettings.ACTION_VARIANCE, 0, Integer.MAX_VALUE);
 		
 		while (numNodesToAdd > 0)
 		{
@@ -92,8 +92,8 @@ public class GeneralMDPModifier
 	
 	private void removeNodes() 
 	{
-		int avgNodesToRemove = avgNodesToChange(mdp, Settings.D_GAMMA);
-		int variance = Settings.ACTION_VARIANCE;
+		int avgNodesToRemove = avgNodesToChange(mdp, GeneralMDPSettings.D_GAMMA);
+		int variance = GeneralMDPSettings.ACTION_VARIANCE;
 		// we can not remove all nodes, because the one where the agent is on should never be removed
 		int numNodesToRemove = MathOperations.getRandomInt(avgNodesToRemove, variance, 1, mdp.countActions());
 		
@@ -114,11 +114,11 @@ public class GeneralMDPModifier
 	private void changeProbabilities() 
 	{
 		// obtain the average amount of QEdges from which to change the probability
-		int avgNodesToChangeProbability = avgNodesToChange(mdp, Settings.D_GAMMA);
+		int avgNodesToChangeProbability = avgNodesToChange(mdp, GeneralMDPSettings.D_GAMMA);
 		
 		int numNodesToChangeProbability = 
 				MathOperations.getRandomInt(
-						avgNodesToChangeProbability, Settings.ACTION_VARIANCE, 0, mdp.countQEdges());
+						avgNodesToChangeProbability, GeneralMDPSettings.ACTION_VARIANCE, 0, mdp.countQEdges());
 		
 		// change probabilities here
 	}
@@ -126,18 +126,18 @@ public class GeneralMDPModifier
 	private void changeRewards()
 	{
 		// obtain the average amount of QEdges from which to change the rewards
-		int avgNodesToChangeReward = avgNodesToChange(mdp, Settings.D_GAMMA);
+		int avgNodesToChangeReward = avgNodesToChange(mdp, GeneralMDPSettings.D_GAMMA);
 		
 		int numNodesToChangeReward =
 				MathOperations.getRandomInt(
-						avgNodesToChangeReward, Settings.ACTION_VARIANCE, 0, mdp.countQEdges());	
+						avgNodesToChangeReward, GeneralMDPSettings.ACTION_VARIANCE, 0, mdp.countQEdges());	
 	}
 	
 	// Note: nodeToAdd(MDP) and nodeToRemove(MDP) are currently identical, 
 	// but they could be altered to implement for instance a growing or shrinking MDP.
 	private int avgNodesToChange(MDP mdp, double gamma) 
 	{
-		double dynamicity = Settings.DYNAMICITY; 
+		double dynamicity = 0.5; //GeneralMDPSettings.DYNAMICITY; 
 		int numStates = mdp.countStates();
 		
 		return (int) (dynamicity * numStates * gamma);

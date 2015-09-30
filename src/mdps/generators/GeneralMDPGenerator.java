@@ -6,10 +6,10 @@ import java.util.LinkedList;
 import java.util.Random;
 
 import constants.MathOperations;
-import constants.Settings;
 import mdps.MDP;
 import mdps.elements.Action;
 import mdps.elements.State;
+import settings.GeneralMDPSettings;
 
 /**
  * This class generates an arbitrary MDP in the method run(MDP), based on the settings in constants.SimulationSettings.
@@ -50,8 +50,8 @@ public class GeneralMDPGenerator extends MDPGenerator
 	public void run(MDP mdp) 
 	{
 		
-		int countMaxStates = Settings.NUM_STATES,
-				numActions = Settings.NUM_ACTIONS;
+		int countMaxStates = GeneralMDPSettings.NUM_STATES,
+				numActions = GeneralMDPSettings.NUM_ACTIONS;
 		
 		mdp.reset();
 		
@@ -62,8 +62,8 @@ public class GeneralMDPGenerator extends MDPGenerator
 		LinkedList<State> stateQueue = new LinkedList<State>();
 		
 		// don't allow cycles for the first state
-		boolean cycles = Settings.CYCLES_ALLOWED;
-		Settings.CYCLES_ALLOWED = false;
+		boolean cycles = GeneralMDPSettings.CYCLES_ALLOWED;
+		GeneralMDPSettings.CYCLES_ALLOWED = false;
 		
 		while (mdp.countStates() < countMaxStates) 
 		{
@@ -78,7 +78,7 @@ public class GeneralMDPGenerator extends MDPGenerator
 				stateQueue.addAll(newQueue);
 			}
 			
-			Settings.CYCLES_ALLOWED = cycles;
+			GeneralMDPSettings.CYCLES_ALLOWED = cycles;
 		}
 	}
 	
@@ -86,17 +86,17 @@ public class GeneralMDPGenerator extends MDPGenerator
 	{
 		LinkedList<State> returnQueue = new LinkedList<State>();
 		
-		int countMaxStates = Settings.NUM_STATES;
+		int countMaxStates = GeneralMDPSettings.NUM_STATES;
 		
 		// a is deterministic with p = Settings.P_DETERMINISTIC
-		if (MathOperations.throw_dice(Settings.P_DETERMINISTIC))
+		if (MathOperations.throw_dice(GeneralMDPSettings.P_DETERMINISTIC))
 		{
 			State nextState;
 			// we have to find a single successor state
 			// if no cycles are allowed we have to create a new state
 			// if cycles are allowed we create a new state with probability 1-Settings.P_CYCLE
 			// we combine these two things in a single if-statement
-			if (!Settings.CYCLES_ALLOWED || MathOperations.throw_dice(1-Settings.P_CYCLE))
+			if (!GeneralMDPSettings.CYCLES_ALLOWED || MathOperations.throw_dice(1-GeneralMDPSettings.P_CYCLE))
 			{
 				
 				nextState = mdp.addState();
@@ -118,12 +118,12 @@ public class GeneralMDPGenerator extends MDPGenerator
 		{	
 			// a is non-deterministic
 			// we select an arbitrary number of successor states in [1,Settings.MAX_SUCCESSOR_STATES]
-			int numNewStates = r.nextInt(Settings.MAX_SUCCESSOR_STATES-1)+1;
+			int numNewStates = r.nextInt(GeneralMDPSettings.MAX_SUCCESSOR_STATES-1)+1;
 			
 			ArrayList<State> nextStates;
 			
 			// if we allow no cycles, we have to generate all new states
-			if (!Settings.CYCLES_ALLOWED) 
+			if (!GeneralMDPSettings.CYCLES_ALLOWED) 
 			{
 				// if this is the first time, do not create more states than we have to
 				if (initial)
@@ -136,7 +136,7 @@ public class GeneralMDPGenerator extends MDPGenerator
 			else
 			{
 				// if cycles are allowed, select m existing nodes with m = n * Settings.P_CYCLE
-				int countMaxExistingStates = (int)(numNewStates *  Settings.P_CYCLE);
+				int countMaxExistingStates = (int)(numNewStates *  GeneralMDPSettings.P_CYCLE);
 			
 				nextStates = mdp.getRandomStates(countMaxExistingStates);
 				
@@ -187,8 +187,8 @@ public class GeneralMDPGenerator extends MDPGenerator
 	private LinkedList<Action> generateActionSet(MDP mdp) 
 	{
 		int countActions = mdp.countActions();
-		int avgActions = Settings.AVG_ACTIONS_STATE;
-		int variance = Settings.ACTION_VARIANCE;
+		int avgActions = GeneralMDPSettings.AVG_ACTIONS_STATE;
+		int variance = GeneralMDPSettings.ACTION_VARIANCE;
 		
 		// we select randomly avgActions +/- SimulationSettings.actionsVariance
 		// if avgActions = n, then we select max(n-actionsVariance,1) to min(numActions,n+actionsVariance) actions.

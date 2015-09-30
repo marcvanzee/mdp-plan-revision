@@ -18,7 +18,7 @@ import javax.swing.JLabel;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 
-import constants.Settings;
+import settings.GeneralMDPSettings;
 import simulations.MDPSimulation;
 import simulations.TileworldSimulation;
 
@@ -338,66 +338,12 @@ public class MDPGUI implements ItemListener {
 	
 	private void initializeParametersInGUI() 
 	{
-		int worldSize = Settings.WORLD_SIZE,
-				lifeExpectancy = Settings.LIFE_EXPECTANCY,
-				gestationPeriod = Settings.GESTATION_PERIOD,
-				planningTime = Settings.PLANNING_TIME,
-				boldness = Settings.BOLDNESS;
-		double dynamicity = Settings.DYNAMICITY,
-				obstacleRate = Settings.OBSTACLE_RATE;
 		
-		textFieldWorldsize.setText(Integer.toString(worldSize));
-		textFieldLifeExpectancy.setText(Integer.toString(lifeExpectancy));
-		textFieldDynamicity.setText(Double.toString(dynamicity));
-		textFieldGestationPeriod.setText(Integer.toString(gestationPeriod));
-		textFieldPlanningTime.setText(Integer.toString(planningTime));
-		textFieldBoldness.setText(Integer.toString(boldness));
-		textFieldObstacleRate.setText(Double.toString(obstacleRate));
 	}
 
 	private void getParametersFromGUI() throws Exception 
 	{
-		int worldSize = validateInt(textFieldWorldsize,1,1000),
-				lifeExpectancy = validateInt(textFieldLifeExpectancy,1,1000),
-				gestationPeriod = validateInt(textFieldGestationPeriod,1,1000),
-				planningTime = validateInt(textFieldPlanningTime,1,1000),
-				boldness = validateInt(textFieldBoldness,1,1000);
-		double dynamicity = validateDouble(textFieldDynamicity, 0, 1),
-				obstacleRate = validateDouble(textFieldObstacleRate, 0, 1);
 		
-		Settings.WORLD_SIZE = worldSize;
-		Settings.LIFE_EXPECTANCY = lifeExpectancy;
-		Settings.GESTATION_PERIOD = gestationPeriod;
-		Settings.PLANNING_TIME = planningTime;
-		Settings.BOLDNESS = boldness;
-		Settings.DYNAMICITY = dynamicity;
-		Settings.OBSTACLE_RATE = obstacleRate;
-		
-		//validateConstraints();
-	}
-	
-	private void validateConstraints() throws Exception {
-		if (Settings.MIN_REWARD > Settings.MAX_REWARD) {
-			throw new Exception("Constraints not satisfied");
-		}
-	}
-	
-	private int validateInt(JTextField textField, int min, int max) throws Exception {
-		int ret = Integer.parseInt(textField.getText());
-		if ((ret >= min) && (ret <= max)) {
-			return ret;
-		} else {
-			throw new Exception("Parsing problem");
-		}
-	}
-	
-	private double validateDouble(JTextField textField, double min, double max) throws Exception {
-		double ret = Double.parseDouble(textField.getText());
-		if ((ret >= min) && (ret <= max)) {
-			return ret;
-		} else {
-			throw new Exception("Parsing problem");
-		}
 	}
 
 	@Override
