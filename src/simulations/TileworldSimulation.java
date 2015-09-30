@@ -98,13 +98,13 @@ public class TileworldSimulation extends BasicSimulation
 		// simply select the unique qstate and state and move there.
 		
 		final QState qState = mdp.getQState(currentState, selectedAction);
-		final QEdge qEdge = mdp.getQEdges(qState).get(0);
-		
-		agent.reward(qEdge.getReward());
-		
+		final State newState = mdp.getQEdges(qState).get(0).getToVertex();
+				
 		agent.getCurrentState().setVisited(false);
-		agent.setCurrentState(qEdge.getToVertex());
-		agent.getCurrentState().setVisited(true);
+		agent.setCurrentState(newState);
+		newState.setVisited(true);
+		
+		agent.reward();
 	}
 	
 	private void addHole() 
@@ -117,22 +117,14 @@ public class TileworldSimulation extends BasicSimulation
 		int score = MathOperations.getRandomInt(
 				TileworldSettings.HOLE_SCORE_MIN, TileworldSettings.HOLE_SCORE_MAX);
 		
-		System.out.println("added hole, score: " + score + ", life exp: " + lifetime);
-
-		for (QEdge qe : tileworld.getQEdges()) {
-			if (qe.getToVertex() == hole) {
-				qe.setReward(score);
-			}
-		}
-		
+		hole.setReward(score);
 		hole.setLifeTime(lifetime);
+		hole.setHole(true);
 
 		tileworld.addHole(hole);
-		hole.setHole(true);
-				
+						
 		setNextHole();
 		
-		System.out.println("number of holes: " + tileworld.getHoles().size());
 		agent.recomputePolicy();
 	}
 	
@@ -165,11 +157,7 @@ public class TileworldSimulation extends BasicSimulation
 			hole.setHole(false);
 			tileworld.removeHole(hole);
 			
-			for (QEdge qe : mdp.getQEdges()) {
-				if (qe.getToVertex() == hole) {
-					qe.setReward(0);
-				}
-			}
+			hole.setReward(0.0);
 		}	
 	}
 }

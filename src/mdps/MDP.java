@@ -292,10 +292,9 @@ public class MDP
 		return edge;
 	}
 	
-	public QEdge createQEdge(QState qState, State s, double prop,
-			double reward) 
+	public QEdge createQEdge(QState qState, State s, double prop) 
 	{
-		QEdge qEdge = new QEdge(qState, s, prop, reward);
+		QEdge qEdge = new QEdge(qState, s, prop);
 		this.qEdges.add(qEdge);
 		
 		addMessage(new AddQEdgesMessage(qEdge));

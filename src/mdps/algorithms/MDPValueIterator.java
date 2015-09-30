@@ -88,53 +88,55 @@ public class MDPValueIterator
 		// removeHighlights();
 		
 		int k = 0;
+		
 		boolean finished = true;
 		
 		do {
+			finished = true;
 			k++;
 			for (State s : mdp.getStates())
 			{
+				
 				prevV.put(s, V.get(s));
 				
-				setMaxValue(s);
+				updateV(s);
 				
-				if ((V.get(s) - prevV.get(s)) >= theta) 
+				if ((V.get(s) - prevV.get(s)) >= theta) {
 					finished = false;
+				}
 				
 			}
-		} while (!finished); //k < ValueIterationSettings.ITERATIONS && !finished);
+		} while (k < ValueIterationSettings.ITERATIONS && !finished);
 		
 		computePolicy();
 		
 		setOptimalVerticesAndEdges();
 	}
 	
-	private void setMaxValue(State s) 
+	private void updateV(State s) 
 	{
-		// first compute values
 		double max = Integer.MIN_VALUE;
-		Action a = null;
 		
 		if (stateToActionEdges.size() == 0)
 			return;
 		
 		for (ActionEdge ae : stateToActionEdges.get(s)) 
 		{
-			double sum = 0;
 			QState toState = ae.getToVertex();
 			
 			if (!qStateToQEdges.containsKey(toState))
 				continue;
 			
-			for (QEdge qe : qStateToQEdges.get(toState))
-			{
-				State s2 = qe.getToVertex();
-				double v = prevV.containsKey(s2) ? prevV.get(s2) : V.get(s2);
-				sum += qe.getProbability() * (qe.getReward() + gamma * v);
-			}
+			// only one successor state since domain is deterministic
+			State s2 = qStateToQEdges.get(toState).get(0).getToVertex();
 			
-			if (sum > max)
-				max = sum;
+			double reward = s.getReward(),
+					previousV = prevV.containsKey(s2) ? prevV.get(s2) : V.get(s2);
+			
+			double v = reward + gamma * previousV;
+			
+			if (v > max)
+				max = v;
 		}
 		
 		V.put(s, max);

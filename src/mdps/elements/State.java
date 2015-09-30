@@ -15,7 +15,7 @@ public class State extends Vertex<ActionEdge>
 	boolean isObstacle = false;
 	boolean isHole = false;
 	int lifeTime;
-	double value;
+	double value, reward;
 	
 	
 	public State(String name) {
@@ -33,6 +33,14 @@ public class State extends Vertex<ActionEdge>
 		this.isObstacle = isObstacle;
 		
 		setColor();
+	}
+	
+	public void setReward(double r) {
+		this.reward = r;
+	}
+	
+	public double getReward() {
+		return this.reward;
 	}
 	
 	public void setHole(boolean isHole) {

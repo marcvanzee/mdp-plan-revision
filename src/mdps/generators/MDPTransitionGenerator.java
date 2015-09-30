@@ -6,6 +6,7 @@ import java.util.Random;
 
 import constants.MathOperations;
 import mdps.MDP;
+import mdps.Tileworld;
 import mdps.elements.Action;
 import mdps.elements.ActionEdge;
 import mdps.elements.QEdge;
@@ -91,7 +92,11 @@ public class MDPTransitionGenerator
 			
 		}
 		
-		QEdge qEdge = mdp.createQEdge(qState, s2, probability, reward);
+		if (!(mdp instanceof Tileworld)) {
+			s2.setReward(reward);
+		}
+		
+		QEdge qEdge = mdp.createQEdge(qState, s2, probability);
 		qState.addEdge(qEdge);
 	}
 	

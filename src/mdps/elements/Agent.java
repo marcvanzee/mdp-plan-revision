@@ -37,7 +37,7 @@ public class Agent
 	private Action nextAction = null;
 	private double reward = 0;
 	private int deliberations = 0, acts = 0;
-	private boolean delib = true;
+	private boolean delib = false;
 	
 	//
 	// CONSTRUCTORS
@@ -121,8 +121,9 @@ public class Agent
 		}
 	}
 	
-	public void reward(double r) {
-		reward += r;
+	public void reward() {
+		if (currentState != null)
+			reward += currentState.getReward();
 	}
 	
 	public double getReward() {

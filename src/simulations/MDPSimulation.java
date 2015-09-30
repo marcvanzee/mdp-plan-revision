@@ -119,7 +119,7 @@ public class MDPSimulation extends BasicSimulation
 		i--;
 		QEdge qEdge = qEdges.get(i);
 		
-		agent.reward(qEdge.getReward());
+		agent.reward();
 		
 		agent.getCurrentState().setVisited(false);
 		agent.setCurrentState(qEdge.getToVertex());
