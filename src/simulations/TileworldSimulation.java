@@ -8,7 +8,6 @@ import constants.MathOperations;
 import mdps.Tileworld;
 import mdps.elements.Action;
 import mdps.elements.Agent;
-import mdps.elements.QEdge;
 import mdps.elements.QState;
 import mdps.elements.State;
 import mdps.factories.MDPType;
