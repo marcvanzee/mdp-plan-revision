@@ -25,8 +25,7 @@ public class TileworldSimulation extends BasicSimulation
 	private final TileworldGenerator tileWorldGenerator = new TileworldGenerator();
 	private final Agent agent;
 	private final Tileworld tileworld;
-	
-	private int agentSteps = 0;
+	private double maxScore = 0;
 	
 	private int nextHole;
 	
@@ -51,12 +50,13 @@ public class TileworldSimulation extends BasicSimulation
 	public void buildNewModel() 
 	{
 		steps = 0;
-		agentSteps = 0;
+		maxScore = 0;
 		
 		if (isRunning)
 			timer.cancel();
 		
 		tileworld.reset();
+		agent.reset();
 		
 		// generate a tileworld	
 		this.tileWorldGenerator.run(mdp);
@@ -66,36 +66,45 @@ public class TileworldSimulation extends BasicSimulation
 				
 		notifyGUI();
 		
-		setNextHole();
+		// immediately create a hole and tell event to deliberate
+		nextHole = 0; 
+		agent.deliberateForEvent();
 	}
 		
 	public void step() 
 	{
-		steps++;
-		nextHole--;
-		
 		if (nextHole <= 0) {
 			addHole();
 		}
 		
-		// first clear the message buffer
-		mdp.clearMessageBuffer();
-		
 		if (steps % TileworldSettings.DYNAMISM == 0) {
-			agentSteps++;
 			
 			// get the next choice by the agent
-			if (agent != null)
+			if (agent != null) {
 				agent.step();
 					
-			// if the agent acted, move the agent and compute its reward
-			if (agent != null && agent.getNextAction() != null)
-				moveAgent(agent.getCurrentState(), agent.getNextAction());
+				// if the agent acted, move the agent and compute its reward
+				if (agent.getNextAction() != null)
+					moveAgent(agent.getCurrentState(), agent.getNextAction());
+			}
 		}
-				
-				
+		
+		steps++;
+		nextHole--;
+		
+		// first clear the message buffer
+		mdp.clearMessageBuffer();
+			
 		decreaseLifetimeHoles();	
 		notifyGUI();
+	}
+	
+	public double getAgentScore() {
+		return agent.getScore();
+	}
+	
+	public double getMaxScore() {
+		return maxScore;
 	}
 	
 	protected void moveAgent(State currentState, Action selectedAction) 
@@ -103,12 +112,16 @@ public class TileworldSimulation extends BasicSimulation
 		// in the tileworld, everything is completely deterministic so moving is quite easy.
 		// simply select the unique qstate and state and move there.
 		
+		System.out.println("action at step " + steps + ": " + selectedAction);
 		final QState qState = mdp.getQState(currentState, selectedAction);
 		final State newState = mdp.getQEdges(qState).get(0).getToVertex();
 				
 		agent.getCurrentState().setVisited(false);
 		agent.setCurrentState(newState);
 		newState.setVisited(true);
+		
+		if (newState.isObstacle())
+			System.out.println("moving to obstacle at step " + steps);
 		
 		agent.reward();
 	}
@@ -126,12 +139,12 @@ public class TileworldSimulation extends BasicSimulation
 		hole.setReward(score);
 		hole.setLifeTime(lifetime);
 		hole.setHole(true);
+		
+		this.maxScore += score;		
 
 		tileworld.addHole(hole);
 						
 		setNextHole();
-		
-		agent.recomputePolicy();
 	}
 	
 	
@@ -147,9 +160,6 @@ public class TileworldSimulation extends BasicSimulation
 		final List<State> toRemove = new LinkedList<State>();
 		final State agState = agent.getCurrentState();
 		final List<State> holes = tileworld.getHoles();
-		
-		if (agState.isHole()) 
-			agent.recomputePolicy();
 		
 		for (State hole : holes) {
 			hole.decreaseLifetime();

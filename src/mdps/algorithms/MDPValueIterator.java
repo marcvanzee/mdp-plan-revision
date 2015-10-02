@@ -24,9 +24,6 @@ public class MDPValueIterator
 {	
 	final protected MDP mdp;
 	
-	// use these mappings for efficiency so we don't have to look them up every time
-	final Map<State,ArrayList<ActionEdge>> stateToActionEdges = new HashMap<State,ArrayList<ActionEdge>>();
-	
 	// only works in deterministic domain
 	// we create a hashmap from s -> map(a,s)
 	final Map<State,Map<Action,State>> stateActionToState = new HashMap<State,Map<Action,State>>();
@@ -117,18 +114,13 @@ public class MDPValueIterator
 	{
 		double max = Integer.MIN_VALUE;
 		
-		if (stateToActionEdges.size() == 0)
+		if (stateActionToState.get(s).size() == 0)
 			return;
 		
-		for (ActionEdge ae : stateToActionEdges.get(s)) 
-		{
-			QState toState = ae.getToVertex();
-			
-			if (!qStateToQEdges.containsKey(toState))
-				continue;
-			
+		for (Map.Entry<Action,State> as : stateActionToState.get(s).entrySet()) 
+		{			
 			// only one successor state since domain is deterministic
-			State s2 = qStateToQEdges.get(toState).get(0).getToVertex();
+			State s2 = as.getValue();
 			
 			double reward = s.getReward(),
 					previousV = prevV.containsKey(s2) ? prevV.get(s2) : V.get(s2);
@@ -153,7 +145,6 @@ public class MDPValueIterator
 			// value iteration
 			V.put(s, 0.0);
 			
-			ArrayList<ActionEdge> actionEdges = new ArrayList<ActionEdge>();
 			Map<Action,State> asMap = new HashMap<Action,State>();
 			
 			for (ActionEdge ae : mdp.getActionEdges())
@@ -168,14 +159,12 @@ public class MDPValueIterator
 						State s2 = qes.get(0).getToVertex();
 						if (!s2.isObstacle()) {
 							asMap.put(a, s2);
-							actionEdges.add(ae);
 						}
 					}
 				}					
 			}
 			
 			stateActionToState.put(s, asMap);
-			stateToActionEdges.put(s, actionEdges);
 		}
 		
 		// qstate to qedges mappings
@@ -218,6 +207,12 @@ public class MDPValueIterator
 			}
 			
 			policy.put(s, a);
+			
+			if (!stateActionToState.get(s).containsKey(a))
+				System.out.println("#### policy chose invalid action from " + s + " using " + a);
+			else 
+				if (stateActionToState.get(s).get(a).isObstacle())
+					System.out.println("#### policy mapped to obstacle from " + s + " using " + a);
 		}
 	}
 	

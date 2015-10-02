@@ -4,7 +4,9 @@ import java.util.Map;
 
 import constants.SimulationConstants;
 import mdps.MDP;
+import mdps.Tileworld;
 import mdps.algorithms.MDPValueIterator;
+import settings.TileworldSettings;
 
 /**
  * An agent resides in an MDP. It has two action:
@@ -33,11 +35,11 @@ public class Agent
 	private final Map<State,Action> policy;
 	private final MDP mdp;
 	
-	private State currentState = null;
-	private Action nextAction = null;
-	private double reward = 0;
+	private State currentState = null, prevState = null;
+	private double score = 0;
 	private int deliberations = 0, acts = 0;
-	private boolean delib = false;
+	private int actSteps = 0;
+	private boolean deliberateForEvent = false;	
 	
 	//
 	// CONSTRUCTORS
@@ -59,7 +61,7 @@ public class Agent
 	}
 	
 	public Action getNextAction() {
-		return nextAction;
+		return policy.get(currentState);
 	}
 	
 	public State getCurrentState() {
@@ -70,7 +72,6 @@ public class Agent
 		// position ourselves on the first state
 		currentState = mdp.getRandomState();
 	}
-
 	
 	//
 	// OTHER PUBLIC METHODS
@@ -81,53 +82,59 @@ public class Agent
 	 * Choices for what has been done are:
 	 * 1. contants.SimulationConstants.AGENT_CHOICE_DELIBERATE
 	 * 2. contants.SimulationConstants.AGENT_CHOICE_ACT
-	 * 
+	 * 	
 	 */
 	public int step() 
-	{
-		/*int index = mdp.getStateIndex(currentState);
-		State currentState = mdp.getState(index);
+	{		
+		int boldness = TileworldSettings.BOLDNESS,
+				nrHoles = ((Tileworld) mdp).getHoles().size();
 		
-		if 
-			// if the current state is null or there is no policy we have to deliberate
-			( (currentState == null) || (policy == null) ||
-			
-			// if the action that should be executed is not possible according to the MDP, deliberate as well
-			(index >= mdp.countStates()) || 
-				(mdp.getActionEdge(currentState, policy[index]) == null) ||
-						
-			// deliberate with probability pDeliberate
-			MathOperations.throw_dice(Settings.P_DELIBERATE))
+		/* 
+		 * The agent has to deliberate if there are holes AND EITHER
+		 * 1. commitment degree == actSteps, or
+		 * 2. boldness == -1 and the optimal state has been reached, or
+		 * 3. reaction strategy is true
+		 */
+		if ((nrHoles > 0) && 
+			(	(actSteps == boldness) ||
+				(boldness == -1 && inOptimalState()) ||
+				deliberateForEvent	))
 		{
-			System.out.println("<Agent> I will deliberate");
+			deliberateForEvent = false;
+			System.out.println("deliberating at step " + (deliberations+acts));
 			deliberate();
 			return SimulationConstants.AGENT_CHOICE_DELIBERATE;
-		}
-		else {
-			System.out.println("<Agent> I will act");
+		} else 
+		{
 			act();
 			return SimulationConstants.AGENT_CHOICE_ACT;
-		}*/
+		}
+	}
+	
+	public void deliberateForEvent() {
+		this.deliberateForEvent = true;
+	}
+	
+	public boolean inOptimalState() 
+	{
+		if (prevState == null) return false;
 		
-		if (delib) {
-			System.out.println("deliberating");
-			deliberate();
-			delib = false;
-			return SimulationConstants.AGENT_CHOICE_DELIBERATE;
-		} else {
-			//System.out.println("acting");
-			act();
-			return SimulationConstants.AGENT_CHOICE_ACT;
-		}
+		// the agent is in an optimal state if it wants to return to the state it came from
+		State nextState = ((Tileworld) mdp).getStatePolicy().get(currentState);
+		boolean ret = (prevState == nextState);
+		
+		if (ret) System.out.println("in optimal state: " + nextState + " and " + prevState);
+		
+		return ret;
 	}
 	
 	public void reward() {
 		if (currentState != null)
-			reward += currentState.getReward();
+			score += currentState.getReward();
 	}
 	
-	public double getReward() {
-		return reward;
+	public double getScore() {
+		return score;
 	}
 	
 	public int getDeliberations() {
@@ -138,16 +145,22 @@ public class Agent
 		return acts;
 	}
 	
-	public void recomputePolicy() {
-		delib = true;
-	}
-	
 	public double getValue(State s) {
 		return valueIterator.getValue(s);
 	}
 	
 	public void update() {
 		valueIterator.update();
+	}
+	
+	public void reset() {
+		currentState = null;
+		prevState = null;
+		score = 0;
+		deliberations = 0;
+		acts = 0;
+		actSteps = 0;
+		deliberateForEvent = false;
 	}
 		
 	/**
@@ -157,9 +170,12 @@ public class Agent
 	 */
 	private void deliberate() 
 	{
+		prevState = null;
+		
 		deliberations++;
 		valueIterator.run(mdp);
-		nextAction = null; // don't move
+		
+		score -= TileworldSettings.PLANNING_COST;
 	}
 	
 	/**
@@ -168,6 +184,6 @@ public class Agent
 	private void act() 
 	{
 		acts++;
-		nextAction = policy.get(currentState);
+		prevState = currentState;
 	}
 }
