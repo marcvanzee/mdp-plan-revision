@@ -6,12 +6,14 @@ import java.util.List;
 
 import constants.MathOperations;
 import mdps.Tileworld;
+import mdps.algorithms.ShortestPath;
 import mdps.elements.Action;
 import mdps.elements.Agent;
 import mdps.elements.QState;
 import mdps.elements.State;
 import mdps.factories.MDPType;
 import mdps.generators.TileworldGenerator;
+import messaging.tileworld.AgentMessage;
 import settings.TileworldSettings;
 
 /**
@@ -69,10 +71,12 @@ public class TileworldSimulation extends BasicSimulation
 		// immediately create a hole and tell event to deliberate
 		nextHole = 0; 
 		agent.deliberateForEvent();
+		
 	}
 		
 	public void step() 
 	{
+		
 		if (nextHole <= 0) {
 			addHole();
 		}
@@ -112,7 +116,6 @@ public class TileworldSimulation extends BasicSimulation
 		// in the tileworld, everything is completely deterministic so moving is quite easy.
 		// simply select the unique qstate and state and move there.
 		
-		System.out.println("action at step " + steps + ": " + selectedAction);
 		final QState qState = mdp.getQState(currentState, selectedAction);
 		final State newState = mdp.getQEdges(qState).get(0).getToVertex();
 				
@@ -120,8 +123,7 @@ public class TileworldSimulation extends BasicSimulation
 		agent.setCurrentState(newState);
 		newState.setVisited(true);
 		
-		if (newState.isObstacle())
-			System.out.println("moving to obstacle at step " + steps);
+		agent.removeActionFromPlan();
 		
 		agent.reward();
 	}
@@ -143,7 +145,9 @@ public class TileworldSimulation extends BasicSimulation
 		this.maxScore += score;		
 
 		tileworld.addHole(hole);
-						
+		
+		agent.inform(AgentMessage.HOLE_APPEARS, hole);
+		
 		setNextHole();
 	}
 	
@@ -174,6 +178,8 @@ public class TileworldSimulation extends BasicSimulation
 			tileworld.removeHole(hole);
 			
 			hole.setReward(0.0);
+			
+			agent.inform(AgentMessage.HOLE_DISAPPEARS, hole);
 		}	
 	}
 }

@@ -7,6 +7,7 @@ import java.util.Map;
 
 import constants.MathOperations;
 import mdps.elements.State;
+import settings.TileworldSettings;
 
 /**
  * This is the Kinny and Georgeff TileWorld
@@ -113,6 +114,41 @@ public class Tileworld extends PopulatedMDP
 		return neighbors.size() > 0 ?
 				neighbors.get(MathOperations.getRandomInt(0, neighbors.size())) : null;
 		
+	}
+	
+	public List<State> getNeighbors(State s) 
+	{
+		int x = s.getX(),
+				y = s.getY(),
+				worldSize = TileworldSettings.WORLD_SIZE;
+		
+		List<State> ret = new LinkedList<State>();
+		
+		if (x > 0) {
+			State left = getState(x-1,y);
+			if (!left.isObstacle())
+				ret.add(left);
+		}
+		
+		if (y > 0) {
+			State above = getState(x,y-1);
+			if (!above.isObstacle())
+				ret.add(above);
+		}
+		
+		if (x < worldSize-1) {
+			State right = getState(x+1,y);
+			if (!right.isObstacle())
+				ret.add(right);
+		}
+		
+		if (y < worldSize-1) {
+			State below = getState(x,y+1);
+			if (!below.isObstacle())
+				ret.add(below);
+		}
+		
+		return ret;
 	}
 	
 	public void reset() {

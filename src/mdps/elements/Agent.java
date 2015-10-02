@@ -1,11 +1,15 @@
 package mdps.elements;
 
+import java.util.LinkedList;
 import java.util.Map;
 
 import constants.SimulationConstants;
 import mdps.MDP;
 import mdps.Tileworld;
 import mdps.algorithms.MDPValueIterator;
+import mdps.algorithms.ShortestPath;
+import messaging.tileworld.AgentMessage;
+import settings.ReactionStrategy;
 import settings.TileworldSettings;
 
 /**
@@ -32,6 +36,7 @@ import settings.TileworldSettings;
 public class Agent 
 {
 	private final MDPValueIterator valueIterator;
+	private LinkedList<Action> plan;
 	private final Map<State,Action> policy;
 	private final MDP mdp;
 	
@@ -40,6 +45,7 @@ public class Agent
 	private int deliberations = 0, acts = 0;
 	private int actSteps = 0;
 	private boolean deliberateForEvent = false;	
+	private State currentTarget = null;
 	
 	//
 	// CONSTRUCTORS
@@ -48,6 +54,7 @@ public class Agent
 		this.mdp = mdp;
 		
 		this.valueIterator = new MDPValueIterator(mdp);
+		this.plan = new LinkedList<Action>();;
 		
 		this.policy = valueIterator.getPolicy();
 	}
@@ -61,7 +68,14 @@ public class Agent
 	}
 	
 	public Action getNextAction() {
-		return policy.get(currentState);
+		switch (TileworldSettings.ALGORITHM) {
+		case VALUE_ITERATION:
+			return policy.get(currentState);
+		case SHORTEST_PATH:
+			return (plan == null || plan.isEmpty() ? null : plan.getFirst());
+		}
+		
+		return null;
 	}
 	
 	public State getCurrentState() {
@@ -71,6 +85,11 @@ public class Agent
 	public void setCurrentStateRandomly() {
 		// position ourselves on the first state
 		currentState = mdp.getRandomState();
+	}
+	
+	public void removeActionFromPlan() {
+		if (plan != null && plan.size() > 0)
+			plan.removeFirst();
 	}
 	
 	//
@@ -117,15 +136,20 @@ public class Agent
 	
 	public boolean inOptimalState() 
 	{
-		if (prevState == null) return false;
+		State nextState = null;
+		switch (TileworldSettings.ALGORITHM) {
+		case VALUE_ITERATION:
+			if (prevState == null) return false;
+			
+			// the agent is in an optimal state if it wants to return to the state it came from
+			nextState = ((Tileworld) mdp).getStatePolicy().get(currentState);
+			
+			return (prevState == nextState);
+		case SHORTEST_PATH:
+			return currentState == currentTarget;
+		}
 		
-		// the agent is in an optimal state if it wants to return to the state it came from
-		State nextState = ((Tileworld) mdp).getStatePolicy().get(currentState);
-		boolean ret = (prevState == nextState);
-		
-		if (ret) System.out.println("in optimal state: " + nextState + " and " + prevState);
-		
-		return ret;
+		return false;
 	}
 	
 	public void reward() {
@@ -161,10 +185,54 @@ public class Agent
 		acts = 0;
 		actSteps = 0;
 		deliberateForEvent = false;
+		plan = null;
+	}
+	
+	public void inform(AgentMessage message, State s)
+	{
+		if (!TileworldSettings.USE_REACTION_STRATEGY)
+			return;
+		
+		switch (message) 
+		{
+		case HOLE_DISAPPEARS: 
+			// if we are using any reaction strategy and the current target disappears, the agent should deliberate
+			if (currentTarget != null && s == currentTarget)
+			{
+				System.out.println("target disappeared!");
+				deliberateForEvent = true;
+			}
+			break;
+			
+		case HOLE_APPEARS:
+			ReactionStrategy strategy = TileworldSettings.REACTION_STRATEGY;
+			
+			if (strategy == ReactionStrategy.TARGET_DIS_OR_ANY_HOLE)
+			{
+				System.out.println("any hole appeared!");
+				deliberateForEvent = true;
+			}
+			
+			else if (strategy == ReactionStrategy.TARGET_DIS_OR_NEARER_HOLE)
+			{
+				int distanceToTarget = ShortestPath.shortestPath(currentState, currentTarget, (Tileworld) mdp),
+						distanceToNewHole = ShortestPath.shortestPath(currentState, s, (Tileworld) mdp);
+				
+				if (distanceToNewHole < distanceToTarget)
+				{
+					System.out.println("nearer hole appeared!");
+					deliberateForEvent = true;
+				}
+			}
+		}
+	}
+	
+	public LinkedList<Action> getPlan() {
+		return plan;
 	}
 		
 	/**
-	 * Compute a new policy through value iteration.
+	 * Compute a new policy.
 	 * 
 	 * @param mdp
 	 */
@@ -173,8 +241,24 @@ public class Agent
 		prevState = null;
 		
 		deliberations++;
-		valueIterator.run(mdp);
 		
+		switch (TileworldSettings.ALGORITHM) 
+		{
+		case VALUE_ITERATION:
+			valueIterator.run(mdp);
+			break;
+		case SHORTEST_PATH:
+			// first find the closest hole
+			Tileworld tw = (Tileworld) mdp;
+			State s = ShortestPath.closestState(currentState, tw.getHoles(), tw);
+			
+			// then compute the plan
+			this.plan = ShortestPath.computePlan(currentState, s, tw);
+			for (Action a : plan) {
+			}
+		}
+		computeCurrentTarget();
+				
 		score -= TileworldSettings.PLANNING_COST;
 	}
 	
@@ -185,5 +269,15 @@ public class Agent
 	{
 		acts++;
 		prevState = currentState;
+	}
+	
+	private void computeCurrentTarget()
+	{
+		// TODO: we now compute the current target based on the Kinny & Georgeff utility function
+		Tileworld tileworld = (Tileworld) mdp; 
+		LinkedList<State> holes = (LinkedList<State>) tileworld.getHoles();
+		
+		this.currentTarget = (currentState == null || holes.size() == 0) ? null :
+			ShortestPath.closestStateWeighted(currentState, holes, tileworld);
 	}
 }

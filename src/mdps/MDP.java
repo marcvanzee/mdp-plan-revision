@@ -370,6 +370,16 @@ public class MDP
 		actions.add(a);
 	}
 	
+	// TODO: VERY BAD!!!
+	public Action getAction(String name) {
+		for (Action a : actions) {
+			if (a.getName().equals(name))
+				return a;
+		}
+		
+		return null;
+	}
+	
 	public void addActions(ArrayList<Action> actions) {
 		this.actions.addAll(actions);
 	}
