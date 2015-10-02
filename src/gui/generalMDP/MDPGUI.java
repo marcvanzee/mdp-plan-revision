@@ -87,7 +87,9 @@ public class MDPGUI implements ItemListener {
 	private final Component horizontalStrut_9 = Box.createHorizontalStrut(10);
 	private final JLabel lblObstacleRate = new JLabel("obstacle rate");
 	private final JTextField textFieldObstacleRate = new JTextField();
-			
+	
+	
+	public static void main(String args[]) { (new MDPGUI()).go();}
 	/**
 	 * Launch the application.
 	 */

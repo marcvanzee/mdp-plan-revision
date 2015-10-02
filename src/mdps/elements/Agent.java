@@ -117,7 +117,7 @@ public class Agent
 		if ((nrHoles > 0) && 
 			(	(actSteps == boldness) ||
 				(boldness == -1 && inOptimalState()) ||
-				deliberateForEvent	))
+				deliberateForEvent))
 		{
 			deliberateForEvent = false;
 			System.out.println("deliberating at step " + (deliberations+acts));
@@ -146,6 +146,9 @@ public class Agent
 			
 			return (prevState == nextState);
 		case SHORTEST_PATH:
+			System.out.println("curstate: " + currentState);
+			System.out.println("curtarget: " + currentTarget);
+			System.out.println("nr holes: " + ((Tileworld) mdp).getHoles().size());
 			return currentState == currentTarget;
 		}
 		
@@ -185,7 +188,7 @@ public class Agent
 		acts = 0;
 		actSteps = 0;
 		deliberateForEvent = false;
-		plan = null;
+		plan.clear();
 	}
 	
 	public void inform(AgentMessage message, State s)
@@ -254,8 +257,6 @@ public class Agent
 			
 			// then compute the plan
 			this.plan = ShortestPath.computePlan(currentState, s, tw);
-			for (Action a : plan) {
-			}
 		}
 		computeCurrentTarget();
 				

@@ -234,7 +234,7 @@ public class MDP
 	public QState getQState(State s, Action a) {
 		for (ActionEdge edge : s.getEdges()) {
 			
-			if (edge.getAction() == a)
+			if (edge.getAction().getName().equals(a.getName()))
 				return edge.getToVertex();
 		}
 		

@@ -10,7 +10,7 @@ import java.util.TimerTask;
 import javax.swing.JPanel;
 
 import edu.uci.ics.jung.algorithms.layout.AbstractLayout;
-import edu.uci.ics.jung.algorithms.layout.KKLayout;
+import edu.uci.ics.jung.algorithms.layout.FRLayout;
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.algorithms.layout.StaticLayout;
 import edu.uci.ics.jung.algorithms.layout.util.Relaxer;
@@ -49,7 +49,7 @@ public class MDPDrawer extends JPanel implements Observer
 
     private final Graph<Vertex<?>,Edge<?,?>> g = new ObservableGraph<Vertex<?>,Edge<?,?>>(ig);;
     
-    private final AbstractLayout<Vertex<?>,Edge<?,?>> layout = new KKLayout<Vertex<?>,Edge<?,?>>(g);
+    private final AbstractLayout<Vertex<?>,Edge<?,?>> layout = new FRLayout<Vertex<?>,Edge<?,?>>(g);
 	
     private final Layout<Vertex<?>,Edge<?,?>> staticLayout = new StaticLayout<Vertex<?>,Edge<?,?>>(g, layout);
     

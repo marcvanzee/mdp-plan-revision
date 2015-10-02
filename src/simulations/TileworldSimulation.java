@@ -3,8 +3,10 @@ package simulations;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Timer;
 
 import constants.MathOperations;
+import gui.generalMDP.DrawTaskScheduler;
 import mdps.Tileworld;
 import mdps.algorithms.ShortestPath;
 import mdps.elements.Action;
@@ -14,7 +16,9 @@ import mdps.elements.State;
 import mdps.factories.MDPType;
 import mdps.generators.TileworldGenerator;
 import messaging.tileworld.AgentMessage;
+import settings.SimulationSettings;
 import settings.TileworldSettings;
+import simulations.BasicSimulation.StepTask;
 
 /**
  * A TileWorldSimulation consists of a TileWorld (i.e. an MDP and an Agent) and models the evolution of this TileWorld over time.
@@ -65,7 +69,7 @@ public class TileworldSimulation extends BasicSimulation
 		
 		// add agent
 		tileworld.addAgentRandomly(new HashSet<State>(tileworld.getObstacles()));
-				
+	
 		notifyGUI();
 		
 		// immediately create a hole and tell event to deliberate
@@ -73,9 +77,19 @@ public class TileworldSimulation extends BasicSimulation
 		agent.deliberateForEvent();
 		
 	}
+	
+	public void startSimulation(int maxSteps) {
+		while (steps < maxSteps) {
+			step();
+		}
+	}
 		
 	public void step() 
 	{
+		if (steps == 0) {
+			for (int i=0; i<TileworldSettings.INITIAL_NR_HOLES; i++)
+				addHole();
+		}
 		
 		if (nextHole <= 0) {
 			addHole();
@@ -116,9 +130,9 @@ public class TileworldSimulation extends BasicSimulation
 		// in the tileworld, everything is completely deterministic so moving is quite easy.
 		// simply select the unique qstate and state and move there.
 		
-		final QState qState = mdp.getQState(currentState, selectedAction);
-		final State newState = mdp.getQEdges(qState).get(0).getToVertex();
-				
+		QState qState = mdp.getQState(currentState, selectedAction);
+		State newState = mdp.getQEdges(qState).get(0).getToVertex();
+
 		agent.getCurrentState().setVisited(false);
 		agent.setCurrentState(newState);
 		newState.setVisited(true);
