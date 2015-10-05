@@ -1,4 +1,4 @@
-package mdps;
+package mdp;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import constants.MathOperations;
-import mdps.elements.State;
+import mdp.elements.Action;
+import mdp.elements.State;
+import mdp.elements.TileworldActionType;
 import settings.TileworldSettings;
 
 /**
@@ -17,10 +19,11 @@ import settings.TileworldSettings;
  */
 public class Tileworld extends PopulatedMDP 
 {
-	final List<State> holes = new LinkedList<State>();	
-	final List<State> obstacles = new LinkedList<State>();	
+	private final List<State> holes = new LinkedList<State>();	
+	private final List<State> obstacles = new LinkedList<State>();	
 	private State[][] stateArr = null;
-	final Map<State,State> statePolicy = new HashMap<State,State>();
+	private final Map<State,State> statePolicy = new HashMap<State,State>();
+	private final Map<TileworldActionType,Action> actionMap = new HashMap<TileworldActionType,Action>();
 	
 	public Tileworld() {
 		super();
@@ -157,6 +160,21 @@ public class Tileworld extends PopulatedMDP
 		stateArr = null;
 		statePolicy.clear();
 		super.reset();
+	}
+	
+	public void addDefaultActions()
+	{
+		for (TileworldActionType tat : TileworldActionType.values())
+		{
+			Action a = new Action(tat.getName());
+			addAction(a);
+			actionMap.put(tat, a);
+		}
+	}
+	
+	public void addTransition(State s1, TileworldActionType tat, State s2)
+	{
+		addTransition(s1, actionMap.get(tat), s2);
 	}
 	
 }

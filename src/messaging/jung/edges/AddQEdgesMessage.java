@@ -1,9 +1,9 @@
 package messaging.jung.edges;
 
 import edu.uci.ics.jung.graph.Graph;
-import mdps.elements.Edge;
-import mdps.elements.QEdge;
-import mdps.elements.Vertex;
+import mdp.elements.Edge;
+import mdp.elements.QEdge;
+import mdp.elements.Vertex;
 
 public class AddQEdgesMessage extends ChangeEdgesMessage<QEdge>
 {

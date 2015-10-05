@@ -1,15 +1,16 @@
-package mdps.elements;
+package mdp.agent;
 
 import java.util.LinkedList;
 import java.util.Map;
 
 import constants.SimulationConstants;
-import mdps.MDP;
-import mdps.Tileworld;
-import mdps.algorithms.MDPValueIterator;
-import mdps.algorithms.ShortestPath;
+import mdp.MDP;
+import mdp.Tileworld;
+import mdp.algorithms.MDPValueIterator;
+import mdp.algorithms.ShortestPath;
+import mdp.elements.Action;
+import mdp.elements.State;
 import messaging.tileworld.AgentMessage;
-import settings.ReactionStrategy;
 import settings.TileworldSettings;
 
 /**

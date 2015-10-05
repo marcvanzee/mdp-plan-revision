@@ -3,9 +3,9 @@ package messaging.jung.edges;
 import java.util.List;
 
 import edu.uci.ics.jung.graph.Graph;
-import mdps.elements.ActionEdge;
-import mdps.elements.Edge;
-import mdps.elements.Vertex;
+import mdp.elements.ActionEdge;
+import mdp.elements.Edge;
+import mdp.elements.Vertex;
 
 public class RemoveActionEdgesMessage extends ChangeEdgesMessage<ActionEdge>
 {

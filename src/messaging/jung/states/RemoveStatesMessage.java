@@ -3,9 +3,9 @@ package messaging.jung.states;
 import java.util.List;
 
 import edu.uci.ics.jung.graph.Graph;
-import mdps.elements.Edge;
-import mdps.elements.State;
-import mdps.elements.Vertex;
+import mdp.elements.Edge;
+import mdp.elements.State;
+import mdp.elements.Vertex;
 
 public class RemoveStatesMessage extends ChangeVerticesMessage<State>
 {

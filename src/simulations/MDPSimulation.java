@@ -3,16 +3,14 @@ package simulations;
 import java.util.ArrayList;
 import java.util.Random;
 
-import mdps.PopulatedMDP;
-import mdps.algorithms.MDPValueIterator;
-import mdps.elements.Action;
-import mdps.elements.Agent;
-import mdps.elements.QEdge;
-import mdps.elements.QState;
-import mdps.elements.State;
-import mdps.factories.MDPType;
-import mdps.generators.GeneralMDPGenerator;
-import mdps.modifiers.GeneralMDPModifier;
+import mdp.PopulatedMDP;
+import mdp.agent.Agent;
+import mdp.elements.Action;
+import mdp.elements.QEdge;
+import mdp.elements.QState;
+import mdp.elements.State;
+import mdp.operations.modifiers.PopulatedMDPModifier;
+import mdps.operations.generators.GeneralMDPGenerator;
 
 /**
  * A Model consists of a PopulatedMDP (i.e. an MDP and an Agent) and models the evolution of this MDP over time.
@@ -20,31 +18,21 @@ import mdps.modifiers.GeneralMDPModifier;
  * @author marc.vanzee
  *
  */
-public class MDPSimulation extends BasicSimulation
+public class MDPSimulation extends Simulation<PopulatedMDP, GeneralMDPGenerator, PopulatedMDPModifier>
 {
-	private final MDPValueIterator valueIterator;
-	private final GeneralMDPGenerator mdpGenerator = new GeneralMDPGenerator();
-	private final GeneralMDPModifier mdpChanger;
-	private final Agent agent;
-	private final PopulatedMDP populatedMDP;
+	final Agent agent;
 	
-	public MDPSimulation() {
-		super(MDPType.POPULATED_MDP);
-		
-		populatedMDP = ((PopulatedMDP) mdp);
-		
-		agent = populatedMDP.getAgent();
-		
-		mdpChanger = new GeneralMDPModifier(agent);
-		
-		valueIterator = new MDPValueIterator(mdp);
+	public MDPSimulation() throws InstantiationException, IllegalAccessException 
+	{
+		super(PopulatedMDP.class, GeneralMDPGenerator.class, PopulatedMDPModifier.class);
+		this.agent = mdp.getAgent();
 	}
-	
+
 	//
 	// GETTERS AND SETTERS
 	//	
 	public double getValue(State s) {
-		return valueIterator.getValue(s);
+		return this.agent.getValue(s);
 	}
 	
 	public Agent getAgent() {
@@ -60,13 +48,13 @@ public class MDPSimulation extends BasicSimulation
 		if (isRunning)
 			timer.cancel();
 		
-		populatedMDP.reset();
+		mdp.reset();
 		
 		// try adding an observer so that the MDP can send its changes directly to the GUI
 				
-		mdpGenerator.run(populatedMDP);
+		mdpGenerator.run();
 		
-		populatedMDP.addAgentRandomly();
+		mdp.addAgentRandomly();
 		
 		steps = 0;
 		
@@ -85,18 +73,15 @@ public class MDPSimulation extends BasicSimulation
 		// first clear the message buffer of the mdp
 		mdp.clearMessageBuffer();
 		
-		// get the next choice by the agent
-		final Agent agent = populatedMDP.getAgent();
-		
-		if (agent != null)
-			agent.step();
+		if (this.agent != null)
+			this.agent.step();
 		
 		// change the MDP (the mdp changer holds a reference to our agent)
-		mdpChanger.run(mdp);
+		mdpModifier.run();
 
 		// if the agent acted, move the agent and compute its reward
-		if (agent != null && agent.getNextAction() != null)
-			moveAgent(agent.getCurrentState(), agent.getNextAction());
+		if (this.agent != null && this.agent.getNextAction() != null)
+			moveAgent(this.agent.getCurrentState(), this.agent.getNextAction());
 	}
 	
 	protected void moveAgent(State currentState, Action selectedAction) 
@@ -119,10 +104,10 @@ public class MDPSimulation extends BasicSimulation
 		i--;
 		QEdge qEdge = qEdges.get(i);
 		
-		agent.reward();
+		this.agent.reward();
 		
-		agent.getCurrentState().setVisited(false);
-		agent.setCurrentState(qEdge.getToVertex());
-		agent.getCurrentState().setVisited(true);
+		this.agent.getCurrentState().setVisited(false);
+		this.agent.setCurrentState(qEdge.getToVertex());
+		this.agent.getCurrentState().setVisited(true);
 	}
 }

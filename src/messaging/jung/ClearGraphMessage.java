@@ -3,8 +3,8 @@ package messaging.jung;
 import java.util.ArrayList;
 
 import edu.uci.ics.jung.graph.Graph;
-import mdps.elements.Edge;
-import mdps.elements.Vertex;
+import mdp.elements.Edge;
+import mdp.elements.Vertex;
 
 public class ClearGraphMessage implements ChangeMessage {
 

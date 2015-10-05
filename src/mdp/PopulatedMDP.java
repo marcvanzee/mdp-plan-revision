@@ -1,9 +1,9 @@
-package mdps;
+package mdp;
 
 import java.util.Set;
 
-import mdps.elements.Agent;
-import mdps.elements.State;
+import mdp.agent.Agent;
+import mdp.elements.State;
 
 /**
  * A PopulatedMDP consists of an MDP and an agent.
@@ -13,7 +13,7 @@ import mdps.elements.State;
  */
 public class PopulatedMDP extends MDP
 {
-	final Agent agent = new Agent(this);
+	protected final Agent agent = new Agent(this);
 	
 	//
 	// CONSTRUCTORS

@@ -1,4 +1,4 @@
-package mdps.elements;
+package mdp.elements;
 
 
 public class Action {

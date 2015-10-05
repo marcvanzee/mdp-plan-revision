@@ -20,9 +20,9 @@ import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.uci.ics.jung.visualization.decorators.EllipseVertexShapeTransformer;
 import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 import edu.uci.ics.jung.visualization.renderers.Renderer;
-import mdps.elements.Edge;
-import mdps.elements.State;
-import mdps.elements.Vertex;
+import mdp.elements.Edge;
+import mdp.elements.State;
+import mdp.elements.Vertex;
 
 /**
  * Task care of all the settings that are necessary to make sure that JUNG works correctly.

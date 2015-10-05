@@ -1,4 +1,4 @@
-package mdps.generators;
+package mdps.operations.generators;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -6,9 +6,10 @@ import java.util.LinkedList;
 import java.util.Random;
 
 import constants.MathOperations;
-import mdps.MDP;
-import mdps.elements.Action;
-import mdps.elements.State;
+import mdp.MDP;
+import mdp.elements.Action;
+import mdp.elements.State;
+import mdp.operations.MDPOperation;
 import settings.GeneralMDPSettings;
 
 /**
@@ -43,11 +44,16 @@ import settings.GeneralMDPSettings;
  * 22.            Generate a probability distribution over the n nodes and connect them all to S.
  * 
  */
-public class GeneralMDPGenerator extends MDPGenerator
+public class GeneralMDPGenerator extends MDPOperation<MDP>
 {
+	
+	public GeneralMDPGenerator(MDP mdp) {
+		super(mdp);
+	}
+
 	private final Random r = new Random();
 		
-	public void run(MDP mdp) 
+	public void run() 
 	{
 		
 		int countMaxStates = GeneralMDPSettings.NUM_STATES,

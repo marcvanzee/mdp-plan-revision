@@ -1,11 +1,13 @@
-package mdps.modifiers;
+package mdp.operations.modifiers;
 
 import constants.MathOperations;
-import mdps.MDP;
-import mdps.elements.Action;
-import mdps.elements.Agent;
-import mdps.elements.State;
-import mdps.generators.GeneralMDPGenerator;
+import mdp.MDP;
+import mdp.PopulatedMDP;
+import mdp.agent.Agent;
+import mdp.elements.Action;
+import mdp.elements.State;
+import mdp.operations.MDPOperation;
+import mdps.operations.generators.GeneralMDPGenerator;
 import settings.GeneralMDPSettings;
 
 /**
@@ -40,20 +42,20 @@ import settings.GeneralMDPSettings;
  * @author marc.vanzee
  *
  */
-public class GeneralMDPModifier
+public class PopulatedMDPModifier extends MDPOperation<PopulatedMDP>
 {
-	protected MDP mdp = null;
-	private Agent agent;
-	private final GeneralMDPGenerator mdpGenerator = new GeneralMDPGenerator();
+	private final Agent agent;
+	private final GeneralMDPGenerator mdpGenerator;
 	
-	public GeneralMDPModifier(Agent agent) {
-		this.agent = agent;
+	public PopulatedMDPModifier(PopulatedMDP mdp) 
+	{
+		super(mdp);
+		this.agent = mdp.getAgent();
+		mdpGenerator = new GeneralMDPGenerator(mdp);
 	}
 	
-	public void run(MDP mdp) 
+	public void run() 
 	{
-		this.mdp = mdp;
-		
 		// only add and remove nodes when the MDP is a tree
 		if (!GeneralMDPSettings.CYCLES_ALLOWED) 
 		{
@@ -65,7 +67,7 @@ public class GeneralMDPModifier
 		changeProbabilities();
 		changeRewards();	
 	}
-	
+		
 	private void addNodes() 
 	{
 		int avgNodesToAdd = avgNodesToChange(mdp, GeneralMDPSettings.D_GAMMA);

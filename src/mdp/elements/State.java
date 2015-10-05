@@ -1,4 +1,4 @@
-package mdps.elements;
+package mdp.elements;
 
 import java.awt.Color;
 import java.awt.Point;

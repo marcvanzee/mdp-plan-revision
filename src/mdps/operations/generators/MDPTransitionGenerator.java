@@ -1,17 +1,17 @@
-package mdps.generators;
+package mdps.operations.generators;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import constants.MathOperations;
-import mdps.MDP;
-import mdps.Tileworld;
-import mdps.elements.Action;
-import mdps.elements.ActionEdge;
-import mdps.elements.QEdge;
-import mdps.elements.QState;
-import mdps.elements.State;
+import mdp.MDP;
+import mdp.Tileworld;
+import mdp.elements.Action;
+import mdp.elements.ActionEdge;
+import mdp.elements.QEdge;
+import mdp.elements.QState;
+import mdp.elements.State;
 import settings.GeneralMDPSettings;
 
 public class MDPTransitionGenerator 

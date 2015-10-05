@@ -49,7 +49,7 @@ import simulations.TileworldSimulation;
 public class MDPGUI implements ItemListener {
 	
 	//private final MDPSimulation model = new MDPSimulation();
-	private final MDPSimulation simulation = new MDPSimulation();
+	private final MDPSimulation simulation;
 	private final JFrame frame = new JFrame();
 	private final MDPDrawer drawPanel = new MDPDrawer(this);
 	
@@ -89,7 +89,16 @@ public class MDPGUI implements ItemListener {
 	private final JTextField textFieldObstacleRate = new JTextField();
 	
 	
-	public static void main(String args[]) { (new MDPGUI()).go();}
+	public static void main(String args[]) { try {
+		(new MDPGUI()).go();
+	} catch (InstantiationException | IllegalAccessException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}}
+	
+	public MDPGUI() throws InstantiationException, IllegalAccessException {
+		simulation = new MDPSimulation();
+	}
 	/**
 	 * Launch the application.
 	 */

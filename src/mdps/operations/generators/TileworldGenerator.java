@@ -1,43 +1,33 @@
-package mdps.generators;
+package mdps.operations.generators;
 
 import java.util.LinkedList;
-import java.util.List;
 
 import constants.MathOperations;
-import mdps.MDP;
-import mdps.Tileworld;
-import mdps.elements.Action;
-import mdps.elements.State;
+import mdp.Tileworld;
+import mdp.elements.State;
+import mdp.elements.TileworldActionType;
+import mdp.operations.MDPOperation;
 import settings.TileworldSettings;
 
 
-public class TileworldGenerator extends MDPGenerator
-{
-	private static final int UP = 0, RIGHT = 1, DOWN = 2, LEFT = 3;
+public class TileworldGenerator extends MDPOperation<Tileworld>
+{	
+	public TileworldGenerator(Tileworld mdp) {
+		super(mdp);
+	}
 	
 	@Override
-	public void run(MDP mdp) {
-		
-		Tileworld tileworld = ((Tileworld) mdp);
-		
-		// add actions and store them in an array
-		Action[] actionArr = new Action[4];
-		
-		actionArr[UP] = new Action("up");
-		actionArr[RIGHT] = new Action("right");
-		actionArr[DOWN] = new Action("down");
-		actionArr[LEFT] = new Action("left");
-		
-		for (Action a : actionArr) {
-			tileworld.addAction(a);
-		}
+	public void run() 
+	{
+		// add tileworld actions
+		mdp.addDefaultActions();
 		
 		int worldSize = TileworldSettings.WORLD_SIZE;
 		
 		// add states and store them in a two-dimensional array
 		State[][] stateArr = new State[worldSize][worldSize];
 		
-		tileworld.setDimension(worldSize);
+		mdp.setDimension(worldSize);
 		
 		for (int i=0; i<worldSize; i++) 
 		{
@@ -47,7 +37,7 @@ public class TileworldGenerator extends MDPGenerator
 				s.setCoord(i, j);
 				stateArr[i][j] = s;
 				
-				tileworld.addState(stateArr[i][j], i, j);
+				mdp.addState(stateArr[i][j], i, j);
 			}
 		}
 		
@@ -57,10 +47,10 @@ public class TileworldGenerator extends MDPGenerator
 		{
 			for (int j=0; j<worldSize; j++) 
 			{
-				if (i > 0) tileworld.addTransition(stateArr[i][j], actionArr[LEFT] , stateArr[i-1][j]);
-				if (j > 0) tileworld.addTransition(stateArr[i][j], actionArr[UP] , stateArr[i][j-1]);
-				if (i < worldSize-1) tileworld.addTransition(stateArr[i][j], actionArr[RIGHT] , stateArr[i+1][j]);
-				if (j < worldSize-1) tileworld.addTransition(stateArr[i][j], actionArr[DOWN] , stateArr[i][j+1]);
+				if (i > 0) mdp.addTransition(stateArr[i][j], TileworldActionType.LEFT , stateArr[i-1][j]);
+				if (j > 0) mdp.addTransition(stateArr[i][j], TileworldActionType.UP , stateArr[i][j-1]);
+				if (i < worldSize-1) mdp.addTransition(stateArr[i][j], TileworldActionType.RIGHT , stateArr[i+1][j]);
+				if (j < worldSize-1) mdp.addTransition(stateArr[i][j], TileworldActionType.DOWN , stateArr[i][j+1]);
 			}
 		}
 		
@@ -83,7 +73,7 @@ public class TileworldGenerator extends MDPGenerator
 			{
 				// add a block for the wall
 				if (curState == null) {
-					curState = tileworld.getRandomEmptyState();
+					curState = mdp.getRandomEmptyState();
 					
 					if (curState == null) {
 						System.out.println("No empty state found!");
@@ -94,7 +84,7 @@ public class TileworldGenerator extends MDPGenerator
 				else 
 				{
 					for (State s2 : curWall) {
-						curState = tileworld.getRandomEmptyNeighbor(s2);
+						curState = mdp.getRandomEmptyNeighbor(s2);
 						if (curState != null) break;
 					}
 					
@@ -105,7 +95,7 @@ public class TileworldGenerator extends MDPGenerator
 				}
 				
 				curState.setObstacle(true);
-				tileworld.addObstacle(curState);
+				mdp.addObstacle(curState);
 				curWall.addFirst(curState);
 				
 				wallSize--;
@@ -113,15 +103,6 @@ public class TileworldGenerator extends MDPGenerator
 			
 			numWalls--;			
 		}
-		
-		// add holes
-		for (int i=0; i<TileworldSettings.INITIAL_NR_HOLES; i++){
-			// TODO: make this
-		}
-		
-		tileworld.updateAgent();
-		
+		mdp.updateAgent();
 	}
-	
-		
 }

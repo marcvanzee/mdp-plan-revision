@@ -1,4 +1,4 @@
-package mdps;
+package mdp;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import mdps.elements.Action;
-import mdps.elements.ActionEdge;
-import mdps.elements.QEdge;
-import mdps.elements.QState;
-import mdps.elements.State;
-import mdps.generators.MDPTransitionGenerator;
+import mdp.elements.Action;
+import mdp.elements.ActionEdge;
+import mdp.elements.QEdge;
+import mdp.elements.QState;
+import mdp.elements.State;
+import mdps.operations.generators.MDPTransitionGenerator;
 import messaging.jung.ChangeMessage;
 import messaging.jung.ChangeMessageBuffer;
 import messaging.jung.edges.AddActionEdgesMessage;
@@ -62,15 +62,9 @@ public class MDP
 	protected final ArrayList<Action> actions = new ArrayList<Action>();	
 	protected final MDPTransitionGenerator tGenerator = new MDPTransitionGenerator(this);
 	protected final Random r = new Random();
-
-	// not final.
-	// TOOD: change this.
-	protected ChangeMessageBuffer mBuffer = new ChangeMessageBuffer();
+	protected final ChangeMessageBuffer mBuffer = new ChangeMessageBuffer();
 	
-	public MDP() 
-	{
-		
-	}
+	public MDP()  {}
 	
 	
 	/***********************
@@ -358,8 +352,7 @@ public class MDP
 		actionEdges.clear();
 		qEdges.clear();
 		
-		// TOOD: this should also be final at some point
-		mBuffer = new ChangeMessageBuffer();
+		mBuffer.clear();
 	}
 	
 	public void clearMessageBuffer() {
@@ -418,11 +411,4 @@ public class MDP
 	public void addMessage(ChangeMessage cm) {
 		mBuffer.addMessage(cm);
 	}
-	
-	/***********************
-	 * PRIVATE METHODS
-	 ***********************
-	 */
-
-	
 }
