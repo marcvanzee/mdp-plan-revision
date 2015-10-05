@@ -9,6 +9,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -89,14 +90,15 @@ public class MDPGUI implements ItemListener {
 	private final JTextField textFieldObstacleRate = new JTextField();
 	
 	
-	public static void main(String args[]) { try {
+	public static void main(String args[]) { 
+		try {
 		(new MDPGUI()).go();
-	} catch (InstantiationException | IllegalAccessException e) {
+	} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}}
 	
-	public MDPGUI() throws InstantiationException, IllegalAccessException {
+	public MDPGUI() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		simulation = new MDPSimulation();
 	}
 	/**

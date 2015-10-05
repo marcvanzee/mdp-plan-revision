@@ -1,11 +1,13 @@
 package simulations;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Observable;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import gui.generalMDP.DrawTaskScheduler;
 import mdp.MDP;
+import mdp.PopulatedMDP;
 import mdp.operations.MDPOperation;
 import settings.SimulationSettings;
 
@@ -15,8 +17,8 @@ import settings.SimulationSettings;
  * @author marc.vanzee
  *
  */
-public abstract class Simulation<MDPTYPE extends MDP, GENERATOR extends MDPOperation<? extends MDP>, 
-						MODIFIER extends MDPOperation<? extends MDP>> extends Observable
+public abstract class Simulation<MDPTYPE extends PopulatedMDP, GENERATOR extends MDPOperation<MDPTYPE>, 
+						MODIFIER extends MDPOperation<MDPTYPE>> extends Observable
 {
 	protected final Timer timer = new Timer(true);
 	protected final MDPTYPE mdp;
@@ -29,11 +31,12 @@ public abstract class Simulation<MDPTYPE extends MDP, GENERATOR extends MDPOpera
 	/*
 	 * Constructor
 	 */
-	public Simulation(Class<MDPTYPE> mdpType, Class<GENERATOR> mdpGenerator, Class<MODIFIER> mdpModifier) throws InstantiationException, IllegalAccessException
+	public Simulation(Class<MDPTYPE> mdpType, Class<GENERATOR> mdpGenerator, Class<MODIFIER> mdpModifier) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException
 	{
 		this.mdp = mdpType.newInstance();
-		this.mdpGenerator = mdpGenerator.newInstance();
-		this.mdpModifier = mdpModifier.newInstance();
+		this.mdpGenerator = mdpGenerator.getDeclaredConstructor(mdp.getClass()).newInstance(mdp);
+		
+		this.mdpModifier = mdpModifier.getDeclaredConstructor(mdp.getClass()).newInstance(mdp);
 	}
 	
 	/*

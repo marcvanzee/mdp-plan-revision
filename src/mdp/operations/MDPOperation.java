@@ -13,7 +13,7 @@ import mdp.MDP;
 public abstract class MDPOperation<E extends MDP>
 {
 	protected final E mdp;
-		
+	
 	public MDPOperation(E mdp)
 	{
 		this.mdp = mdp;

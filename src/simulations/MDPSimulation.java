@@ -1,5 +1,6 @@
 package simulations;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -22,7 +23,7 @@ public class MDPSimulation extends Simulation<PopulatedMDP, GeneralMDPGenerator,
 {
 	final Agent agent;
 	
-	public MDPSimulation() throws InstantiationException, IllegalAccessException 
+	public MDPSimulation() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException 
 	{
 		super(PopulatedMDP.class, GeneralMDPGenerator.class, PopulatedMDPModifier.class);
 		this.agent = mdp.getAgent();

@@ -1,5 +1,6 @@
 package simulations;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,7 +11,7 @@ import mdp.agent.Agent;
 import mdp.elements.Action;
 import mdp.elements.QState;
 import mdp.elements.State;
-import mdp.operations.modifiers.PopulatedMDPModifier;
+import mdp.operations.modifiers.TileworldModifier;
 import mdps.operations.generators.TileworldGenerator;
 import messaging.tileworld.AgentMessage;
 import settings.TileworldSettings;
@@ -21,16 +22,16 @@ import settings.TileworldSettings;
  * @author marc.vanzee
  *
  */
-public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator, PopulatedMDPModifier>
+public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator, TileworldModifier>
 {
 	private final Agent agent;
 	
 	private double maxScore = 0;
 	private int nextHole;
 	
-	public TileworldSimulation() throws InstantiationException, IllegalAccessException 
+	public TileworldSimulation() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException 
 	{
-		super(Tileworld.class, TileworldGenerator.class, PopulatedMDPModifier.class);
+		super(Tileworld.class, TileworldGenerator.class, TileworldModifier.class);
 		
 		this.agent = mdp.getAgent();
 	}
