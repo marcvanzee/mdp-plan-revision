@@ -11,7 +11,7 @@ import mdp.elements.ActionEdge;
 import mdp.elements.QEdge;
 import mdp.elements.QState;
 import mdp.elements.State;
-import mdps.operations.generators.MDPTransitionGenerator;
+import mdp.operations.generators.MDPTransitionGenerator;
 import messaging.jung.ChangeMessage;
 import messaging.jung.ChangeMessageBuffer;
 import messaging.jung.edges.AddActionEdgesMessage;
@@ -64,9 +64,9 @@ public class MDP
 	protected final Random r = new Random();
 	protected final ChangeMessageBuffer mBuffer = new ChangeMessageBuffer();
 	
-	public MDP()  {}
-	
-	
+	public MDP()  {
+	}
+
 	/***********************
 	 * GETTERS AND SETTERS
 	 ***********************

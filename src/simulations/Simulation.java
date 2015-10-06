@@ -7,7 +7,6 @@ import java.util.TimerTask;
 
 import gui.generalMDP.DrawTaskScheduler;
 import mdp.MDP;
-import mdp.PopulatedMDP;
 import mdp.operations.MDPOperation;
 import settings.SimulationSettings;
 
@@ -17,15 +16,16 @@ import settings.SimulationSettings;
  * @author marc.vanzee
  *
  */
-public abstract class Simulation<MDPTYPE extends PopulatedMDP, GENERATOR extends MDPOperation<MDPTYPE>, 
+public abstract class Simulation<MDPTYPE extends MDP, GENERATOR extends MDPOperation<MDPTYPE>, 
 						MODIFIER extends MDPOperation<MDPTYPE>> extends Observable
 {
-	protected final Timer timer = new Timer(true);
+	
 	protected final MDPTYPE mdp;
 	protected final GENERATOR mdpGenerator;
 	protected final MODIFIER mdpModifier;	
 	
-	protected boolean isRunning = false;
+	protected Timer timer;
+	protected boolean started = false;
 	protected int steps = 0;
 	
 	/*
@@ -47,14 +47,13 @@ public abstract class Simulation<MDPTYPE extends PopulatedMDP, GENERATOR extends
 	/*
 	 * Implemented methods
 	 */
-	public void startSimulation(DrawTaskScheduler scheduler) {
-		if (isRunning) {
-			timer.cancel();
-		}
+	public void startSimulation(DrawTaskScheduler scheduler) 
+	{		
+		timer = new Timer(true);
 		
 		// try to step every 100 ms, this will only work when the GUI has finished drawing
 		timer.schedule(new StepTask(scheduler), 
-				SimulationSettings.REPAINT_DELAY, SimulationSettings.REPAINT_DELAY); 
+			SimulationSettings.REPAINT_DELAY, SimulationSettings.REPAINT_DELAY); 
 	}
 
 	public void stopSimulation() {

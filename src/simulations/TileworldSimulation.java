@@ -11,8 +11,8 @@ import mdp.agent.Agent;
 import mdp.elements.Action;
 import mdp.elements.QState;
 import mdp.elements.State;
+import mdp.operations.generators.TileworldGenerator;
 import mdp.operations.modifiers.TileworldModifier;
-import mdps.operations.generators.TileworldGenerator;
 import messaging.tileworld.AgentMessage;
 import settings.TileworldSettings;
 
@@ -23,26 +23,17 @@ import settings.TileworldSettings;
  *
  */
 public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator, TileworldModifier>
-{
-	private final Agent agent;
-	
+{	
 	private double maxScore = 0;
 	private int nextHole;
+	private Agent agent;
 	
 	public TileworldSimulation() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException 
 	{
 		super(Tileworld.class, TileworldGenerator.class, TileworldModifier.class);
+		agent = mdp.getAgent();
+	}
 		
-		this.agent = mdp.getAgent();
-	}
-	
-	//
-	// GETTERS AND SETTERS
-	//	
-	public double getValue(State s) {
-		return this.agent.getValue(s);
-	}
-	
 	//
 	// OTHER PUBLIC METHODS
 	//
@@ -52,9 +43,6 @@ public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator
 		steps = 0;
 		maxScore = 0;
 		
-		if (isRunning)
-			timer.cancel();
-		
 		mdp.reset();
 		agent.reset();
 		
@@ -63,13 +51,15 @@ public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator
 		
 		// add agent
 		mdp.addAgentRandomly(new HashSet<State>(mdp.getObstacles()));
+		
+		// add holes
+		for (int i=0; i<TileworldSettings.INITIAL_NR_HOLES; i++)
+				addHole();
 	
 		notifyGUI();
 		
-		// immediately create a hole and tell event to deliberate
-		nextHole = 0; 
-		agent.deliberateForEvent();
-		
+		// schedule next hole and tell event to deliberate
+		setNextHole();		
 	}
 	
 	public void startSimulation(int maxSteps) {
@@ -80,24 +70,26 @@ public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator
 		
 	public void step() 
 	{
-		if (steps == 0) {
-			for (int i=0; i<TileworldSettings.INITIAL_NR_HOLES; i++)
-				addHole();
-		}
-		
 		if (nextHole <= 0) {
 			addHole();
+			
+			// if the agent happens to be on the location where the hole has just 
+			// been created, reward it and remove the hole
+			removeHoleIfVisited();
+			setNextHole();
 		}
 		
 		if (steps % TileworldSettings.DYNAMISM == 0) {
 			
-			// get the next choice by the agent
-			if (agent != null) {
-				agent.step();
+			agent.step();
 					
-				// if the agent acted, move the agent and compute its reward
-				if (agent.getNextAction() != null)
-					moveAgent(agent.getCurrentState(), agent.getNextAction());
+			// if the agent acted, move the agent and compute its reward
+			if (agent.getNextAction() != null)
+			{
+				moveAgent(agent.getCurrentState(), agent.getNextAction());
+				
+				agent.updatePlan();
+				agent.reward();
 			}
 		}
 		
@@ -107,7 +99,8 @@ public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator
 		// first clear the message buffer
 		mdp.clearMessageBuffer();
 			
-		decreaseLifetimeHoles();	
+		decreaseLifetimeHoles();
+		removeHoleIfVisited();
 		notifyGUI();
 	}
 	
@@ -130,10 +123,6 @@ public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator
 		agent.getCurrentState().setVisited(false);
 		agent.setCurrentState(newState);
 		newState.setVisited(true);
-		
-		agent.removeActionFromPlan();
-		
-		agent.reward();
 	}
 	
 	private void addHole() 
@@ -155,8 +144,6 @@ public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator
 		mdp.addHole(hole);
 		
 		agent.inform(AgentMessage.HOLE_APPEARS, hole);
-		
-		setNextHole();
 	}
 	
 	
@@ -170,24 +157,42 @@ public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator
 	private void decreaseLifetimeHoles() 
 	{
 		final List<State> toRemove = new LinkedList<State>();
-		final State agState = agent.getCurrentState();
 		final List<State> holes = mdp.getHoles();
 		
 		for (State hole : holes) {
 			hole.decreaseLifetime();
 			
-			if (hole.getLifetime() <= 0 || hole == agState) {
+			if (hole.getLifetime() <= 0) {
 				toRemove.add(hole);
 			}
 		}
-
-		for (State hole : toRemove) {
-			hole.setHole(false);
-			mdp.removeHole(hole);
-			
-			hole.setReward(0.0);
-			
+		
+		removeHoles(toRemove);
+	}
+	
+	private void removeHoleIfVisited()
+	{
+		State s = agent.getCurrentState();
+		
+		if (s.isHole())
+			removeHole(s);
+	}
+	
+	private void removeHoles(List<State> holes)
+	{
+		for (State hole : holes) { 
+			removeHole(hole);
 			agent.inform(AgentMessage.HOLE_DISAPPEARS, hole);
-		}	
+		}
+	}
+	
+	private void removeHole(State hole)
+	{
+		hole.setHole(false);
+		mdp.removeHole(hole);
+		
+		hole.setReward(0.0);
+		
+		
 	}
 }

@@ -121,14 +121,14 @@ public class MDPDrawer extends JPanel implements Observer
     {
     	change.modifyGraph(g);
 		
-    	Agent ag = this.simulation.getAgent();
+    	//Agent ag = this.simulation.getAgent();
     	
-    	if (ag != null)
-    	{
+    	//if (ag != null)
+    	//{
     		//mainApp.textFieldRewards.setText(model.getAgent().getReward()+"");
     		//mainApp.textFieldDeliberations.setText(model.getAgent().getDeliberations()+"");
     		//mainApp.textFieldActs.setText(model.getAgent().getActs()+"");
-    	}
+    	//}
     	
     	mdpGUI.textFieldSteps.setText(simulation.getSteps()+"");
     	

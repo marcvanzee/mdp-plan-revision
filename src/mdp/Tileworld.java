@@ -4,8 +4,13 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import constants.MathOperations;
+import mdp.agent.Agent;
+import mdp.agent.ShortestPathAgent;
+import mdp.agent.ValueIterationAgent;
+import mdp.algorithms.AlgorithmType;
 import mdp.elements.Action;
 import mdp.elements.State;
 import mdp.elements.TileworldActionType;
@@ -17,16 +22,19 @@ import settings.TileworldSettings;
  * @author marc.vanzee
  *
  */
-public class Tileworld extends PopulatedMDP 
+public class Tileworld extends MDP
 {
 	private final List<State> holes = new LinkedList<State>();	
 	private final List<State> obstacles = new LinkedList<State>();	
 	private State[][] stateArr = null;
 	private final Map<State,State> statePolicy = new HashMap<State,State>();
 	private final Map<TileworldActionType,Action> actionMap = new HashMap<TileworldActionType,Action>();
+	protected final Agent agent;
 	
 	public Tileworld() {
-		super();
+		
+		this.agent = (TileworldSettings.ALGORITHM == AlgorithmType.SHORTEST_PATH ?
+				new ShortestPathAgent(this) : new ValueIterationAgent(this) );
 	}
 		
 	public void setDimension(int d) {
@@ -175,6 +183,22 @@ public class Tileworld extends PopulatedMDP
 	public void addTransition(State s1, TileworldActionType tat, State s2)
 	{
 		addTransition(s1, actionMap.get(tat), s2);
+	}
+	
+	public Agent getAgent() {
+		return agent;
+	}
+		
+	public void updateAgent() {
+		agent.update();
+	}
+	
+	public void addAgentRandomly() {
+		agent.setCurrentStateRandomly();
+	}
+	
+	public void addAgentRandomly(Set<State> excludeStates) {
+		agent.setCurrentState(getRandomState(excludeStates));
 	}
 	
 }

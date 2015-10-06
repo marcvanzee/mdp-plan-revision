@@ -2,12 +2,10 @@ package mdp.operations.modifiers;
 
 import constants.MathOperations;
 import mdp.MDP;
-import mdp.PopulatedMDP;
-import mdp.agent.Agent;
 import mdp.elements.Action;
 import mdp.elements.State;
 import mdp.operations.MDPOperation;
-import mdps.operations.generators.GeneralMDPGenerator;
+import mdp.operations.generators.GeneralMDPGenerator;
 import settings.GeneralMDPSettings;
 
 /**
@@ -42,15 +40,13 @@ import settings.GeneralMDPSettings;
  * @author marc.vanzee
  *
  */
-public class PopulatedMDPModifier extends MDPOperation<PopulatedMDP>
+public class MDPModifier extends MDPOperation<MDP>
 {
-	private final Agent agent;
 	private final GeneralMDPGenerator mdpGenerator;
 	
-	public PopulatedMDPModifier(PopulatedMDP mdp) 
+	public MDPModifier(MDP mdp) 
 	{
 		super(mdp);
-		this.agent = mdp.getAgent();
 		mdpGenerator = new GeneralMDPGenerator(mdp);
 	}
 	
@@ -102,9 +98,9 @@ public class PopulatedMDPModifier extends MDPOperation<PopulatedMDP>
 		while (numNodesToRemove > 0)
 		{
 			// remove an arbitrary unpopulated node
-			if (agent != null)
-				mdp.removeRandomState(agent.getCurrentState());
-			else
+			//if (agent != null)
+			//	mdp.removeRandomState(agent.getCurrentState());
+			//else
 				mdp.removeRandomState();
 			
 			numNodesToRemove--;
