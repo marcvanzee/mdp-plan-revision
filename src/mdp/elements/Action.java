@@ -3,6 +3,7 @@ package mdp.elements;
 
 public class Action {
 	String name;
+	TileworldActionType tat;
 	
 	public Action(String name) {
 		try {
@@ -15,6 +16,11 @@ public class Action {
 	
 	public Action(int i) {
 		toName(i);
+	}
+	
+	public Action(TileworldActionType tat) {
+		this.tat = tat;
+		this.name = tat.getName();
 	}
 	
 	private void toName(int i) {
@@ -31,6 +37,10 @@ public class Action {
 	
 	public String getName() {
 		return name;
+	}
+	
+	public TileworldActionType getActionType() {
+		return this.tat;
 	}
 	
 	public String toString() {

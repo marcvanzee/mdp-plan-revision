@@ -106,7 +106,6 @@ public abstract class Agent
 			// if we are using any reaction strategy and the current target disappears, the agent should deliberate
 			if (currentTarget != null && s == currentTarget)
 			{
-				System.out.println("target disappeared!");
 				deliberateForEvent = true;
 			}
 			break;
@@ -134,10 +133,41 @@ public abstract class Agent
 		}
 	}
 	
+	public void copyValues(Agent ag)
+	{
+		// position agent at the right state
+		State agState = ag.getCurrentState(),
+				agTarget = ag.getCurrentTarget(),
+				thisAgState = tileworld.getStateAtSameCoord(agState),
+				thisAgTarget = tileworld.getStateAtSameCoord(agTarget);
+		
+		this.currentState = thisAgState;
+		this.currentTarget = thisAgTarget;
+		this.score = ag.getScore();
+		this.acts = ag.getActs();
+		this.actSteps = ag.getActSteps();
+		this.deliberations = ag.getDeliberations();
+		this.deliberateForEvent = ag.getDeliberateForEvent();
+	}
+	
+	public State getCurrentTarget() {
+		return this.currentTarget;
+	}
+	
+	public int getActSteps() {
+		return this.actSteps;
+	}
+	
+	public boolean getDeliberateForEvent() {
+		return this.deliberateForEvent;
+	}
+	
 	public abstract MetaAction step();
+	public abstract boolean hasExecutedAction();
 	protected abstract void deliberate();
 	protected abstract void act();
 	public abstract  void update();
 	public abstract Action getNextAction();
 	public abstract void updatePlan();
+	public abstract void setNextMetaAction(MetaAction metaAction);
 }

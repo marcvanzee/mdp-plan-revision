@@ -19,40 +19,7 @@ public class TileworldGenerator extends MDPOperation<Tileworld>
 	@Override
 	public void run() 
 	{
-		// add tileworld actions
-		mdp.addDefaultActions();
-		
-		int worldSize = TileworldSettings.WORLD_SIZE;
-		
-		// add states and store them in a two-dimensional array
-		State[][] stateArr = new State[worldSize][worldSize];
-		
-		mdp.setDimension(worldSize);
-		
-		for (int i=0; i<worldSize; i++) 
-		{
-			for (int j=0; j<worldSize; j++) 
-			{
-				State s = new State("state at (" + i + "," + j + ")");
-				s.setCoord(i, j);
-				stateArr[i][j] = s;
-				
-				mdp.addState(stateArr[i][j], i, j);
-			}
-		}
-		
-		// then add all transitions
-		// since the domain is completely deterministic, we only have probabilities of 1
-		for (int i=0; i<worldSize; i++) 
-		{
-			for (int j=0; j<worldSize; j++) 
-			{
-				if (i > 0) mdp.addTransition(stateArr[i][j], TileworldActionType.LEFT , stateArr[i-1][j]);
-				if (j > 0) mdp.addTransition(stateArr[i][j], TileworldActionType.UP , stateArr[i][j-1]);
-				if (i < worldSize-1) mdp.addTransition(stateArr[i][j], TileworldActionType.RIGHT , stateArr[i+1][j]);
-				if (j < worldSize-1) mdp.addTransition(stateArr[i][j], TileworldActionType.DOWN , stateArr[i][j+1]);
-			}
-		}
+		buildEmptyTileworld();
 		
 		// add walls
 		int numWalls = TileworldSettings.INITIAL_NR_WALLS;
@@ -103,6 +70,46 @@ public class TileworldGenerator extends MDPOperation<Tileworld>
 			
 			numWalls--;			
 		}
+		mdp.updateAgent();
+	}
+	
+	public void buildEmptyTileworld() 
+	{
+		// add tileworld actions
+		mdp.addDefaultActions();
+		
+		int worldSize = TileworldSettings.WORLD_SIZE;
+		
+		// add states and store them in a two-dimensional array
+		State[][] stateArr = new State[worldSize][worldSize];
+		
+		mdp.setDimension(worldSize);
+		
+		for (int i=0; i<worldSize; i++) 
+		{
+			for (int j=0; j<worldSize; j++) 
+			{
+				State s = new State("state at (" + i + "," + j + ")");
+				s.setCoord(i, j);
+				stateArr[i][j] = s;
+				
+				mdp.addState(stateArr[i][j], i, j);
+			}
+		}
+		
+		// then add all transitions
+		// since the domain is completely deterministic, we only have probabilities of 1
+		for (int i=0; i<worldSize; i++) 
+		{
+			for (int j=0; j<worldSize; j++) 
+			{
+				if (i > 0) mdp.addTransition(stateArr[i][j], TileworldActionType.LEFT , stateArr[i-1][j]);
+				if (j > 0) mdp.addTransition(stateArr[i][j], TileworldActionType.UP , stateArr[i][j-1]);
+				if (i < worldSize-1) mdp.addTransition(stateArr[i][j], TileworldActionType.RIGHT , stateArr[i+1][j]);
+				if (j < worldSize-1) mdp.addTransition(stateArr[i][j], TileworldActionType.DOWN , stateArr[i][j+1]);
+			}
+		}
+		
 		mdp.updateAgent();
 	}
 }

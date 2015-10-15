@@ -8,6 +8,7 @@ import java.util.Set;
 
 import constants.MathOperations;
 import mdp.agent.Agent;
+import mdp.agent.Angel;
 import mdp.agent.ShortestPathAgent;
 import mdp.agent.ValueIterationAgent;
 import mdp.algorithms.AlgorithmType;
@@ -34,11 +35,16 @@ public class Tileworld extends MDP
 	public Tileworld() {
 		
 		this.agent = (TileworldSettings.ALGORITHM == AlgorithmType.SHORTEST_PATH ?
-				new ShortestPathAgent(this) : new ValueIterationAgent(this) );
+				new ShortestPathAgent(this) : (TileworldSettings.ALGORITHM == AlgorithmType.ANGELIC ?
+						new Angel(this) : new ValueIterationAgent(this) ));
 	}
 		
 	public void setDimension(int d) {
 		stateArr = new State[d][d];
+	}
+	
+	public int getDimension() {
+		return stateArr.length;
 	}
 	
 	public void addHole(State hole) {
@@ -47,6 +53,46 @@ public class Tileworld extends MDP
 	
 	public void removeHole(State hole) {
 		this.holes.remove(hole);
+	}
+	
+	public void copyValues(Tileworld tw) 
+	{
+		// remove all holes and obstacles and agent position
+		for (State h : getHoles()) {
+			h.setHole(false);
+			h.setReward(0);
+		}
+		
+		for (State o : getObstacles())
+			o.setObstacle(false);
+		
+		if (agent.getCurrentState() != null)
+			agent.getCurrentState().setVisited(false);
+
+		holes.clear();
+		obstacles.clear();
+		statePolicy.clear();
+		
+		// add holes and obstacles from tw
+		for (State h : tw.getHoles())
+		{
+			State thisH = getStateAtSameCoord(h);
+			thisH.setHole(true);
+			thisH.setReward(h.getReward());
+			thisH.setLifeTime(h.getLifetime());
+			holes.add(thisH);
+		}
+		
+		for (State o : tw.getObstacles()) {
+			State thisO = getStateAtSameCoord(o);
+			thisO.setObstacle(true);
+			obstacles.add(thisO);
+		}
+	}
+	
+	public State getStateAtSameCoord(State s)
+	{
+		return s == null ? null : stateArr[s.getX()][s.getY()];
 	}
 	
 	
@@ -81,6 +127,11 @@ public class Tileworld extends MDP
 	
 	public List<State> getObstacles() {
 		return obstacles;
+	}
+	
+	public Action getAction(TileworldActionType tat)
+	{
+		return actionMap.get(tat);
 	}
 	
 	public void addState(State s, int i, int j) {
@@ -174,7 +225,7 @@ public class Tileworld extends MDP
 	{
 		for (TileworldActionType tat : TileworldActionType.values())
 		{
-			Action a = new Action(tat.getName());
+			Action a = new Action(tat);
 			addAction(a);
 			actionMap.put(tat, a);
 		}

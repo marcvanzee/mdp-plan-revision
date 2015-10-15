@@ -2,10 +2,6 @@ package mdp.elements;
 
 import java.awt.Color;
 import java.awt.Point;
-import java.util.Random;
-
-import constants.MathOperations;
-import settings.TileworldSettings;
 
 public class State extends Vertex<ActionEdge> 
 {
@@ -17,7 +13,6 @@ public class State extends Vertex<ActionEdge>
 	int lifeTime;
 	double value, reward;
 	
-	
 	public State(String name) {
 		super(name);
 		this.color = Color.RED;
@@ -28,7 +23,7 @@ public class State extends Vertex<ActionEdge>
 		
 		setColor();
 	}
-	
+		
 	public void setObstacle(boolean isObstacle) {
 		this.isObstacle = isObstacle;
 		

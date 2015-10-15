@@ -6,8 +6,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import constants.MathOperations;
+import constants.Printing;
 import mdp.Tileworld;
 import mdp.agent.Agent;
+import mdp.agent.Angel;
+import mdp.agent.MetaAction;
 import mdp.elements.Action;
 import mdp.elements.QState;
 import mdp.elements.State;
@@ -24,16 +27,70 @@ import settings.TileworldSettings;
  */
 public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator, TileworldModifier>
 {	
+	private final Agent agent;
+	
 	private double maxScore = 0;
 	private int nextHole;
-	private Agent agent;
-	
+	private boolean isHypothetical = false;
+	private int hypothesisDepth = TileworldSettings.HYPOTHESIS_DEPTH;
+
 	public TileworldSimulation() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException 
 	{
 		super(Tileworld.class, TileworldGenerator.class, TileworldModifier.class);
 		agent = mdp.getAgent();
-	}
 		
+		if (agent instanceof Angel)
+			// the agent requires a reference to this simulation for hy
+			((Angel) agent).setSimulation(this);
+	}
+	
+	public TileworldSimulation(TileworldSimulation tws) 
+			throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException 
+	{
+		this();
+		
+		buildEmptyTileworld();
+		
+		copyValues(tws);
+		
+		// copy everything of tw into this simulation
+		Tileworld tw = tws.getTileworld();
+		
+		mdp.copyValues(tw);
+		
+
+		// copy everything from the agent in tw to our agent
+		if (agent instanceof Angel && tw.getAgent() instanceof Angel)
+			((Angel)agent).copyValues(((Angel)tw.getAgent()));
+		else
+			agent.copyValues(tw.getAgent());
+	}
+	
+	public void copyValues(TileworldSimulation tws)
+	{
+		this.steps = tws.getSteps();
+		this.maxScore = tws.getMaxScore();
+		this.nextHole = tws.getNextHole();
+		this.isHypothetical = true;
+		this.hypothesisDepth = tws.getHypothesisDepth() - 1;
+	}
+	
+	public Tileworld getTileworld() {
+		return mdp;
+	}
+	
+	public boolean isHypothetical() {
+		return this.isHypothetical;
+	}
+	
+	public int getHypothesisDepth() {
+		return this.hypothesisDepth;
+	}
+	
+	public Agent getAgent() {
+		return agent;
+	}
+	
 	//
 	// OTHER PUBLIC METHODS
 	//
@@ -62,6 +119,11 @@ public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator
 		setNextHole();		
 	}
 	
+	public void buildEmptyTileworld()
+	{
+		this.mdpGenerator.buildEmptyTileworld();
+	}
+	
 	public void startSimulation(int maxSteps) {
 		while (steps < maxSteps) {
 			step();
@@ -69,7 +131,7 @@ public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator
 	}
 		
 	public void step() 
-	{
+	{		
 		if (nextHole <= 0) {
 			addHole();
 			
@@ -81,10 +143,10 @@ public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator
 		
 		if (steps % TileworldSettings.DYNAMISM == 0) {
 			
-			agent.step();
+			MetaAction metaAct = agent.step();
 					
 			// if the agent acted, move the agent and compute its reward
-			if (agent.getNextAction() != null)
+			if (metaAct != MetaAction.NOP && agent.getNextAction() != null)
 			{
 				moveAgent(agent.getCurrentState(), agent.getNextAction());
 				
@@ -102,6 +164,12 @@ public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator
 		decreaseLifetimeHoles();
 		removeHoleIfVisited();
 		notifyGUI();
+		
+		// keep stepping until the agent has done something
+		// this is to ensure that a hypothetical simulation continues
+		// until the agent has either deliberated or acted
+		if (isHypothetical && !agent.hasExecutedAction())
+			step();
 	}
 	
 	public double getAgentScore() {
@@ -110,6 +178,10 @@ public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator
 	
 	public double getMaxScore() {
 		return maxScore;
+	}
+	
+	public int getNextHole() {
+		return nextHole;
 	}
 	
 	protected void moveAgent(State currentState, Action selectedAction) 
@@ -151,7 +223,7 @@ public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator
 	{
 		nextHole = MathOperations.getRandomInt(
 				TileworldSettings.HOLE_GESTATION_TIME_MIN, TileworldSettings.HOLE_GESTATION_TIME_MAX);
-		System.out.println("next hole in: " + nextHole);
+		//System.out.println("next hole in: " + nextHole);
 	}
 	
 	private void decreaseLifetimeHoles() 
