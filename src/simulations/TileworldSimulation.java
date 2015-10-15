@@ -6,7 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import constants.MathOperations;
-import constants.Printing;
 import mdp.Tileworld;
 import mdp.agent.Agent;
 import mdp.agent.Angel;
