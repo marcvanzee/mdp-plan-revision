@@ -55,6 +55,11 @@ public class Tileworld extends MDP
 		this.holes.remove(hole);
 	}
 	
+	public State[][] getStateArray()
+	{
+		return this.stateArr;
+	}
+		
 	public void copyValues(Tileworld tw) 
 	{
 		// remove all holes and obstacles and agent position
