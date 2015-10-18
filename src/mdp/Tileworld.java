@@ -134,6 +134,11 @@ public class Tileworld extends MDP
 		return obstacles;
 	}
 	
+	public int countObstacles()
+	{
+		return obstacles.size();
+	}
+	
 	public Action getAction(TileworldActionType tat)
 	{
 		return actionMap.get(tat);

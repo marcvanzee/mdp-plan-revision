@@ -32,12 +32,7 @@ public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator
 	private int nextHole;
 	private boolean isHypothetical = false;
 	private int hypothesisDepth = TileworldSettings.HYPOTHESIS_DEPTH;
-	private MinimalTileworldSimulation minTileworld;
 	
-	// minimal representation of the tileworld
-	int[] tw;
-	int[][] dist, next;
-
 	public TileworldSimulation() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException 
 	{
 		super(Tileworld.class, TileworldGenerator.class, TileworldModifier.class);
@@ -46,8 +41,6 @@ public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator
 		if (agent instanceof Angel)
 			// the agent requires a reference to this simulation for hy
 			((Angel) agent).setSimulation(this);
-		
-		minTileworld = new MinimalTileworldSimulation(mdp);
 	}
 	
 	public TileworldSimulation(TileworldSimulation tws) 
@@ -111,7 +104,7 @@ public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator
 		
 		// generate a tileworld	
 		this.mdpGenerator.run();
-		
+				
 		// add agent
 		mdp.addAgentRandomly(new HashSet<State>(mdp.getObstacles()));
 		
