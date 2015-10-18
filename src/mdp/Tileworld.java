@@ -41,6 +41,11 @@ public class Tileworld extends MDP
 		
 	public void setDimension(int d) {
 		stateArr = new State[d][d];
+		
+		for (int i = 0; i<d; i++)
+		{
+			stateArr[i] = new State[d];
+		}
 	}
 	
 	public int getDimension() {
@@ -60,41 +65,6 @@ public class Tileworld extends MDP
 		return this.stateArr;
 	}
 		
-	public void copyValues(Tileworld tw) 
-	{
-		// remove all holes and obstacles and agent position
-		for (State h : getHoles()) {
-			h.setHole(false);
-			h.setReward(0);
-		}
-		
-		for (State o : getObstacles())
-			o.setObstacle(false);
-		
-		if (agent.getCurrentState() != null)
-			agent.getCurrentState().setVisited(false);
-
-		holes.clear();
-		obstacles.clear();
-		statePolicy.clear();
-		
-		// add holes and obstacles from tw
-		for (State h : tw.getHoles())
-		{
-			State thisH = getStateAtSameCoord(h);
-			thisH.setHole(true);
-			thisH.setReward(h.getReward());
-			thisH.setLifeTime(h.getLifetime());
-			holes.add(thisH);
-		}
-		
-		for (State o : tw.getObstacles()) {
-			State thisO = getStateAtSameCoord(o);
-			thisO.setObstacle(true);
-			obstacles.add(thisO);
-		}
-	}
-	
 	public State getStateAtSameCoord(State s)
 	{
 		return s == null ? null : stateArr[s.getX()][s.getY()];

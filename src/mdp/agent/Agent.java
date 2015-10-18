@@ -169,5 +169,4 @@ public abstract class Agent
 	public abstract  void update();
 	public abstract Action getNextAction();
 	public abstract void updatePlan();
-	public abstract void setNextMetaAction(MetaAction metaAction);
 }
