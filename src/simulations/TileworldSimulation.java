@@ -5,8 +5,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.ctc.wstx.stax.MinimalInputFactory;
-
 import constants.MathOperations;
 import constants.Printing;
 import mdp.Tileworld;
@@ -40,6 +38,9 @@ public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator
 	{
 		super(Tileworld.class, TileworldGenerator.class, TileworldModifier.class);
 		agent = mdp.getAgent();
+		
+		if (agent instanceof Angel)
+			((Angel) agent).setSimulation(this);
 	}
 		
 	public Tileworld getTileworld() {
@@ -87,19 +88,13 @@ public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator
 	
 		notifyGUI();
 		
-		// schedule next hole and tell event to deliberate
 		setNextHole();	
 		
 		if (agent instanceof Angel)
-			// the agent requires a reference to this simulation for hypotheses
-			((Angel) agent).setSimulation(this);
+			// load a new minimal tileworld representation of the current tileworld
+			((Angel) agent).updateSimulation();
 	}
-	
-	public void buildEmptyTileworld()
-	{
-		this.mdpGenerator.buildEmptyTileworld();
-	}
-	
+		
 	public void startSimulation(int maxSteps) {
 		while (steps < maxSteps) {
 			step();
@@ -108,6 +103,8 @@ public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator
 		
 	public void step() 
 	{		
+		//if (steps % 1000 == 0)
+		//	System.out.println("<sim> at step " + steps);
 		Printing.sim("Step");
 		if (nextHole <= 0) {
 			addHole();
@@ -120,11 +117,11 @@ public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator
 		
 		if (steps % TileworldSettings.DYNAMISM == 0) 
 		{
-			Printing.sim("Agent can step as well");
+			Printing.sim("agent steps");
 			
 			MetaAction metaAct = agent.step();
 			
-			Printing.sim("Agent did " + metaAct);
+			Printing.sim("agent did " + metaAct);
 					
 			// if the agent acted, move the agent and compute its reward
 			if (metaAct == MetaAction.ACT && agent.getNextAction() != null)

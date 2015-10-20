@@ -154,7 +154,7 @@ public class Tileworld extends MDP
 		if (b != null && !b.isObstacle()) neighbors.add(getState(x, y+1));
 		
 		return neighbors.size() > 0 ?
-				neighbors.get(MathOperations.getRandomInt(0, neighbors.size())) : null;
+				neighbors.get(MathOperations.getRandomInt(0, neighbors.size()-1)) : null;
 		
 	}
 	

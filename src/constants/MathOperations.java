@@ -47,6 +47,6 @@ public class MathOperations
 	}
 	
 	public static int getRandomInt(int min, int max) {
-		return r.nextInt(max-min) + min;
+		return r.nextInt(max-min+1) + min;
 	}
 }

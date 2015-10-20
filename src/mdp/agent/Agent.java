@@ -40,6 +40,7 @@ public abstract class Agent
 	//
 	// CONSTRUCTORS
 	//
+	
 	public Agent(Tileworld mdp) {
 		this.tileworld = mdp;
 	}
