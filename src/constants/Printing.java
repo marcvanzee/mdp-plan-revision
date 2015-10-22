@@ -2,7 +2,20 @@ package constants;
 
 public class Printing 
 {
-	private static boolean PRINT = false;
+	private enum Reporter {
+		ANGEL, HYP, SIM, MINSIM;
+		
+		private static boolean report(Reporter r){
+			switch (r) {
+			case ANGEL: return false;
+			case HYP: return false;
+			case SIM: return false;
+			case MINSIM: return false;
+			}
+			
+			return false;
+		}
+	}
 	
 	public static String spaces(int num)
 	{
@@ -11,25 +24,25 @@ public class Printing
 
 	public static void angel(String str)
 	{
-		if (PRINT)
+		if (Reporter.report(Reporter.ANGEL))
 			System.out.println("<angel>" + str);
 	}
 	
 	public static void hyp(String str)
 	{
-		if (PRINT)
+		if (Reporter.report(Reporter.HYP))
 			System.out.println("<hypothesis>" + str);
 	}
 	
 	public static void sim(String str)
 	{
-		if (PRINT)
+		if (Reporter.report(Reporter.SIM))
 			System.out.println("<simulation>" + str);
 	}
 	
 	public static void minsim(String str)
 	{
-		if (PRINT)
+		if (Reporter.report(Reporter.MINSIM))
 			System.out.println("<minsimulation>" + str);
 	}
 	

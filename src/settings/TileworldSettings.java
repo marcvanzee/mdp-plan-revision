@@ -54,6 +54,7 @@ public class TileworldSettings
 	 * Angel Settings
 	 */
 	
-	public static int HYPOTHESIS_DEPTH = 10;
-	public static int HYPOTHESIS_REPETITIONS = 50;
+	public static int HYPOTHESIS_DEPTH = 6;
+	
+	public static int HYPOTHESIS_REPETITIONS = 100;
 }

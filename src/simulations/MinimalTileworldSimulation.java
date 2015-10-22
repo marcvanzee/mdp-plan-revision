@@ -98,7 +98,8 @@ public class MinimalTileworldSimulation
 		
 		int actScore=0, delScore=0;
 		
-		int hCount = TileworldSettings.HYPOTHESIS_REPETITIONS;
+		int hCount = TileworldSettings.HYPOTHESIS_REPETITIONS,
+				simsThink = 0, simsAct = 0;
 		
 		Printing.minsim("creating " + hCount*2 + " simulations");
 		for (int i=0; i<hCount; i++)
@@ -128,14 +129,22 @@ public class MinimalTileworldSimulation
 				e.printStackTrace();
 			}
 			
+			simsThink += delThread.countSims();
+			simsAct += actThread.countSims();
 			actScore += actThread.getMaxScore();
 			delScore += delThread.getMaxScore();
 		}
 		
-		Printing.minsim("finished hypothesis. actScore="+actScore+", thinkScore="+delScore);
+		double actS = (double)actScore/(double)simsAct,
+				delS = (double)delScore/(double)simsThink;
+		
+		Printing.angel("num finished sims think: " + simsThink);
+		Printing.angel("num finished sims act: " + simsAct);
+		
+		Printing.angel("finished hypothesis. actScore="+actS+", thinkScore="+delS);
 		
 		// prefer acting
-		return (actScore >= delScore ? MetaAction.ACT : MetaAction.DELIBERATE);
+		return (actS >= delS ? MetaAction.ACT : MetaAction.DELIBERATE);
 	}
 		
 	public void floydWarshallWithPathReconstruction()
@@ -305,7 +314,7 @@ public class MinimalTileworldSimulation
 		return ret;
 	}
 	
-	public static void printWithHyp(Hypothesis h)
+	public static String toStringWithHyp(Hypothesis h)
 	{
 		String ret = "\n[";
 		
@@ -327,8 +336,7 @@ public class MinimalTileworldSimulation
 		}
 		ret += "]";
 		
-		Printing.hyp(ret);
-		//System.out.println(ret);
+		return ret;
 	}
 
 }

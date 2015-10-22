@@ -82,7 +82,7 @@ public class Hypothesis
 		
 		depth = TileworldSettings.HYPOTHESIS_DEPTH;
 		
-		MinimalTileworldSimulation.printWithHyp(this);
+		Printing.hyp(MinimalTileworldSimulation.toStringWithHyp(this));
 	}
 	
 	public void planToIntArray(List<Action> agPlan)
@@ -234,7 +234,7 @@ public class Hypothesis
 			} 
 			catch (ArrayIndexOutOfBoundsException e)
 			{
-				MinimalTileworldSimulation.printWithHyp(this);
+				Printing.hyp(MinimalTileworldSimulation.toStringWithHyp(this));
 				System.out.println("agPos: " + agPos);
 				System.out.println("hole: " + hole);
 				System.out.println("holes: " + holes);
@@ -336,7 +336,7 @@ public class Hypothesis
 		if (start >= twsize*twsize) {
 			System.err.println("No free empty state left!");
 			System.err.println("exclude:" + exclude);
-			MinimalTileworldSimulation.printWithHyp(this);
+			Printing.hyp(MinimalTileworldSimulation.toStringWithHyp(this));
 			return -1;
 		}			
 			

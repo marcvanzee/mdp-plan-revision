@@ -9,10 +9,17 @@ public class SimThread implements Runnable
 {
 	final Hypothesis h;
 	int score = 0;
+	int numFinishedSims = 0;
+	MetaAction metaAct;
 	
 	public SimThread(Hypothesis h)
 	{
 		this.h = h;
+		metaAct = h.metaAction;
+	}
+	
+	public int countSims(){
+		return numFinishedSims;
 	}
 	
 	public void run()
@@ -43,6 +50,11 @@ public class SimThread implements Runnable
 			// if we are at the leaf of the search tree, see whether we have found an optimal score
 			if (curH.depth <= 0)
 			{
+				numFinishedSims++;
+				
+				//if (curH.score > 0)
+				//	Printing.angel("For " + metaAct + ", score " + curH.score + MinimalTileworldSimulation.toStringWithHyp(curH));
+				
 				Printing.minsim("Finished a hypothesis with score " + curH.score + " (maxScore=" + maxScore +")");
 				if (curH.score > maxScore) {
 					maxScore = curH.score;
