@@ -1,6 +1,5 @@
 package mdp.agent;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 
 import constants.Printing;
@@ -16,7 +15,7 @@ public class Angel extends Agent
 	TileworldSimulation simulation;
 	private LinkedList<Action> plan = new LinkedList<Action>();
 	private double planningDelay = 0;
-	private boolean delay = true, executedAction = false;
+	private boolean delay = false;
 	private MinimalTileworldSimulation minTileworldSim;
 	
 	//
@@ -44,11 +43,7 @@ public class Angel extends Agent
 	public boolean isDelayed() {
 		return this.delay;
 	}
-	
-	public boolean hasExecutedAction() {
-		return this.executedAction;
-	}
-		
+			
 	@Override
 	public MetaAction step() 
 	{
@@ -66,65 +61,47 @@ public class Angel extends Agent
 		// - we have no plan. in this case we have to create one if there are holes, otherwise we wait
 		
 		// if we have 0.5 plan delay and we have waited in the previous step, we may now do something again
-		if (planningDelay == 0.5 && !delay)
+		if (planningDelay > 0)
 		{
-			delay = !delay;
-			planningDelay = 0;
+			Printing.angel("planning delay");
+			planningDelay--;			
+			choice = MetaAction.NOP;
 		}
 		
-		// do nothing when we are thinking
-		if (planningDelay == 0.5 && delay)
+		// wait if there are no holes
+		else if (tileworld.getHoles().size() == 0)  
 		{
-			Printing.angel("planning delay");
-			planningDelay = 0;
-			delay = !delay;
 			choice = MetaAction.NOP;
 		}
-		else if (planningDelay >= 1)
-		{
-			Printing.angel("planning delay");
-			planningDelay--;
-			choice = MetaAction.NOP;
-		}
-			
-		// if we have no plan, deliberate
+		
 		else if (plan.size() == 0)
 		{
-			// if there are no holes, don't create a new plan
-			if (tileworld.getHoles().size() == 0)
-			{
-				Printing.angel("No holes, so I wait ");
-				choice = MetaAction.NOP;
-			}
-			else {
-				Printing.angel("No plan, so I deliberate");
-				choice = MetaAction.DELIBERATE;
-			}
+			choice = MetaAction.DELIBERATE;
 		}
 				
 		// create hypotheses
 		else
 		{
 			Printing.angel("Computing optimal action by creating hypotheses");
-			choice = minTileworldSim.computeOptimalAction(simulation);	
+			choice = minTileworldSim.computeOptimalAction(simulation);
+			Printing.angel("decisions: " + choice);
 		}
 				
 		switch (choice)
-		{
-		case ACT: 
-			act();
-			executedAction = true;
-			Printing.angel("acted");
-			break;
-			
+		{			
 		case DELIBERATE: 
 			deliberate();
-			Printing.angel("deliberated, plan: " + Arrays.toString(plan.toArray()));
-			executedAction = true;
+			if (planningDelay > 0.0 || plan.size() == 0 || delay) {
+				if (planningDelay > 0) planningDelay--;
+				if (delay) delay = false;
+				break;
+			}
+			choice = MetaAction.ACT;
+		case ACT:
+			act();
 			break;
 			
 		case NOP:
-			Printing.angel("NOP");
 			break;
 		}
 		
@@ -151,9 +128,14 @@ public class Angel extends Agent
 		// then compute the plan
 		this.plan = ShortestPath.computePlan(currentState, this.currentTarget, tileworld);
 
-		planningDelay = TileworldSettings.PLANNING_TIME;
-		
-		
+		if (TileworldSettings.PLANNING_TIME == 0.5)
+		{
+			delay = true;
+		}
+		else 
+		{
+			planningDelay = TileworldSettings.PLANNING_TIME;
+		}
 	}
 	
 	/**

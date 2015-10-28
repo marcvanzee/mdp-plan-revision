@@ -8,6 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import gui.Main;
 import settings.BenchmarkSettings;
 import settings.TileworldSettings;
+import settings.BenchmarkSettings.BenchmarkType;
 import simulations.TileworldSimulation;
 
 public class TileworldBenchmark 
@@ -46,32 +47,31 @@ public class TileworldBenchmark
 		
 		boolean loga = BenchmarkSettings.LOGARITHMIC;
 		
-		int dMin = BenchmarkSettings.DYNAMISM_MIN,
-				dMax = BenchmarkSettings.DYNAMISM_MAX,
-				dPoints = BenchmarkSettings.DYNAMISM_POINTS,
+		int vMin = BenchmarkSettings.BENCHMARK_VALUE_MIN,
+				vMax = BenchmarkSettings.BENCHMARK_VALUE_MAX,
+				vPoints = BenchmarkSettings.BENCHMARK_POINTS,
 				simLength = BenchmarkSettings.SIMULATION_LENGTH,
 				simRep = BenchmarkSettings.REPETITIONS;
+		BenchmarkType bmType = BenchmarkSettings.BENCHMARK_TYPE;
 	
-		double dStep = loga ? (Math.log10(dMax) - Math.log10(dMin)) / dPoints :
-					(dMax-dMin)/dPoints;
+		double vStep = loga ? (Math.log10(vMax) - Math.log10(vMin)) / vPoints :
+					Math.ceil(((double)vMax-(double)vMin)/(double)vPoints);
 			
 		System.out.println("###### benchmark settings ####");
-		System.out.println("# dynamism values: ["+ dMin + ", " + dMax +"], step size: " + dStep);
+		System.out.println("# " + bmType + " values: ["+ vMin + ", " + vMax +"], step size: " + vStep);
 		System.out.println("# simulation length: " + simLength + ", repetitions per dynamism value: " + simRep);
-		System.out.println("# total nr of simulations: " + (dPoints * simRep));
+		System.out.println("# total nr of simulations: " + (vPoints * simRep));
 		System.out.println("# logarithmic scale: " + loga);
 		System.out.println("##############################\n");
 		
-		System.out.println("planning time: " + TileworldSettings.PLANNING_TIME);
+		System.out.println(bmType + "; effectiveness");
 		
-		System.out.println("dynamism; effectiveness");
-		
-		int dynamism = dMin;
+		int value = vMin;
 		int iterations = 0;
 		
-		while (dynamism <= dMax)
+		while (value <= vMax)
 		{
-			TileworldSettings.DYNAMISM = dynamism;
+			setBenchmarkValue(value);
 			
 			double totalEff = 0;
 			
@@ -93,18 +93,40 @@ public class TileworldBenchmark
 		
 			totalEff /= (double) simRep;
 			
-			System.out.println(dynamism + "; " + totalEff);
+			System.out.println(value + "; " + totalEff);
 			
 			
 			
-			int newDynamism = dynamism;
+			int newValue = value;
 			
-			while (newDynamism == dynamism) {
+			while (newValue == value) {
 				iterations++;
-				newDynamism = (int) (loga ? dMin + Math.pow(10.0, iterations * dStep) : dynamism + dStep);
+				newValue = (int) (loga ? vMin + Math.pow(10.0, iterations * vStep) : value + vStep);
 			}
 			
-			dynamism = newDynamism;
+			value = newValue;
+		}
+	}
+	
+	private void setBenchmarkValue(int value)
+	{
+		switch (BenchmarkSettings.BENCHMARK_TYPE)
+		{
+		case DYNAMISM: TileworldSettings.DYNAMISM = value; break;
+		case MIN_GESTATION_TIME: 
+			TileworldSettings.HOLE_GESTATION_TIME_MIN = value; 
+			TileworldSettings.HOLE_GESTATION_TIME_MAX = value + BenchmarkSettings.BENCHMARK_RANGE;
+			break;
+		case MIN_LIFETIME:
+			TileworldSettings.HOLE_LIFE_EXP_MIN = value;
+			TileworldSettings.HOLE_LIFE_EXP_MAX = value + BenchmarkSettings.BENCHMARK_RANGE;
+			break;
+		case PLANNING_TIME:
+			TileworldSettings.PLANNING_TIME = value;
+			break;
+		case WORLD_SIZE:
+			TileworldSettings.WORLD_SIZE = value;
+			break;
 		}
 	}
 	

@@ -1,6 +1,5 @@
 package simulations;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -45,20 +44,6 @@ public class MinimalTileworldSimulation
 		tileworldToIntArray(tileworld);
 		
 		floydWarshallWithPathReconstruction();
-		
-		//Printing.minsim("\n"+toString());
-		
-		for (int i=0; i<tw.length; i++)
-		{
-			for (int j=0; j<tw.length; j++)
-			{
-				Printing.minsim("from ("+getX(i)+","+getY(i)+") to ("+getX(j)+","+getY(j)+"): " + dist[i][j]);
-				int p = pair(i,j);
-				
-				if (planMap.containsKey(p))
-					Printing.minsim("plan: " + Arrays.toString(planMap.get(pair(i,j)).toArray()));
-			}
-		}
 	}
 	
 	public void tileworldToIntArray(Tileworld tileworld)
@@ -98,8 +83,7 @@ public class MinimalTileworldSimulation
 		
 		int actScore=0, delScore=0;
 		
-		int hCount = TileworldSettings.HYPOTHESIS_REPETITIONS,
-				simsThink = 0, simsAct = 0;
+		int hCount = TileworldSettings.HYPOTHESIS_REPETITIONS;
 		
 		Printing.minsim("creating " + hCount*2 + " simulations");
 		for (int i=0; i<hCount; i++)
@@ -117,34 +101,26 @@ public class MinimalTileworldSimulation
 			Thread t1 = new Thread(actThread),
 					t2 = new Thread(delThread);
 			
-			
 			try {
 				t1.start();
-				t2.start();
-				
 				t1.join();
+				
+				t2.start();
+								
 				t2.join();
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
-			simsThink += delThread.countSims();
-			simsAct += actThread.countSims();
 			actScore += actThread.getMaxScore();
 			delScore += delThread.getMaxScore();
 		}
-		
-		double actS = (double)actScore/(double)simsAct,
-				delS = (double)delScore/(double)simsThink;
-		
-		Printing.angel("num finished sims think: " + simsThink);
-		Printing.angel("num finished sims act: " + simsAct);
-		
-		Printing.angel("finished hypothesis. actScore="+actS+", thinkScore="+delS);
+				
+		Printing.angel("finished hypothesis. max actScore="+actScore+", max thinkScore="+delScore);
 		
 		// prefer acting
-		return (actS >= delS ? MetaAction.ACT : MetaAction.DELIBERATE);
+		return (actScore >= delScore ? MetaAction.ACT : MetaAction.DELIBERATE);
 	}
 		
 	public void floydWarshallWithPathReconstruction()

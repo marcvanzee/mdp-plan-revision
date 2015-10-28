@@ -232,4 +232,9 @@ public class Tileworld extends MDP
 		agent.setCurrentState(getRandomState(excludeStates));
 	}
 	
+	public void addAgentAt(int x, int y)
+	{
+		agent.setCurrentState(getState(x, y));
+	}
+	
 }

@@ -181,10 +181,4 @@ public class ValueIterationAgent extends Agent
 		// TODO Auto-generated method stub
 		
 	}
-
-	@Override
-	public boolean hasExecutedAction() {
-		// TODO Auto-generated method stub
-		return false;
-	}
 }

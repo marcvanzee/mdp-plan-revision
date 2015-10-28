@@ -2,6 +2,7 @@ package mdp.agent;
 
 import java.util.LinkedList;
 
+import constants.Printing;
 import mdp.Tileworld;
 import mdp.algorithms.ShortestPath;
 import mdp.elements.Action;
@@ -32,7 +33,7 @@ public class ShortestPathAgent extends Agent
 {
 	private LinkedList<Action> plan = new LinkedList<Action>();
 	private double planningDelay = 0;
-	private boolean delay = true;
+	private boolean delay = false;
 	
 	//
 	// CONSTRUCTORS
@@ -70,73 +71,73 @@ public class ShortestPathAgent extends Agent
 		int boldness = TileworldSettings.BOLDNESS,
 				nrHoles = tileworld.getHoles().size();
 		
-		MetaAction choice;
-		
-		if (planningDelay == 0.5 && !delay)
-		{
-			delay = !delay;
-			planningDelay = 0;
-		}
-		
+		MetaAction choice = null;
+				
 		// do nothing when we are thinking
-		if (planningDelay == 0.5 && delay)
-		{
-			planningDelay = 0;
-			delay = !delay;
-			choice = MetaAction.NOP;
-		}
-		else if (planningDelay >= 1)
+		if (planningDelay > 0)
 		{
 			planningDelay--;
+			
 			choice = MetaAction.NOP;
+			Printing.spa("planning delay");
 		}
 		
 		// wait if there are no holes
-		else if (nrHoles == 0)  
+		if (nrHoles == 0)  
 		{
 			choice = MetaAction.NOP;
+			Printing.spa("no holes");
 		}
 		
-		// if there are holes and we have no plan, deliberate
-		// note that if boldness=-1, this will automatically mean that planning
-		// only occurs when the plan is finished (or possibly through reaction strategies)
-		else if (plan.size() == 0)
+		// if we did not decide yet
+		if (choice == null)
 		{
-			//System.out.println("deliberating because plan is empty");
-			choice = MetaAction.DELIBERATE;
-		}
+			// if there are holes and we have no plan, deliberate
+			// note that if boldness=-1, this will automatically mean that planning
+			// only occurs when the plan is finished (or possibly through reaction strategies)
+			if (plan.size() == 0)
+			{
+				Printing.spa("deliberating because plan is empty");
+				choice = MetaAction.DELIBERATE;
+			}
+			
+			// if there are holes and we have a plan, deliberate if our boldness tells us to
+			else if (actSteps == boldness)
+			{
+				Printing.spa("deliberating because of boldness");
+				choice = MetaAction.DELIBERATE;
+			}
+			
+			// if there are holes and we have a plan and our boldness doesn't tell us to deliberate,
+			// deliberate for reaction strategies
+			else if (deliberateForEvent)
+			{
+				Printing.spa("deliberating for event");
+				choice = MetaAction.DELIBERATE;
+				deliberateForEvent = false;
+				
+			}
 		
-		// if there are holes and we have a plan, deliberate if our boldness tells us to
-		else if (actSteps == boldness)
-		{
-			//System.out.println("deliberating because of boldness");
-			choice = MetaAction.DELIBERATE;
-		}
-		
-		// if there are holes and we have a plan and our boldness doesn't tell us to deliberate,
-		// deliberate for reaction strategies
-		else if (deliberateForEvent)
-		{
-			//System.out.println("deliberating for event");
-			choice = MetaAction.DELIBERATE;
-			deliberateForEvent = false;
-		}
-		
-		// if there are holes, we have a plan, our boldness doesn't tell us to deliberate and
-		// there are no reaction strategies that apply, act
-		else
-		{
-			choice = MetaAction.ACT;
+			// if there are holes, we have a plan, our boldness doesn't tell us to deliberate and
+			// there are no reaction strategies that apply, act
+			else
+			{
+				choice = MetaAction.ACT;
+			}
 		}
 		
 		switch (choice)
-		{
-		case ACT: 
-			act();
-			break;
-			
+		{			
 		case DELIBERATE: 
 			deliberate(); 
+			deliberateForEvent = false;
+			if (planningDelay > 0 || plan.size() == 0 || delay) {
+				delay = false;
+				break;
+			}
+			choice = MetaAction.ACT;
+		case ACT:
+			act();
 			break;
 			
 		case NOP:
@@ -176,7 +177,14 @@ public class ShortestPathAgent extends Agent
 		// then compute the plan
 		this.plan = ShortestPath.computePlan(currentState, this.currentTarget, tileworld);
 
-		planningDelay = TileworldSettings.PLANNING_TIME;	
+		if (TileworldSettings.PLANNING_TIME == 0.5)
+		{
+			delay = true;
+		}
+		else 
+		{
+			planningDelay = TileworldSettings.PLANNING_TIME;
+		}
 	}
 	
 	/**
@@ -194,11 +202,5 @@ public class ShortestPathAgent extends Agent
 	
 	public void updatePlan() {
 		removeActionFromPlan();
-	}
-
-	@Override
-	public boolean hasExecutedAction() {
-		// TODO Auto-generated method stub
-		return false;
 	}
 }

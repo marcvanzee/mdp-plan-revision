@@ -20,6 +20,11 @@ public class TileworldGenerator extends MDPOperation<Tileworld>
 	public void run() 
 	{
 		buildEmptyTileworld();
+	
+		if (TileworldSettings.TEST_ENV) {
+			buildTestSetup();
+			return;
+		}
 		
 		// add walls
 		int numWalls = TileworldSettings.INITIAL_NR_WALLS;
@@ -111,5 +116,10 @@ public class TileworldGenerator extends MDPOperation<Tileworld>
 		}
 		
 		mdp.updateAgent();
+	}
+	
+	public void buildTestSetup()
+	{
+		
 	}
 }

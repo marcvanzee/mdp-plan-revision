@@ -1,16 +1,22 @@
 package constants;
 
+import settings.TileworldSettings;
+
 public class Printing 
 {
 	private enum Reporter {
-		ANGEL, HYP, SIM, MINSIM;
+	
+		ANGEL, HYP, SIM, MINSIM, SPA;
 		
 		private static boolean report(Reporter r){
+			if (TileworldSettings.PRINT_NOTHING)
+				return false;
 			switch (r) {
-			case ANGEL: return false;
+			case ANGEL: return true;
 			case HYP: return false;
 			case SIM: return false;
-			case MINSIM: return false;
+			case MINSIM: return true;
+			case SPA: return true;
 			}
 			
 			return false;
@@ -27,6 +33,13 @@ public class Printing
 		if (Reporter.report(Reporter.ANGEL))
 			System.out.println("<angel>" + str);
 	}
+	
+	public static void spa(String str)
+	{
+		if (Reporter.report(Reporter.SPA))
+			System.out.println("<shortest path agent>" + str);
+	}
+	
 	
 	public static void hyp(String str)
 	{

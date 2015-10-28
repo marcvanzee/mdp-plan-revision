@@ -37,9 +37,9 @@ public class TileworldSettings
 	// When cd=-1, the agent keeps its plan until it's finished
 	// For value iteration, this means the agent replans when it has reached a state where it cannot optimize further
 	public static int BOLDNESS = 					1;
-	public static boolean USE_REACTION_STRATEGY = 	false;
+	public static boolean USE_REACTION_STRATEGY = 	true;
 	public static ReactionStrategy 
-						REACTION_STRATEGY =			ReactionStrategy.TARGET_DISAPPEARS;
+						REACTION_STRATEGY =			ReactionStrategy.TARGET_DIS_OR_ANY_HOLE;
 	
 	public static AlgorithmType ALGORITHM = AlgorithmType.ANGELIC;
 	
@@ -54,7 +54,12 @@ public class TileworldSettings
 	 * Angel Settings
 	 */
 	
+	
 	public static int HYPOTHESIS_DEPTH = 6;
 	
-	public static int HYPOTHESIS_REPETITIONS = 100;
+	public static int HYPOTHESIS_REPETITIONS = 5;
+	
+	public static boolean TEST_ENV = true;
+	
+	public static boolean PRINT_NOTHING = false;
 }

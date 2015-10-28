@@ -116,7 +116,7 @@ public abstract class Agent
 			
 			if (strategy == ReactionStrategy.TARGET_DIS_OR_ANY_HOLE)
 			{
-				System.out.println("any hole appeared!");
+				//System.out.println("any hole appeared!");
 				deliberateForEvent = true;
 			}
 			
@@ -127,7 +127,7 @@ public abstract class Agent
 				
 				if (distanceToNewHole < distanceToTarget)
 				{
-					System.out.println("nearer hole appeared!");
+					//System.out.println("nearer hole appeared!");
 					deliberateForEvent = true;
 				}
 			}
@@ -164,7 +164,6 @@ public abstract class Agent
 	}
 	
 	public abstract MetaAction step();
-	public abstract boolean hasExecutedAction();
 	protected abstract void deliberate();
 	protected abstract void act();
 	public abstract  void update();

@@ -31,6 +31,8 @@ public class Hypothesis
 	LinkedList<Integer> plan; // a list of integers, representing positions in tw[]
 	MetaAction metaAction;
 	
+	LinkedList<Hypothesis> history = new LinkedList<Hypothesis>();
+	
 	public Hypothesis() {}
 	
 	public Hypothesis(Hypothesis h, MetaAction ma)
@@ -47,6 +49,14 @@ public class Hypothesis
 		delay = h.delay;
 		plan = new LinkedList<Integer>(h.plan);
 		metaAction = ma;
+		history = new LinkedList<Hypothesis>(h.history);
+	}
+	
+	public void save()
+	{
+		Hypothesis copy = new Hypothesis(this, metaAction);
+		copy.depth++;
+		history.add(copy);
 	}
 	
 	public Hypothesis(TileworldSimulation tws)
@@ -80,7 +90,7 @@ public class Hypothesis
 		plan = new LinkedList<Integer>();
 		planToIntArray(((Angel) ag).getPlan());
 		
-		depth = TileworldSettings.HYPOTHESIS_DEPTH;
+		depth = TileworldSettings.HYPOTHESIS_DEPTH+1;
 		
 		Printing.hyp(MinimalTileworldSimulation.toStringWithHyp(this));
 	}
@@ -118,7 +128,12 @@ public class Hypothesis
 		{
 			Printing.hyp("step");
 			
-			if (nextHole <= 0) 
+			if (TileworldSettings.TEST_ENV)
+			{
+				addTestHoles();
+				removeHoleIfVisited();
+			}
+			else if (nextHole <= 0) 
 			{
 				Printing.hyp("adding hole");
 				addHole();
@@ -130,7 +145,7 @@ public class Hypothesis
 			if (steps % TileworldSettings.DYNAMISM == 0) 
 			{
 				agentStep();
-				metaAction = null;
+				depth--;
 			}
 			
 			steps++;
@@ -138,6 +153,19 @@ public class Hypothesis
 			
 			decreaseLifetimeHoles();
 			removeHoleIfVisited();
+		}
+	}
+	
+	private void addTestHoles()
+	{
+		if (steps == 0)
+		{
+			addHole(getPos(0, 4), 10, 10);
+		}
+		
+		else if (steps == 4)
+		{
+			addHole(getPos(2, 0), 4, 40);
 		}
 	}
 	
@@ -165,48 +193,45 @@ public class Hypothesis
 	{
 		Printing.hyp("agent step");
 		
-		if (planningDelay == 0.5 && !delay)
-		{
-			delay = !delay;
-			planningDelay = 0;
-		}
-		
-		// do nothing when we are thinking
-		if (planningDelay == 0.5 && delay)
-		{
-			planningDelay = 0;
-			delay = !delay;
-		}
-		else if (planningDelay >= 1)
+		if (planningDelay > 0)
 		{
 			planningDelay--;
 		}
-		// otherwise execute the meta-action
-		// this should never occur
-		else if (plan.size() == 0 && metaAction != MetaAction.DELIBERATE)
-		{
-			System.out.println("I am instructed to act but I have to think because"
-					+ "there is no plan! " + metaAction);
-		}
 		
-		// otherwise carry out the meta-action
-		else if (metaAction == MetaAction.ACT && plan.size() > 0)
+		// wait if there are no holes
+		else if (holes.size() == 0)  
 		{
-			act();
-			Printing.hyp("agent acted");
+			// do nothing
+			Printing.hyp("no holes");
+		}
+						
+		// otherwise carry out the meta-action
+		else if (metaAction == MetaAction.ACT)
+		{
+			// if we have to act but we have no plan, stop
+			if (plan.size() == 0) {
+				System.err.println("PROBLEMEMMM");
+				metaAction = null;
+			}
+			else {
+				act();
+				Printing.hyp("agent acted");
+				metaAction = null;
+			}
 		}
 		else if (metaAction == MetaAction.DELIBERATE)
 		{
-			if (holes.size() == 0)
-			{
-				// wait
-				Printing.hyp("no holes");
-			}
-			else
-			{
-				deliberate();
-				Printing.hyp("agent deliberated");
-			}
+			deliberate();
+			if (planningDelay > 0)
+				planningDelay--;
+			if (delay)
+				delay = false;
+			Printing.hyp("agent deliberated");
+			metaAction = null;
+		}
+		
+		else {
+			Printing.hyp("agent did nothing :(");
 		}
 	}
 	
@@ -265,22 +290,36 @@ public class Hypothesis
 		
 		plan = MinimalTileworldSimulation.path(agPos, maxPos);
 		
-		planningDelay = TileworldSettings.PLANNING_TIME;
+		if (TileworldSettings.PLANNING_TIME == 0.5)
+		{
+			delay = true;
+		}
+		else 
+		{
+			planningDelay = TileworldSettings.PLANNING_TIME;
+		}
 	}
 	
 	public void addHole()
 	{
 		int p = getRandomEmptyState();
+		
+		if (p == -1) // no free space
+			return;
 		int lifetime = MathOperations.getRandomInt(
 				TileworldSettings.HOLE_LIFE_EXP_MIN, TileworldSettings.HOLE_LIFE_EXP_MAX);
 	
 		int score = MathOperations.getRandomInt(
 				TileworldSettings.HOLE_SCORE_MIN, TileworldSettings.HOLE_SCORE_MAX);
 		
-		holes.add(p);
-		holeLife.put(p, lifetime);
-		holeScore.put(p, score);
-		
+		addHole(p, lifetime, score);
+	}
+	
+	public void addHole(int location, int lifetime, int score)
+	{
+		holes.add(location);
+		holeLife.put(location, lifetime);
+		holeScore.put(location, score);
 	}
 	
 	public void removeHoleIfVisited()
@@ -318,7 +357,9 @@ public class Hypothesis
 	{
 		// exclude obstacles, holes, and the agent location
 		
-		int twsize = TileworldSettings.WORLD_SIZE;
+		int twsize = TileworldSettings.WORLD_SIZE,
+				end = twsize * twsize;
+				
 		
 		ArrayList<Integer> exclude = new ArrayList<Integer>(holes);
 				
@@ -331,16 +372,17 @@ public class Hypothesis
 		
 		int start = 0;
 		
-		while (exclude.contains(start)) start++;
-		
-		if (start >= twsize*twsize) {
-			System.err.println("No free empty state left!");
-			System.err.println("exclude:" + exclude);
-			Printing.hyp(MinimalTileworldSimulation.toStringWithHyp(this));
+		if (exclude.size() == end)
 			return -1;
-		}			
-			
-		int random = MathOperations.getRandomInt(start, twsize*twsize-1 - exclude.size());
+		
+		int random = 0;
+		
+		try {
+			random = start + MathOperations.getRandomInt(0, end-start-1 - exclude.size());
+		} catch (IllegalArgumentException e)
+		{
+			return -1;
+		}
 		    
 	    for (int ex : exclude) {
 	        if (random < ex) {
