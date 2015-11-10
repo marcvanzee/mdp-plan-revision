@@ -20,9 +20,10 @@ This general setup is quite complex, so we have simplified the environment (i.e.
 
 ![Tileworld in MDP representation](images/screenshots/tileworld0.png)
 
-In order to simplify the Tileworld visualization, we have developed an alternative one:
+In the above screenshot, the agent is represented by a yellow state, obstacles are represented by black states, goal states by larger green states, and "normal" grid states by red states. In order to simplify the Tileworld visualization, we have developed an alternative one:
 
 ![Tileworld in simplified representation](images/screenshots/tileworld1.png)
+
 
 Note that this is still an MDP: We have only simplified the visualization. This allows us to visualize larger Tileworld scenarios easily:
 
