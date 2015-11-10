@@ -1,31 +1,33 @@
 # mdp-plan-revision
 
-Read a more detailed description of the conceptual underpinnings in the following paper:
+Read a more detailed description of the conceptual underpinnings and experimental results in the following paper:
 
 > [Intention Reconsideration as Metareasoning](http://www.marcvanzee.nl/publications/2015/borm2015_metareasoning.pdf) ([Marc van Zee](http://www.marcvanzee.nl), [Thomas Icard](http://stanford.edu/~icard/)), [In Bounded Optimality and Rational Metareasoning NIPS 2015 Workshop](https://sites.google.com/site/boundedoptimalityworkshop/home), 2015. 
 
-### Screenshots
+### Summary
 
+This project implements an agent that is situated on a [Markov Decision Process (MDP)](https://en.wikipedia.org/wiki/Markov_decision_process). 
 
+![A Markov Decision Process in this software](images/screenshots/mdp1.png)
 
-### Background: Intention Reconsideration
-In this project we are interested in understanding a specific aspect of bounded optimality and metareasoning, namely the control of _plan_ or _intention reconsideration_. This problem is more circumscribed than the general problem of metareasoning, but it also inherits many of the interesting and characteristic features. The basic problem is as follows: Suppose an agent has devised a (partial) plan of action for a particular environment, as it appeared to the agent at some time _t_. But then at some later time _t'>t_---perhaps in the course of executing the plan---the agent's view on the world changes. When should the agent _replan_, and when should the agent keep its current (perhaps improvable, possibly dramatically) plan? In other words, in the specific context of a planning agent who is learning new relevant facts about the world, when should this agent stop to _rethink_, and when should it go ahead and _act_ according to its current plan? 
+The agent is able to compute the optimal policy through [Value Iteration](http://artint.info/html/ArtInt_227.html). 
 
-Our work builds on earlier, largely forgotten (regrettably, in our view) work in the _belief-desire-intention_ (BDI) agent literature, by [Kinny and Georgeff](http://www.ijcai.org/Past%20Proceedings/IJCAI-91-VOL1/PDF/014.pdf). They compare some rudimentary reconsideration strategies, as a function of several environmental parameters, in simple _Tileworld_ experiments. We reproduce their results, and also compare their reconsideration strategies to the \emph{optimal} reconsideration strategies for these environmental parameter settings. Interestingly, even the very simple agents Kinny and Georgeff considered behave nearly optimally in certain environments. However, no agent performs optimally across environments. Our results suggest that meta-meta-reasoning may indeed be called for in this setting, so that an agent might tune its reconsideration strategy flexibly to different environments.
+![Optimal policy (green arrows) computing using value iteration](images/screenshots/mdp_vi.png)
 
-## Implementation Details
+The MDP is changing over time, and the agent can respond to this change by either acting (i.e. executing the optimal action according to its current policy) or thinking (i.e. computing a new policy). The task is to learn the best meta-reasoning strategy, i.e. deciding when to think or act, based on the characteristics of the envrionment.
 
--	The project is Eclipse, so it’s easiest to use that
--	You can run the Tileworld GUI from gui.Main
--	Tileworld settings are in settings.tileworldsettings
--	You can run a benchmark from benchmarking.TileworldBenchmark
--	Benchmark settings are in settings.benchmarksettings
--	The main simulation runs in simulations.TIleworldSimulation
--	This simulation contains a tileworld (mdp.Tileworld) and an agent.
--	The agent can be a value iteration agent, a shortest path agent, or an angelic planner (all in mdp.agent)
--	The angelic planner creates a simulation.MinimalTileworldSimulation for metareasoning, which again calls simulations.Hypothesis multiple times.
+This general setup is quite complex, so we have simplified the environment (i.e. the MDP) to the TIleworld environment. This consists of an agent that is situated on a grid. It can move up, down, left, or right and has to fill holes, which means it has to reach specific states in the grid. It cannot move through obstacles.
 
+![Tileworld in MDP representation](images/screenshots/tileworld0.png)
 
-## Experiments
+In order to simplify the Tileworld visualization, we have developed an alternative one:
 
-Experimental results and comparison with Kinny and Georgeff can be found in [our paper](http://www.marcvanzee.nl/publications/2015/borm2015_metareasoning.pdf).
+![Tileworld in simplified representation](images/screenshots/tileworld1.png)
+
+Note that this is still an MDP: We have only simplified the visualization. This allows us to visualize larger Tileworld scenarios easily:
+
+![Tileworld in simplified representation](images/screenshots/tileworld2.png)
+
+We then develop several metareasoning strategies that the agent can use. Read a more detailed description of the conceptual underpinnings and experimental results in our paper:
+
+> [Intention Reconsideration as Metareasoning](http://www.marcvanzee.nl/publications/2015/borm2015_metareasoning.pdf) ([Marc van Zee](http://www.marcvanzee.nl), [Thomas Icard](http://stanford.edu/~icard/)), [In Bounded Optimality and Rational Metareasoning NIPS 2015 Workshop](https://sites.google.com/site/boundedoptimalityworkshop/home), 2015. 
