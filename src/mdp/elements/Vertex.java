@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 public abstract class Vertex<E> 
 {
-	protected String name = "undefined";
+	protected String name = "";
 	protected ArrayList<E> edges = new ArrayList<E>();
 	protected Color color = Color.BLACK;
 	int indegree = 0, outdegree = 0;

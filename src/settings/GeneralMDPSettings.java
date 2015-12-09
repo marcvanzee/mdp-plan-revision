@@ -11,7 +11,7 @@ public class GeneralMDPSettings
 	/*
 	 * MDP GENERATOR SETTINGS 
 	 */
-	public static int NUM_STATES = 5, 				// number of states (not q-states) to generate)
+	public static int NUM_STATES = 20, 				// number of states (not q-states) to generate)
 			NUM_ACTIONS = 10, 				// number of distinct actions
 			AVG_ACTIONS_STATE = 3, 			// average umber of actions that are executable in each state
 			ACTION_VARIANCE = 3,			    // variance on numActions for number of actions per state

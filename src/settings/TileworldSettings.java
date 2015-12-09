@@ -41,7 +41,7 @@ public class TileworldSettings
 	public static ReactionStrategy 
 						REACTION_STRATEGY =			ReactionStrategy.TARGET_DIS_OR_ANY_HOLE;
 	
-	public static AlgorithmType ALGORITHM = AlgorithmType.ANGELIC;
+	public static AlgorithmType ALGORITHM = AlgorithmType.LEARNING;
 	
 	public static ReactionStrategy parseReactionStrategy(String str) {
 		if (str.equals("TARGET_DISAPPEARS")) return ReactionStrategy.TARGET_DISAPPEARS;
@@ -59,7 +59,7 @@ public class TileworldSettings
 	
 	public static int HYPOTHESIS_REPETITIONS = 5;
 	
-	public static boolean TEST_ENV = true;
+	public static boolean TEST_ENV = false;
 	
-	public static boolean PRINT_NOTHING = false;
+	public static boolean PRINT_NOTHING = true;
 }

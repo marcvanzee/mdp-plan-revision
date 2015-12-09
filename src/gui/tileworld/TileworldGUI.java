@@ -97,7 +97,7 @@ public class TileworldGUI implements ItemListener, Observer {
 				jSep2 = new JSeparator(JSeparator.VERTICAL);
 		
 		//frame.setBounds(100, 100, 1057, 822);
-		frame.setBounds(100, 100, 800, 200);
+		frame.setBounds(100, 100, 800, 563);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		cPane.setLayout(new BoxLayout(cPane, BoxLayout.Y_AXIS));
@@ -231,7 +231,7 @@ public class TileworldGUI implements ItemListener, Observer {
 	/**
 	 * Build a new model according to the current settings in the GUI
 	 */
-	private void buildNewModel() {
+	public void buildNewModel() {
 		try
 		{
 			simulation.buildNewModel();
@@ -241,7 +241,7 @@ public class TileworldGUI implements ItemListener, Observer {
 		}
 	}
 	
-	private void startSimulation() {
+	public void startSimulation() {
 		simulation.startSimulation(null);
 	}
 	

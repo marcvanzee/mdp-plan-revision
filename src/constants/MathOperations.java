@@ -49,4 +49,12 @@ public class MathOperations
 	public static int getRandomInt(int min, int max) {
 		return r.nextInt(max-min+1) + min;
 	}
+	
+	public static double getRandomDouble(double min, double max) {
+		return r.nextDouble() * max + min;
+	}
+	
+	public static double getRandomDouble() {
+		return r.nextDouble();
+	}
 }

@@ -51,6 +51,7 @@ public abstract class Agent
 	
 	public void setCurrentState(State newState) {
 		this.currentState = newState;
+		
 	}
 	
 	public State getCurrentState() {

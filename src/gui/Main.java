@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Properties;
 
@@ -16,6 +18,7 @@ import javax.swing.JFrame;
 
 import gui.generalMDP.MDPGUI;
 import gui.tileworld.TileworldGUI;
+import mdp.algorithms.AlgorithmType;
 import settings.FileSettings;
 import settings.TileworldSettings;
 
@@ -44,6 +47,7 @@ public class Main
 	 * Create the application.
 	 */
 	public Main() {
+		
 		if (FileSettings.LOAD_SETTINGS)
 			try {
 				loadSettings();
@@ -51,16 +55,8 @@ public class Main
 				e.printStackTrace();
 			}
 		
-		try {
-			(new TileworldGUI()).go();
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-				| NoSuchMethodException | SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		//initialize();
-		//frame.setVisible(true);
+		initialize();
+		frame.setVisible(true);
 	}
 	
 	public static void loadSettings() throws IOException 
@@ -122,6 +118,9 @@ public class Main
 		
 		if (settings.getProperty("reactionStrategy") != null)
 			TileworldSettings.REACTION_STRATEGY = TileworldSettings.parseReactionStrategy(settings.getProperty("reactionStrategy"));
+		
+		if (settings.getProperty("learning") != null)
+			TileworldSettings.ALGORITHM = AlgorithmType.LEARNING;
 	}
 
 	/**
@@ -170,6 +169,23 @@ public class Main
 			}
 		});
 		frame.getContentPane().add(btnTileworld);
+	}
+	
+	private static class NullOutputStream extends OutputStream {
+	    @Override
+	    public void write(int b){
+	         return;
+	    }
+	    @Override
+	    public void write(byte[] b){
+	         return;
+	    }
+	    @Override
+	    public void write(byte[] b, int off, int len){
+	         return;
+	    }
+	    public NullOutputStream(){
+	    }
 	}
 
 }

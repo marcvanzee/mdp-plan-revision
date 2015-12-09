@@ -16,6 +16,10 @@ public class BenchmarkSettings
 	
 	public static final int BENCHMARK_RANGE = 		5; // only for hole gestation time and life time
 	
+	// for learning
+	public static final int TRAINING_LENGTH = 100000;
+	public static final int TEST_LENGTH     = 5000;
+	
 	public enum BenchmarkType {
 		DYNAMISM, PLANNING_TIME, MIN_GESTATION_TIME, MIN_LIFETIME, WORLD_SIZE;
 	}

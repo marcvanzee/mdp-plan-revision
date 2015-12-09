@@ -9,6 +9,7 @@ import java.util.Set;
 import constants.MathOperations;
 import mdp.agent.Agent;
 import mdp.agent.Angel;
+import mdp.agent.LearningAgent;
 import mdp.agent.ShortestPathAgent;
 import mdp.agent.ValueIterationAgent;
 import mdp.algorithms.AlgorithmType;
@@ -34,9 +35,13 @@ public class Tileworld extends MDP
 	
 	public Tileworld() {
 		
-		this.agent = (TileworldSettings.ALGORITHM == AlgorithmType.SHORTEST_PATH ?
-				new ShortestPathAgent(this) : (TileworldSettings.ALGORITHM == AlgorithmType.ANGELIC ?
-						new Angel(this) : new ValueIterationAgent(this) ));
+		switch(TileworldSettings.ALGORITHM) {
+		case SHORTEST_PATH: 	this.agent = new ShortestPathAgent(this); break;
+		case ANGELIC:			this.agent = new Angel(this); break;
+		case VALUE_ITERATION:	this.agent = new ValueIterationAgent(this); break;
+		case LEARNING:			this.agent = new LearningAgent(this); break;
+		default:				this.agent = null;
+		}
 	}
 		
 	public void setDimension(int d) {

@@ -211,7 +211,7 @@ public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator
 		
 		QState qState = mdp.getQState(currentState, selectedAction);
 		State newState = mdp.getQEdges(qState).get(0).getToVertex();
-
+				
 		agent.getCurrentState().setVisited(false);
 		agent.setCurrentState(newState);
 		newState.setVisited(true);

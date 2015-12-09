@@ -157,6 +157,7 @@ public class MDPGUI implements ItemListener {
 		pNavTop.setLayout(new BoxLayout(pNavTop, BoxLayout.X_AXIS));
 		pNavTop.add(Box.createHorizontalStrut(5));
 		pNavTop.add(new JLabel("world size"));
+		textFieldWorldsize.setText("20");
 		
 		textFieldWorldsize.setMaximumSize( new Dimension(30, 20) );
 		pNavTop.add(textFieldWorldsize);
@@ -325,6 +326,7 @@ public class MDPGUI implements ItemListener {
 	private void buildNewModel() {
 		try
 		{
+			GeneralMDPSettings.NUM_STATES = Integer.parseInt(textFieldWorldsize.getText()); 
 			// clear the graph
 			drawPanel.clearGraph();
 			

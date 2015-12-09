@@ -1,14 +1,16 @@
 package benchmarking;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 
 import gui.Main;
+import gui.tileworld.TileworldGUI;
+import mdp.agent.LearningAgent;
+import mdp.algorithms.AlgorithmType;
 import settings.BenchmarkSettings;
-import settings.TileworldSettings;
 import settings.BenchmarkSettings.BenchmarkType;
+import settings.TileworldSettings;
 import simulations.TileworldSimulation;
 
 public class TileworldBenchmark 
@@ -18,18 +20,9 @@ public class TileworldBenchmark
 	public static void main(String args[])
 	{
 		try {
-			try {
-				(new TileworldBenchmark()).go();
-			} catch (IllegalArgumentException | InvocationTargetException | NoSuchMethodException
-					| SecurityException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
+			(new TileworldBenchmark()).go();
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+				| NoSuchMethodException | SecurityException e) {
 			e.printStackTrace();
 		}
 	}
@@ -39,12 +32,17 @@ public class TileworldBenchmark
 		try {
 			Main.loadSettings();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		PrintStream realSystemOut = System.out;
-		
+		if (TileworldSettings.ALGORITHM == AlgorithmType.LEARNING) {
+			benchmarkLearning();
+		} else {
+			benchmarkNotLearning();
+		}
+	}
+	
+	public void benchmarkNotLearning() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {		
 		boolean loga = BenchmarkSettings.LOGARITHMIC;
 		
 		int vMin = BenchmarkSettings.BENCHMARK_VALUE_MIN,
@@ -108,6 +106,53 @@ public class TileworldBenchmark
 		}
 	}
 	
+	public void benchmarkLearning() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+		int trainingLength = BenchmarkSettings.TRAINING_LENGTH,
+				testLength = BenchmarkSettings.TEST_LENGTH;
+		
+		System.out.println("---- training ("+trainingLength+" rounds)");
+		simulation = new TileworldSimulation();
+		simulation.buildNewModel();
+		simulation.startSimulation(trainingLength);
+				
+		double score = simulation.getAgentScore(),
+				maxScore = simulation.getMaxScore(),
+				effectiveness = (double) score / (double) maxScore;
+			
+		System.out.println("effectiveness for training: " + effectiveness);
+		System.out.println("thetaAct: " + Arrays.toString(LearningAgent.thetaAct));
+		System.out.println("thetaThink: " + Arrays.toString(LearningAgent.thetaThink));
+		
+		// get theta values
+		double thetaAct[] = Arrays.copyOf(LearningAgent.thetaAct, LearningAgent.FEATURES);
+		double thetaThink[] = Arrays.copyOf(LearningAgent.thetaThink, LearningAgent.FEATURES);
+				
+		System.out.println("---- testing ("+testLength+" rounds)");
+		simulation = new TileworldSimulation();
+		simulation.buildNewModel();
+		LearningAgent.TRAINING = false;
+		LearningAgent.thetaAct = Arrays.copyOf(thetaAct, LearningAgent.FEATURES);
+		LearningAgent.thetaThink = Arrays.copyOf(thetaThink, LearningAgent.FEATURES);	
+		//LearningAgent.thetaAct = new double[]{67.9586396409001, 0.5906703400857038, -67.9586396409001, -67.9586396409001, 33.99999999997416};
+		//LearningAgent.thetaThink = new double[]{67.98464306118106, 0.564665899766446, -67.98464306118106, -67.93263520058085, 33.999999999997904};
+		simulation.startSimulation(testLength);
+		
+		score = simulation.getAgentScore();
+		maxScore = simulation.getMaxScore();
+		effectiveness = (double) score / (double) maxScore;
+			
+		System.out.println("effectiveness for testing: " + effectiveness);
+		
+		System.out.println("now running the agent in the GUI...");
+		
+		TileworldGUI gui = new TileworldGUI();
+		gui.go();
+		
+		gui.buildNewModel();
+		gui.startSimulation();
+		
+	}
+	
 	private void setBenchmarkValue(int value)
 	{
 		switch (BenchmarkSettings.BENCHMARK_TYPE)
@@ -129,22 +174,4 @@ public class TileworldBenchmark
 			break;
 		}
 	}
-	
-	private static class NullOutputStream extends OutputStream {
-	    @Override
-	    public void write(int b){
-	         return;
-	    }
-	    @Override
-	    public void write(byte[] b){
-	         return;
-	    }
-	    @Override
-	    public void write(byte[] b, int off, int len){
-	         return;
-	    }
-	    public NullOutputStream(){
-	    }
-	}
-
 }
