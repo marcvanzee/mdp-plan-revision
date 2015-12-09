@@ -122,6 +122,7 @@ public class LearningAgent extends Agent
 	}
 
 	public void getFeatures() {
+		
 		features[0] = TileworldSettings.DYNAMISM;
 		features[1] = justDeliberated ? 1 : -1;
 		features[2] = deliberateForEvent ? 1 : -1;
