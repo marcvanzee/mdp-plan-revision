@@ -140,7 +140,7 @@ public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator
 	public void startSimulation(int maxSteps) {
 		while (steps < maxSteps) {
 			step();
-		}
+		}		
 	}
 		
 	public void step() 

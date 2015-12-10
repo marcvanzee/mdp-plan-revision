@@ -41,7 +41,7 @@ public class TileworldSettings
 	public static ReactionStrategy 
 						REACTION_STRATEGY =			ReactionStrategy.TARGET_DIS_OR_ANY_HOLE;
 	
-	public static AlgorithmType ALGORITHM = AlgorithmType.LEARNING;
+	public static AlgorithmType ALGORITHM = AlgorithmType.SHORTEST_PATH;
 	
 	public static ReactionStrategy parseReactionStrategy(String str) {
 		if (str.equals("TARGET_DISAPPEARS")) return ReactionStrategy.TARGET_DISAPPEARS;

@@ -16,6 +16,7 @@ import simulations.TileworldSimulation;
 public class TileworldBenchmark 
 {
 	private TileworldSimulation simulation;
+	public static int countDif = 0;
 	
 	public static void main(String args[])
 	{
@@ -34,15 +35,11 @@ public class TileworldBenchmark
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		if (TileworldSettings.ALGORITHM == AlgorithmType.LEARNING) {
-			benchmarkLearning();
-		} else {
-			benchmarkNotLearning();
-		}
+			
+		benchmark();
 	}
 	
-	public void benchmarkNotLearning() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {		
+	public void benchmark() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {		
 		boolean loga = BenchmarkSettings.LOGARITHMIC;
 		
 		int vMin = BenchmarkSettings.BENCHMARK_VALUE_MIN,
@@ -55,12 +52,13 @@ public class TileworldBenchmark
 		double vStep = loga ? (Math.log10(vMax) - Math.log10(vMin)) / vPoints :
 					Math.ceil(((double)vMax-(double)vMin)/(double)vPoints);
 			
-		System.out.println("###### benchmark settings ####");
-		System.out.println("# " + bmType + " values: ["+ vMin + ", " + vMax +"], step size: " + vStep);
-		System.out.println("# simulation length: " + simLength + ", repetitions per dynamism value: " + simRep);
-		System.out.println("# total nr of simulations: " + (vPoints * simRep));
-		System.out.println("# logarithmic scale: " + loga);
-		System.out.println("##############################\n");
+		System.out.println("---- benchmark settings:");
+		System.out.println("    algorithm type:" + TileworldSettings.ALGORITHM);
+		System.out.println("    " + bmType + " values: ["+ vMin + ", " + vMax +"], step size: " + vStep);
+		System.out.println("    simulation length: " + simLength + ", repetitions per dynamism value: " + simRep);
+		System.out.println("    total nr of simulations: " + (vPoints * simRep));
+		System.out.println("    logarithmic scale: " + loga);
+		System.out.println("---- benchmarking....\n");
 		
 		System.out.println(bmType + "; effectiveness");
 		
@@ -70,6 +68,10 @@ public class TileworldBenchmark
 		while (value <= vMax)
 		{
 			setBenchmarkValue(value);
+			
+			if (TileworldSettings.ALGORITHM == AlgorithmType.LEARNING) {
+				train();
+			} 
 			
 			double totalEff = 0;
 			
@@ -106,51 +108,22 @@ public class TileworldBenchmark
 		}
 	}
 	
-	public void benchmarkLearning() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
-		int trainingLength = BenchmarkSettings.TRAINING_LENGTH,
-				testLength = BenchmarkSettings.TEST_LENGTH;
+	public void train() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+		int trainingLength = BenchmarkSettings.TRAINING_LENGTH;
 		
-		System.out.println("---- training ("+trainingLength+" rounds)");
+		LearningAgent.TRAINING = true;
+		resetTheta();
 		simulation = new TileworldSimulation();
 		simulation.buildNewModel();
+
 		simulation.startSimulation(trainingLength);
-				
-		double score = simulation.getAgentScore(),
-				maxScore = simulation.getMaxScore(),
-				effectiveness = (double) score / (double) maxScore;
 			
-		System.out.println("effectiveness for training: " + effectiveness);
-		System.out.println("thetaAct: " + Arrays.toString(LearningAgent.thetaAct));
-		System.out.println("thetaThink: " + Arrays.toString(LearningAgent.thetaThink));
-		
-		// get theta values
-		double thetaAct[] = Arrays.copyOf(LearningAgent.thetaAct, LearningAgent.FEATURES);
-		double thetaThink[] = Arrays.copyOf(LearningAgent.thetaThink, LearningAgent.FEATURES);
-				
-		System.out.println("---- testing ("+testLength+" rounds)");
-		simulation = new TileworldSimulation();
-		simulation.buildNewModel();
 		LearningAgent.TRAINING = false;
-		LearningAgent.thetaAct = Arrays.copyOf(thetaAct, LearningAgent.FEATURES);
-		LearningAgent.thetaThink = Arrays.copyOf(thetaThink, LearningAgent.FEATURES);	
-		//LearningAgent.thetaAct = new double[]{67.9586396409001, 0.5906703400857038, -67.9586396409001, -67.9586396409001, 33.99999999997416};
-		//LearningAgent.thetaThink = new double[]{67.98464306118106, 0.564665899766446, -67.98464306118106, -67.93263520058085, 33.999999999997904};
-		simulation.startSimulation(testLength);
-		
-		score = simulation.getAgentScore();
-		maxScore = simulation.getMaxScore();
-		effectiveness = (double) score / (double) maxScore;
-			
-		System.out.println("effectiveness for testing: " + effectiveness);
-		
-		System.out.println("now running the agent in the GUI...");
-		
-		TileworldGUI gui = new TileworldGUI();
-		gui.go();
-		
-		gui.buildNewModel();
-		gui.startSimulation();
-		
+	}
+	
+	private void resetTheta() {
+		LearningAgent.thetaAct = new double[LearningAgent.FEATURES];
+		LearningAgent.thetaThink = new double[LearningAgent.FEATURES];
 	}
 	
 	private void setBenchmarkValue(int value)

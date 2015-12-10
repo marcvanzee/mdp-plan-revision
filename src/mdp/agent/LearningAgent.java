@@ -8,29 +8,34 @@ import mdp.Tileworld;
 import mdp.algorithms.ShortestPath;
 import mdp.elements.Action;
 import mdp.elements.State;
+import settings.BenchmarkSettings;
 import settings.TileworldSettings;
 
 public class LearningAgent extends Agent
 {
-	public static final int FEATURES = 5;
-	private double ALPHA = 0.1, EPSILON = 0.1;
+	public static final int FEATURES = 2;
+	public static double ALPHA = 0.1, EPSILON = 0.01;
 	public static boolean TRAINING = true;
+	int steps = 0;
 	
-	public static double thetaAct[] = new double[]{67, 0.6, -68, -68, 34},
-				thetaThink[] = new double[]{68, 0.56, -68, -68, 34},
+	public static double thetaAct[] = new double[FEATURES],
+				thetaThink[] = new double[FEATURES],
 				features[] = new double[FEATURES];
 	
 	
 	private LinkedList<Action> plan = new LinkedList<Action>();
 	private double planningDelay = 0;
 	private boolean delay = false;
-	private boolean justDeliberated = false;
 	
 	//
 	// CONSTRUCTORS
 	//
 	public LearningAgent(Tileworld mdp) {
 		super(mdp);
+		steps = 0;
+		
+		thetaAct[0] = 10;
+		thetaThink[0] = -10;
 	}
 	
 	//
@@ -59,6 +64,11 @@ public class LearningAgent extends Agent
 	 */
 	public MetaAction step() 
 	{		
+		steps++;
+		
+		if (steps % (BenchmarkSettings.TRAINING_LENGTH/4) == 0) {
+			ALPHA = ALPHA / 10;
+		}
 		int nrHoles = tileworld.getHoles().size();
 		
 		MetaAction choice = null;
@@ -83,10 +93,11 @@ public class LearningAgent extends Agent
 		if (choice == null)
 		{
 			getFeatures();
-			
+				
 			if (TRAINING) {
 				updateTheta();
 			}
+			
 			
 			double valueThink = dotProduct(thetaThink, features);
 			double valueAct = dotProduct(thetaAct, features);
@@ -104,7 +115,6 @@ public class LearningAgent extends Agent
 		case DELIBERATE: 
 			deliberate(); 
 			deliberateForEvent = false;
-			justDeliberated = true;
 			if (planningDelay > 0 || plan.size() == 0 || delay) {
 				delay = false;
 				break;
@@ -122,16 +132,16 @@ public class LearningAgent extends Agent
 	}
 
 	public void getFeatures() {
-		
-		features[0] = TileworldSettings.DYNAMISM;
-		features[1] = justDeliberated ? 1 : -1;
-		features[2] = deliberateForEvent ? 1 : -1;
-		features[3] = plan.isEmpty() ? 1 : -1;
-		features[4] = TileworldSettings.PLANNING_TIME;
+		features[0] = plan.isEmpty() ? 1 : -1;
+		features[1] = deliberateForEvent ? 1 : -1;
+		//features[0] = (TileworldSettings.DYNAMISM/100);
+		//features[1] = justDeliberated ? 1 : -1;
+		//features[2] = deliberateForEvent ? 1 : -1;
+		//features[3] = (TileworldSettings.PLANNING_TIME/4);
 	}
 	
 	public void updateTheta() {
-		State newTarget = ShortestPath.closestStateWeighted(currentState, tileworld.getHoles(), tileworld);
+		State newTarget = ShortestPath.closestStateWeighted2(currentState, tileworld.getHoles(), tileworld);
 		
 		double valueThink = newTarget == null ? 0 : newTarget.getReward();
 		double valueAct   = currentTarget == null ? 0 : currentTarget.getReward();
@@ -143,7 +153,10 @@ public class LearningAgent extends Agent
 	}
 	
 	public double dotProduct(double arr1[], double arr2[]) {
-		if (arr1.length != arr2.length) return -1;
+		if (arr1.length != arr2.length) {
+			System.out.println("PROBLEM!");
+			return -1;
+		}
 		
 		double ret = 0;
 		
@@ -201,7 +214,6 @@ public class LearningAgent extends Agent
 	{
 		acts++;
 		actSteps++;
-		justDeliberated = false;
 	}
 	
 	@Override

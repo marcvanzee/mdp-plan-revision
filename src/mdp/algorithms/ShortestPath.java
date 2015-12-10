@@ -7,6 +7,7 @@ import java.util.List;
 import mdp.Tileworld;
 import mdp.elements.Action;
 import mdp.elements.State;
+import settings.TileworldSettings;
 
 public class ShortestPath 
 {
@@ -42,6 +43,28 @@ public class ShortestPath
 		for (State s2 : targetStates)
 		{
 			double score = (double) s2.getReward() / (double) shortestPath(s,s2, tileworld);
+			
+			if (score > maxScore) {
+				maxScore = score;
+				ret = s2;
+			}
+		}
+		
+		return ret;
+	}
+	
+	public static State closestStateWeighted2(State s, List<State> targetStates, Tileworld tileworld)
+	{
+		double maxScore = Double.MIN_VALUE;
+		State ret = null;
+		
+		for (State s2 : targetStates)
+		{
+			int dist = shortestPath(s,s2, tileworld);
+			if (s2.getLifetime() - (dist+TileworldSettings.PLANNING_TIME)*TileworldSettings.DYNAMISM < 0) {
+				continue;
+			}
+			double score = (double) s2.getReward() / (double) dist;
 			
 			if (score > maxScore) {
 				maxScore = score;
