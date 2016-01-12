@@ -40,7 +40,7 @@ public class JUNGRendering extends VisualizationViewer<Vertex<?>,Edge<?,?>>
 	
     //private final Layout<Vertex<?>,Edge<?,?>> staticLayout;
 	
-    public JUNGRendering(AbstractLayout<Vertex<?>,Edge<?,?>> layout,
+    public JUNGRendering(final AbstractLayout<Vertex<?>,Edge<?,?>> layout,
     		Layout<Vertex<?>,Edge<?,?>> staticLayout)
     {
     	
