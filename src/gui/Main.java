@@ -61,7 +61,7 @@ public class Main
 	
 	public static void loadSettings() throws IOException 
 	{
-		String file = ".settings/" + FileSettings.SETTINGS_FILE;
+		String file = FileSettings.SETTINGS_FILE;
 		
 		if (!new File(file).exists()) {
 			throw new FileNotFoundException("file " + file + " not found!");

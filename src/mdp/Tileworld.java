@@ -132,6 +132,12 @@ public class Tileworld extends MDP
 	{
 		State ret = null;
 		
+		if ((holes.size() + obstacles.size() + 1) == states.size()) {
+			// no free states left!
+			return null;
+		}
+		
+		
 		do {
 			ret = getRandomState(agent.getCurrentState());
 			if (ret.isHole() || ret.isObstacle()) {

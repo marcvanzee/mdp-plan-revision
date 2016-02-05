@@ -221,6 +221,10 @@ public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator
 	{
 		final State hole = mdp.getRandomEmptyState();
 		
+		if (hole == null) {
+			return;
+		}
+		
 		int lifetime = MathOperations.getRandomInt(
 				TileworldSettings.HOLE_LIFE_EXP_MIN, TileworldSettings.HOLE_LIFE_EXP_MAX);
 	

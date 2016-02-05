@@ -7,6 +7,7 @@ import java.util.Arrays;
 import gui.Main;
 import gui.tileworld.TileworldGUI;
 import mdp.agent.LearningAgent;
+import mdp.agent.ReactionStrategy;
 import mdp.algorithms.AlgorithmType;
 import settings.BenchmarkSettings;
 import settings.BenchmarkSettings.BenchmarkType;
@@ -51,6 +52,11 @@ public class TileworldBenchmark
 	
 		double vStep = loga ? (Math.log10(vMax) - Math.log10(vMin)) / vPoints :
 					Math.ceil(((double)vMax-(double)vMin)/(double)vPoints);
+		
+		TileworldSettings.BOLDNESS = -1;
+		TileworldSettings.USE_REACTION_STRATEGY = true;
+		TileworldSettings.REACTION_STRATEGY = ReactionStrategy.TARGET_DIS_OR_ANY_HOLE;
+		TileworldSettings.PLANNING_TIME = 1;
 			
 		System.out.println("---- benchmark settings:");
 		System.out.println("    algorithm type:" + TileworldSettings.ALGORITHM);

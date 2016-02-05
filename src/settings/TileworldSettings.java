@@ -9,11 +9,11 @@ public class TileworldSettings
 	/*
 	 * Environment Settings
 	 */
-	public static int WORLD_SIZE =	 				10;
+	public static int WORLD_SIZE =	 				20;
 	public static int HOLE_GESTATION_TIME_MIN = 	60;
-	public static int HOLE_GESTATION_TIME_MAX = 	210;
-	public static int HOLE_LIFE_EXP_MIN = 			240;
-	public static int HOLE_LIFE_EXP_MAX = 			860;
+	public static int HOLE_GESTATION_TIME_MAX = 	240;
+	public static int HOLE_LIFE_EXP_MIN = 			20;
+	public static int HOLE_LIFE_EXP_MAX = 			25;
 	public static int HOLE_SCORE_MIN = 				20;
 	public static int HOLE_SCORE_MAX =				80; 			
 	public static int INITIAL_NR_HOLES = 			4;
@@ -27,16 +27,16 @@ public class TileworldSettings
 	
 	// Dynamism = nr. Env steps / nr. Agent steps
 	// so d=5 means the agent takes 1 step every 5 steps of the environment
-	public static int DYNAMISM = 					9;
+	public static int DYNAMISM = 					1;
 	
 	// Planning time is the cost for making a plan.
 	// So p=4 means the reward of the agent is decreased by 4 whenever it forms a plan
-	public static double PLANNING_TIME = 			3;
+	public static double PLANNING_TIME = 			1;
 	
 	// Commitment degree is the number of steps the agent keeps its plan
 	// When cd=-1, the agent keeps its plan until it's finished
 	// For value iteration, this means the agent replans when it has reached a state where it cannot optimize further
-	public static int BOLDNESS = 					1;
+	public static int BOLDNESS = 					-1;
 	public static boolean USE_REACTION_STRATEGY = 	true;
 	public static ReactionStrategy 
 						REACTION_STRATEGY =			ReactionStrategy.TARGET_DIS_OR_ANY_HOLE;

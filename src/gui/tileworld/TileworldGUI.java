@@ -25,6 +25,7 @@ import javax.swing.JSeparator;
 import javax.swing.JTextField;
 
 import constants.MathOperations;
+import gui.Main;
 import simulations.TileworldSimulation;
 
 public class TileworldGUI implements ItemListener, Observer {
@@ -58,14 +59,25 @@ public class TileworldGUI implements ItemListener, Observer {
 		drawPanel = new TileworldPanel(simulation.getMDP());
 	}
 	
+	public static void main(String args[]) {
+		try {
+			(new TileworldGUI()).go();
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+				| NoSuchMethodException | SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	/**
 	 * @wbp.parser.entryPoint
 	 */
 	public void go() {
 		try 
 		{			
-			// build GUI and set parameters in GUI according to model.Settings
+			// build GUI and set parameters in GUI according to settings file
 			buildGUI();
+			Main.loadSettings();
 			addListeners();
 			
 			simulation.addObserver(drawPanel);
