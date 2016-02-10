@@ -10,7 +10,9 @@ import constants.Printing;
 import mdp.Tileworld;
 import mdp.agent.Agent;
 import mdp.agent.Angel;
+import mdp.agent.LearningAgent;
 import mdp.agent.MetaAction;
+import mdp.agent.ReactionStrategy;
 import mdp.agent.ShortestPathAgent;
 import mdp.elements.Action;
 import mdp.elements.QState;
@@ -18,6 +20,7 @@ import mdp.elements.State;
 import mdp.operations.generators.TileworldGenerator;
 import mdp.operations.modifiers.TileworldModifier;
 import messaging.tileworld.AgentMessage;
+import settings.LearningSettings;
 import settings.TileworldSettings;
 
 /**
@@ -78,22 +81,15 @@ public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator
 		
 		// generate a tileworld	
 		this.mdpGenerator.run();
-				
-		if (TileworldSettings.TEST_ENV)
-		{
-			addTestAgent();
-			addTestHoles();
-		}
-		else
-		{
-			// add agent
-			mdp.addAgentRandomly(new HashSet<State>(mdp.getObstacles()));
-		
-			// add holes
-			for (int i=0; i<TileworldSettings.INITIAL_NR_HOLES; i++)
-					addHole();
-		}
 	
+		// add agent
+		mdp.addAgentRandomly(new HashSet<State>(mdp.getObstacles()));
+	
+		// add holes
+		for (int i=0; i<TileworldSettings.INITIAL_NR_HOLES; i++) {
+				addHole();
+		}
+		
 		notifyGUI();
 		
 		setNextHole();	
@@ -102,41 +98,7 @@ public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator
 			// load a new minimal tileworld representation of the current tileworld
 			((Angel) agent).updateSimulation();
 	}
-	
-	private void addTestAgent()
-	{
-		mdp.addAgentAt(2, 2);
-	}
-	
-	private void addTestHoles()
-	{
-		addObstacle(mdp.getState(2, 0));
-		addObstacle(mdp.getState(3, 0));
-		addObstacle(mdp.getState(0, 3));
-		addObstacle(mdp.getState(1, 1));
-		addObstacle(mdp.getState(4, 1));
-		addObstacle(mdp.getState(4, 2));
-		addObstacle(mdp.getState(0, 3));
-		addObstacle(mdp.getState(3, 3));
-		addObstacle(mdp.getState(4, 3));
-		addObstacle(mdp.getState(0, 4));
-		addObstacle(mdp.getState(2, 4));
-		addObstacle(mdp.getState(3, 4));
-		
-		addHole(mdp.getState(1,0),127,127);
-		
-		/*
-		if (steps == 0)
-		{
-			addHole(mdp.getState(0, 4), 10, 10);
-		}
-		
-		else if (steps == 4)
-		{
-			addHole(mdp.getState(2, 0), 4, 40);
-		}*/
-	}
-		
+			
 	public void startSimulation(int maxSteps) {
 		while (steps < maxSteps) {
 			step();
@@ -149,18 +111,17 @@ public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator
 		//	System.out.println("<sim> at step " + steps);
 		Printing.sim("Step");
 		
-		if (TileworldSettings.TEST_ENV)
-		{
-			addTestHoles();
-			removeHoleIfVisited();
-		}
-		else if (nextHole <= 0) {
+		if (nextHole <= 0) {
 			addHole();
 			
 			// if the agent happens to be on the location where the hole has just 
 			// been created, reward it and remove the hole
 			removeHoleIfVisited();
 			setNextHole();
+		}
+		
+		if (steps > 0 && agent instanceof LearningAgent && steps % LearningSettings.TEMP_DECREASE_STEPS == 0) {
+			((LearningAgent) agent).updateTemperature();
 		}
 		
 		if (steps % TileworldSettings.DYNAMISM == 0) 
@@ -194,6 +155,14 @@ public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator
 	
 	public double getAgentScore() {
 		return agent.getScore();
+	}
+	
+	public ReactionStrategy getLearnedStrategy() {
+		return agent instanceof LearningAgent ? ((LearningAgent) agent).getLearnedStrategy() : null;
+	}
+	
+	public double getTemperature() {
+		return agent instanceof LearningAgent ? ((LearningAgent) agent).getTemperature() : -1;
 	}
 	
 	public double getMaxScore() {
@@ -250,14 +219,7 @@ public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator
 		
 		agent.inform(AgentMessage.HOLE_APPEARS, hole);
 	}
-	
-	private void addObstacle(State hole)
-	{
-		hole.setObstacle(true);
-		mdp.addObstacle(hole);
-	}
-	
-	
+		
 	private void setNextHole()
 	{
 		nextHole = MathOperations.getRandomInt(

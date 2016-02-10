@@ -80,7 +80,7 @@ public class SettingsDialog {
 	 */
 	private void initialize() {
 		frame = new JFrame("Tileworld Settings");
-		frame.setBounds(400, 300, 450, 300);
+		frame.setBounds(400, 300, 430, 280);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		SpringLayout springLayout = new SpringLayout();
 		frame.getContentPane().setLayout(springLayout);
@@ -378,9 +378,9 @@ public class SettingsDialog {
 		
 		if (TileworldSettings.USE_REACTION_STRATEGY) {
 			switch (TileworldSettings.REACTION_STRATEGY) {
-			case TARGET_DISAPPEARS: radioTargetDisappears.setSelected(true); break;
-			case TARGET_DIS_OR_ANY_HOLE: radioTargetDisOrAnyHole.setSelected(true); break;
-			case TARGET_DIS_OR_NEARER_HOLE: radioTargetDisOrNearerHole.setSelected(true); break;
+			case BOLD: radioTargetDisappears.setSelected(true); break;
+			case ANY_HOLE: radioTargetDisOrAnyHole.setSelected(true); break;
+			case CLOSER_HOLE: radioTargetDisOrNearerHole.setSelected(true); break;
 			}
 		}
 	}
@@ -405,9 +405,9 @@ public class SettingsDialog {
 		
 		boolean useReactionStrategy = checkUseReactionStrategy.isSelected();
 		
-		ReactionStrategy reactionStrategy = (radioTargetDisappears.isSelected() ? ReactionStrategy.TARGET_DISAPPEARS :
-			(radioTargetDisOrAnyHole.isSelected() ? ReactionStrategy.TARGET_DIS_OR_ANY_HOLE :
-				(radioTargetDisOrNearerHole.isSelected() ? ReactionStrategy.TARGET_DIS_OR_NEARER_HOLE :
+		ReactionStrategy reactionStrategy = (radioTargetDisappears.isSelected() ? ReactionStrategy.BOLD :
+			(radioTargetDisOrAnyHole.isSelected() ? ReactionStrategy.ANY_HOLE :
+				(radioTargetDisOrNearerHole.isSelected() ? ReactionStrategy.CLOSER_HOLE :
 					null)));
 		
 		validateConstraint(holeGestationTimeMin < holeGestationTimeMax);

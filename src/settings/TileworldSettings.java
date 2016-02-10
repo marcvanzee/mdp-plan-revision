@@ -39,15 +39,15 @@ public class TileworldSettings
 	public static int BOLDNESS = 					-1;
 	public static boolean USE_REACTION_STRATEGY = 	true;
 	public static ReactionStrategy 
-						REACTION_STRATEGY =			ReactionStrategy.TARGET_DIS_OR_ANY_HOLE;
+						REACTION_STRATEGY =			ReactionStrategy.ANY_HOLE;
 	
 	public static AlgorithmType ALGORITHM = AlgorithmType.SHORTEST_PATH;
 	
 	public static ReactionStrategy parseReactionStrategy(String str) {
-		if (str.equals("TARGET_DISAPPEARS")) return ReactionStrategy.TARGET_DISAPPEARS;
-		if (str.equals("TARGET_DIS_OR_NEARER_HOLE")) return ReactionStrategy.TARGET_DIS_OR_NEARER_HOLE;
+		if (str.equals("TARGET_DISAPPEARS")) return ReactionStrategy.BOLD;
+		if (str.equals("TARGET_DIS_OR_NEARER_HOLE")) return ReactionStrategy.CLOSER_HOLE;
 		
-		return ReactionStrategy.TARGET_DIS_OR_ANY_HOLE;
+		return ReactionStrategy.ANY_HOLE;
 	}
 	
 	/*

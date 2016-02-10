@@ -22,6 +22,7 @@ import mdp.MDP;
 import mdp.Tileworld;
 import mdp.agent.Agent;
 import mdp.agent.Angel;
+import mdp.agent.LearningAgent;
 import mdp.agent.ShortestPathAgent;
 import mdp.elements.Action;
 import mdp.elements.State;
@@ -108,7 +109,8 @@ public class TileworldPanel extends JPanel implements Observer
     		drawPolicy(g);
     		drawStateValues(g);
     		break;
-    	case SHORTEST_PATH:
+    	case SHORTEST_PATH: 
+    	case LEARNING:
     		drawPlan(g);
     		break;
     	case ANGELIC:
@@ -323,7 +325,8 @@ public class TileworldPanel extends JPanel implements Observer
     	g.setColor(Color.RED);
     	Agent agent = tileworld.getAgent();
     	State s = agent.getCurrentState();
-    	LinkedList<Action> plan = (agent instanceof ShortestPathAgent ? ((ShortestPathAgent)agent).getPlan() : ((Angel)agent).getPlan());
+    	LinkedList<Action> plan = (agent instanceof ShortestPathAgent ? ((ShortestPathAgent)agent).getPlan() : 
+    		(agent instanceof LearningAgent ? ((LearningAgent)agent).getPlan() : ((Angel)agent).getPlan()));
     	
     	if (plan == null || plan.isEmpty())
     		return;

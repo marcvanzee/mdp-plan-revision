@@ -111,7 +111,7 @@ public class TileworldBenchmark2 {
 				benchmarkAgent(x, y, 0, writer);
 				
 				TileworldSettings.USE_REACTION_STRATEGY = true;
-				TileworldSettings.REACTION_STRATEGY = ReactionStrategy.TARGET_DIS_OR_NEARER_HOLE;
+				TileworldSettings.REACTION_STRATEGY = ReactionStrategy.CLOSER_HOLE;
 				benchmarkAgent(x, y, 1, writer);
 		
 				// optimized reactive

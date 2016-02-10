@@ -3,7 +3,7 @@ package settings;
 public class BenchmarkSettings 
 {
 	public static final int SIMULATION_LENGTH = 	15000;
-	public static final int REPETITIONS = 			15;
+	public static final int REPETITIONS = 			10;
 		
 	public static final boolean LOGARITHMIC = 		true;
 	

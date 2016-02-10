@@ -73,8 +73,9 @@ public abstract class Agent
 	
 	
 	public void reward() {
-		if (currentState != null)
+		if (currentState != null) {
 			score += currentState.getReward();
+		}
 	}
 	
 	public double getScore() {
@@ -99,14 +100,11 @@ public abstract class Agent
 	
 	public void inform(AgentMessage message, State s)
 	{
-		if (!TileworldSettings.USE_REACTION_STRATEGY)
-			return;
-		
 		switch (message) 
 		{
 		case HOLE_DISAPPEARS: 
-			// if we are using any reaction strategy and the current target disappears, the agent should deliberate
-			if (currentTarget != null && s == currentTarget)
+			// if the current target disappears, any agent (except fixed) should deliberate
+			if (currentTarget != null && s == currentTarget && TileworldSettings.BOLDNESS == -1)
 			{
 				deliberateForEvent = true;
 			}
@@ -115,13 +113,13 @@ public abstract class Agent
 		case HOLE_APPEARS:
 			ReactionStrategy strategy = TileworldSettings.REACTION_STRATEGY;
 			
-			if (strategy == ReactionStrategy.TARGET_DIS_OR_ANY_HOLE)
+			if (strategy == ReactionStrategy.ANY_HOLE)
 			{
 				//System.out.println("any hole appeared!");
 				deliberateForEvent = true;
 			}
 			
-			else if (strategy == ReactionStrategy.TARGET_DIS_OR_NEARER_HOLE)
+			else if (strategy == ReactionStrategy.CLOSER_HOLE)
 			{
 				int distanceToTarget = ShortestPath.shortestPath(currentState, currentTarget, (Tileworld) tileworld),
 						distanceToNewHole = ShortestPath.shortestPath(currentState, s, (Tileworld) tileworld);

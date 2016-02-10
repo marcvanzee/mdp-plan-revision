@@ -55,7 +55,7 @@ public class TileworldBenchmark
 		
 		TileworldSettings.BOLDNESS = -1;
 		TileworldSettings.USE_REACTION_STRATEGY = true;
-		TileworldSettings.REACTION_STRATEGY = ReactionStrategy.TARGET_DIS_OR_ANY_HOLE;
+		TileworldSettings.REACTION_STRATEGY = ReactionStrategy.ANY_HOLE;
 		TileworldSettings.PLANNING_TIME = 1;
 			
 		System.out.println("---- benchmark settings:");
@@ -74,11 +74,7 @@ public class TileworldBenchmark
 		while (value <= vMax)
 		{
 			setBenchmarkValue(value);
-			
-			if (TileworldSettings.ALGORITHM == AlgorithmType.LEARNING) {
-				train();
-			} 
-			
+						
 			double totalEff = 0;
 			
 			//System.out.println("<benchmark>dynamism="+dynamism);
@@ -113,25 +109,7 @@ public class TileworldBenchmark
 			value = newValue;
 		}
 	}
-	
-	public void train() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
-		int trainingLength = BenchmarkSettings.TRAINING_LENGTH;
 		
-		LearningAgent.TRAINING = true;
-		resetTheta();
-		simulation = new TileworldSimulation();
-		simulation.buildNewModel();
-
-		simulation.startSimulation(trainingLength);
-			
-		LearningAgent.TRAINING = false;
-	}
-	
-	private void resetTheta() {
-		LearningAgent.thetaAct = new double[LearningAgent.FEATURES];
-		LearningAgent.thetaThink = new double[LearningAgent.FEATURES];
-	}
-	
 	private void setBenchmarkValue(int value)
 	{
 		switch (BenchmarkSettings.BENCHMARK_TYPE)

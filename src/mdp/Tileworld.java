@@ -12,7 +12,6 @@ import mdp.agent.Angel;
 import mdp.agent.LearningAgent;
 import mdp.agent.ShortestPathAgent;
 import mdp.agent.ValueIterationAgent;
-import mdp.algorithms.AlgorithmType;
 import mdp.elements.Action;
 import mdp.elements.State;
 import mdp.elements.TileworldActionType;
