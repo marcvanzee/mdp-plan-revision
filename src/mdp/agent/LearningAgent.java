@@ -46,6 +46,8 @@ public class LearningAgent extends Agent
 			maxScore = 0, currentScore = 0;
 	private int timeoutSteps = 0;
 	
+	private int countStrategies = 0;
+	
 	private final Random r =  new Random();
 		
 	//
@@ -159,21 +161,20 @@ public class LearningAgent extends Agent
 			break;
 		}
 		
-		if (choice != MetaAction.NOP) {
-			updateTemperature();
-		}
-		
 		if (timeoutSteps == LearningSettings.TIMEOUT_PERIOD) {
 //			System.out.println("### TIMEOUT!!! ### (timeoutstep="+timeoutSteps);
 			changeStrategy();
 		}
-		
+				
 		return choice;
 	}
 
 	public void updateTemperature() {
 		if (temperature/LearningSettings.TEMP_DIVIDER > LearningSettings.TEMP_MIN_VALUE) {
 			temperature /= LearningSettings.TEMP_DIVIDER;
+//			System.out.println("new temperature " + temperature);
+		} else {
+			STOP = true;
 		}
 	}
 	
@@ -294,6 +295,14 @@ public class LearningAgent extends Agent
 		currentScore = 0;	
 		
 //		System.out.println("maxscore and currentscore reset: maxscore="+maxScore+", currentscore="+currentScore);
+		
+		countStrategies++;
+		
+		// decrease temperature after trying LearningSettings.TEMP_DECREASE_STEPS
+		if (countStrategies % LearningSettings.TEMP_DECREASE_STEPS == 0) {
+			countStrategies = 0;
+			updateTemperature();
+		}
 	}
 	
 	@Override

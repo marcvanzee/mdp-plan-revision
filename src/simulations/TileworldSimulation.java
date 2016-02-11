@@ -100,7 +100,7 @@ public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator
 	}
 			
 	public void startSimulation(int maxSteps) {
-		while (steps < maxSteps) {
+		while (steps < maxSteps && !agent.stop()) {
 			step();
 		}		
 	}
@@ -119,11 +119,7 @@ public class TileworldSimulation extends Simulation<Tileworld,TileworldGenerator
 			removeHoleIfVisited();
 			setNextHole();
 		}
-		
-		if (steps > 0 && agent instanceof LearningAgent && steps % LearningSettings.TEMP_DECREASE_STEPS == 0) {
-			((LearningAgent) agent).updateTemperature();
-		}
-		
+				
 		if (steps % TileworldSettings.DYNAMISM == 0) 
 		{
 			Printing.sim("agent steps");

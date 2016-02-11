@@ -35,7 +35,8 @@ public abstract class Agent
 	protected State currentState = null, currentTarget = null;
 	protected double score = 0;
 	protected int deliberations = 0, acts = 0, actSteps = 0;
-	protected boolean deliberateForEvent = false;	
+	protected boolean deliberateForEvent = false;
+	protected boolean STOP = false; // when the agent makes this boolean true, the simulation stops after the current step
 
 	//
 	// CONSTRUCTORS
@@ -160,6 +161,10 @@ public abstract class Agent
 	
 	public boolean getDeliberateForEvent() {
 		return this.deliberateForEvent;
+	}
+	
+	public boolean stop() {
+		return STOP;
 	}
 	
 	public abstract MetaAction step();

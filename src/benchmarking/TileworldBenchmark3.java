@@ -7,6 +7,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
+import constants.MathOperations;
 import gui.Main;
 import mdp.agent.ReactionStrategy;
 import mdp.algorithms.AlgorithmType;
@@ -106,12 +107,11 @@ public class TileworldBenchmark3 {
 	public void benchmarkAgent(int id, PrintWriter writer) throws InstantiationException, IllegalAccessException, IllegalArgumentException,
 			InvocationTargetException, NoSuchMethodException, SecurityException {
 		int simRep = BenchmarkSettings.REPETITIONS,
-				minT = 100, maxT = 8000, tStep = 100;
+				minT = 5, maxT = 300, tStep = 5;
 		
 		HashMap<ReactionStrategy,Double> results = new HashMap<ReactionStrategy,Double>();
 		
-		//for (int t = minT; t <= maxT; t+=tStep) {
-		int t = 80000;
+		for (int t = minT; t <= maxT; t+=tStep) {
 			for (ReactionStrategy rs : ReactionStrategy.values()) {
 				results.put(rs, 0.0);
 			}
@@ -119,8 +119,8 @@ public class TileworldBenchmark3 {
 			for (int simCount = 0; simCount < simRep; simCount++) {
 				simulation = new TileworldSimulation();
 				simulation.buildNewModel();
-				simulation.startSimulation(t * 10);
-				
+				simulation.startSimulation(Integer.MAX_VALUE);
+								
 				ReactionStrategy rs = simulation.getLearnedStrategy();
 				results.put(rs, results.get(rs)+1.0);
 				
@@ -129,9 +129,9 @@ public class TileworldBenchmark3 {
 			}
 			System.out.print(t+",");
 			for (ReactionStrategy rs : ReactionStrategy.values()) {
-				System.out.print((results.get(rs)/simRep)*100 + ",");
+				System.out.print(MathOperations.round((results.get(rs)/simRep)*100,2) + ",");
 			}
 			System.out.println();
-		//}
+		}
 	}
 }
