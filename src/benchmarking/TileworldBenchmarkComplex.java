@@ -16,12 +16,21 @@ import settings.LearningSettings;
 import settings.TileworldSettings;
 import simulations.TileworldSimulation;
 
-public class TileworldBenchmark3 {
+public class TileworldBenchmarkComplex {
+	
 	private TileworldSimulation simulation;
+	
+	int numWorlds = 1000;	// number of worlds to create randomly
+		
+	// boundary values. we keep planning cost (1), hole score ([20,80]), inital nr holes (0), initial nr walls (0) and dynamism at 1
+	int worldSizeMin = 3, worldSizeMax = 20, 
+			holeGestMin = 3, holeGestMax = 200, 
+			holeLifeTimeMin = 3, holeLifeTimeMax = 200;
+	
 
 	public static void main(String args[]) {
 		try {
-			(new TileworldBenchmark3()).go();
+			(new TileworldBenchmarkComplex()).go();
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException | FileNotFoundException e) {
 			e.printStackTrace();
@@ -43,21 +52,35 @@ public class TileworldBenchmark3 {
 	public void benchmark() throws InstantiationException, IllegalAccessException, IllegalArgumentException,
 			InvocationTargetException, NoSuchMethodException, SecurityException, FileNotFoundException {
 
-		boolean log = false, write = false;
-		String AXIS = "simulation_length effectiveness";
-		String TYPES = "bold reactive_nearer_hole reactive_any_hole learning";
+		TileworldSettings.DYNAMISM = 1;
+		TileworldSettings.PLANNING_TIME = 1;
+		TileworldSettings.INITIAL_NR_HOLES = 0;
+		TileworldSettings.INITIAL_NR_WALLS = 0;
+		TileworldSettings.HOLE_SCORE_MIN = 20;
+		TileworldSettings.HOLE_SCORE_MAX = 80;
 		
-		String file = "../../../matlab/metareasoning/output.txt";
-
+		
 		PrintWriter writer = null;
+		String file = "worldID.txt";
 		
-		if (write) {
-			try {
-				writer = new PrintWriter(file, "UTF-8");
-			} catch (FileNotFoundException | UnsupportedEncodingException e) {
-				e.printStackTrace();
-			}
+		try {
+			writer = new PrintWriter(file, "UTF-8");
+		} catch (FileNotFoundException | UnsupportedEncodingException e) {
+			e.printStackTrace();
 		}
+		/*
+		for (int i=1; i<=numWorlds; i++)
+		{
+			generateRandomWorld();
+			writeWorldToFile(writer);
+			HashMap<ReactionStrategy,Double> effStrategies = benchmarkStrategies();
+			double T = benchmarkLearner();
+			
+			System.out.println(i + "," + effStrategies);
+		}
+		
+		
+
 
 		String str = "TYPES " + TYPES + "\n" 
 				+ "AXIS " + AXIS + "\n"
@@ -101,7 +124,7 @@ public class TileworldBenchmark3 {
 		
 		if (writer != null) {
 			writer.close();
-		}
+		}*/
 	}
 
 	public void benchmarkAgent(int id, PrintWriter writer) throws InstantiationException, IllegalAccessException, IllegalArgumentException,
@@ -134,4 +157,8 @@ public class TileworldBenchmark3 {
 			System.out.println();
 		}
 	}
+	
+	//public void writeToFile(String str, ) {
+		
+	//}
 }

@@ -2,19 +2,15 @@ package benchmarking;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 
 import gui.Main;
-import gui.tileworld.TileworldGUI;
-import mdp.agent.LearningAgent;
 import mdp.agent.ReactionStrategy;
-import mdp.algorithms.AlgorithmType;
 import settings.BenchmarkSettings;
 import settings.BenchmarkSettings.BenchmarkType;
 import settings.TileworldSettings;
 import simulations.TileworldSimulation;
 
-public class TileworldBenchmark 
+public class TileworldBenchmarkSimple 
 {
 	private TileworldSimulation simulation;
 	public static int countDif = 0;
@@ -22,7 +18,7 @@ public class TileworldBenchmark
 	public static void main(String args[])
 	{
 		try {
-			(new TileworldBenchmark()).go();
+			(new TileworldBenchmarkSimple()).go();
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException e) {
 			e.printStackTrace();
@@ -55,7 +51,7 @@ public class TileworldBenchmark
 		
 		TileworldSettings.BOLDNESS = -1;
 		TileworldSettings.USE_REACTION_STRATEGY = true;
-		TileworldSettings.REACTION_STRATEGY = ReactionStrategy.ANY_HOLE;
+		TileworldSettings.REACTION_STRATEGY = ReactionStrategy.TARGET_DIS_OR_ANY_HOLE;
 		TileworldSettings.PLANNING_TIME = 1;
 			
 		System.out.println("---- benchmark settings:");

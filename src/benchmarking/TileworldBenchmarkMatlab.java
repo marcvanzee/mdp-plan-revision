@@ -19,12 +19,12 @@ import settings.BenchmarkSettings;
 import settings.TileworldSettings;
 import simulations.TileworldSimulation;
 
-public class TileworldBenchmark2 {
+public class TileworldBenchmarkMatlab {
 	private TileworldSimulation simulation;
 
 	public static void main(String args[]) {
 		try {
-			(new TileworldBenchmark2()).go();
+			(new TileworldBenchmarkMatlab()).go();
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException | FileNotFoundException e) {
 			e.printStackTrace();
@@ -111,7 +111,7 @@ public class TileworldBenchmark2 {
 				benchmarkAgent(x, y, 0, writer);
 				
 				TileworldSettings.USE_REACTION_STRATEGY = true;
-				TileworldSettings.REACTION_STRATEGY = ReactionStrategy.CLOSER_HOLE;
+				TileworldSettings.REACTION_STRATEGY = ReactionStrategy.TARGET_DIS_OR_NEARER_HOLE;
 				benchmarkAgent(x, y, 1, writer);
 		
 				// optimized reactive

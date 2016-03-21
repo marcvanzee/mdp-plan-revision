@@ -83,7 +83,7 @@ public class ShortestPathAgent extends Agent
 		}
 		
 		// wait if there are no holes
-		if (nrHoles == 0)  
+		if (nrHoles == 0 && plan.isEmpty())  
 		{
 			choice = MetaAction.NOP;
 			Printing.spa("no holes");
@@ -128,7 +128,7 @@ public class ShortestPathAgent extends Agent
 		
 		switch (choice)
 		{			
-		case DELIBERATE: 
+		case DELIBERATE:
 			deliberate(); 
 			deliberateForEvent = false;
 			if (planningDelay > 0 || plan.size() == 0 || delay) {

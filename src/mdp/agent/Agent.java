@@ -101,11 +101,15 @@ public abstract class Agent
 	
 	public void inform(AgentMessage message, State s)
 	{
+		
+		if (!TileworldSettings.USE_REACTION_STRATEGY)
+			return;
+				
 		switch (message) 
 		{
 		case HOLE_DISAPPEARS: 
-			// if the current target disappears, any agent (except fixed) should deliberate
-			if (currentTarget != null && s == currentTarget && TileworldSettings.BOLDNESS == -1)
+			// if we are using any reaction strategy and the current target disappears, the agent should deliberate
+			if (currentTarget != null && s == currentTarget)
 			{
 				deliberateForEvent = true;
 			}
@@ -114,13 +118,13 @@ public abstract class Agent
 		case HOLE_APPEARS:
 			ReactionStrategy strategy = TileworldSettings.REACTION_STRATEGY;
 			
-			if (strategy == ReactionStrategy.ANY_HOLE)
+			if (strategy == ReactionStrategy.TARGET_DIS_OR_ANY_HOLE)
 			{
 				//System.out.println("any hole appeared!");
 				deliberateForEvent = true;
 			}
 			
-			else if (strategy == ReactionStrategy.CLOSER_HOLE)
+			else if (strategy == ReactionStrategy.TARGET_DIS_OR_NEARER_HOLE)
 			{
 				int distanceToTarget = ShortestPath.shortestPath(currentState, currentTarget, (Tileworld) tileworld),
 						distanceToNewHole = ShortestPath.shortestPath(currentState, s, (Tileworld) tileworld);

@@ -37,17 +37,17 @@ public class TileworldSettings
 	// When cd=-1, the agent keeps its plan until it's finished
 	// For value iteration, this means the agent replans when it has reached a state where it cannot optimize further
 	public static int BOLDNESS = 					-1;
-	public static boolean USE_REACTION_STRATEGY = 	true;
+	public static boolean USE_REACTION_STRATEGY = 	false;
 	public static ReactionStrategy 
-						REACTION_STRATEGY =			ReactionStrategy.ANY_HOLE;
+						REACTION_STRATEGY =			ReactionStrategy.TARGET_DISAPPEARS;
 	
 	public static AlgorithmType ALGORITHM = AlgorithmType.SHORTEST_PATH;
 	
 	public static ReactionStrategy parseReactionStrategy(String str) {
-		if (str.equals("TARGET_DISAPPEARS")) return ReactionStrategy.BOLD;
-		if (str.equals("TARGET_DIS_OR_NEARER_HOLE")) return ReactionStrategy.CLOSER_HOLE;
+		if (str.equals("TARGET_DISAPPEARS")) return ReactionStrategy.TARGET_DISAPPEARS;
+		if (str.equals("TARGET_DIS_OR_NEARER_HOLE")) return ReactionStrategy.TARGET_DIS_OR_NEARER_HOLE;
 		
-		return ReactionStrategy.ANY_HOLE;
+		return ReactionStrategy.TARGET_DIS_OR_ANY_HOLE;
 	}
 	
 	/*

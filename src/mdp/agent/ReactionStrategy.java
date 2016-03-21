@@ -1,7 +1,7 @@
 package mdp.agent;
 
 public enum ReactionStrategy { 
-	BOLD,
-	CLOSER_HOLE,
-	ANY_HOLE
+	TARGET_DISAPPEARS,
+	TARGET_DIS_OR_ANY_HOLE,
+	TARGET_DIS_OR_NEARER_HOLE
 }
