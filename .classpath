@@ -28,5 +28,15 @@
 	<classpathentry kind="lib" path="/Users/marc.vanzee/Desktop/coding/java/git/mdp-plan-revision/lib/stax-api-1.0.1.jar"/>
 	<classpathentry kind="lib" path="/Users/marc.vanzee/Desktop/coding/java/git/mdp-plan-revision/lib/vecmath-1.3.1.jar"/>
 	<classpathentry kind="lib" path="/Users/marc.vanzee/Desktop/coding/java/git/mdp-plan-revision/lib/wstx-asl-3.2.6.jar"/>
+	<classpathentry kind="lib" path="/Users/marc.vanzee/Desktop/coding/java/git/mdp-plan-revision/lib/commons-logging-1.1.1.jar"/>
+	<classpathentry kind="lib" path="/Users/marc.vanzee/Desktop/coding/java/git/mdp-plan-revision/lib/google-http-client-1.21.0.jar"/>
+	<classpathentry kind="lib" path="/Users/marc.vanzee/Desktop/coding/java/git/mdp-plan-revision/lib/google-http-client-protobuf-1.21.0.jar"/>
+	<classpathentry kind="lib" path="/Users/marc.vanzee/Desktop/coding/java/git/mdp-plan-revision/lib/httpclient-4.0.1.jar"/>
+	<classpathentry kind="lib" path="/Users/marc.vanzee/Desktop/coding/java/git/mdp-plan-revision/lib/httpcore-4.0.1.jar"/>
+	<classpathentry kind="lib" path="/Users/marc.vanzee/Desktop/coding/java/git/mdp-plan-revision/lib/jsr305-1.3.9.jar"/>
+	<classpathentry kind="lib" path="/Users/marc.vanzee/Desktop/coding/java/git/mdp-plan-revision/lib/google-http-client-jackson-1.21.0.jar"/>
+	<classpathentry kind="lib" path="/Users/marc.vanzee/Desktop/coding/java/git/mdp-plan-revision/lib/google-http-client-jackson2-1.21.0.jar"/>
+	<classpathentry kind="lib" path="/Users/marc.vanzee/Desktop/coding/java/git/mdp-plan-revision/lib/jackson-core-2.1.3.jar"/>
+	<classpathentry kind="lib" path="/Users/marc.vanzee/Desktop/coding/java/git/mdp-plan-revision/lib/jackson-core-asl-1.9.11.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -1,5 +1,6 @@
 package settings;
 
+import benchmarking.JSONParameters;
 import mdp.agent.ReactionStrategy;
 import mdp.algorithms.AlgorithmType;
 
@@ -15,7 +16,7 @@ public class TileworldSettings
 	public static int HOLE_LIFE_EXP_MIN = 			20;
 	public static int HOLE_LIFE_EXP_MAX = 			25;
 	public static int HOLE_SCORE_MIN = 				20;
-	public static int HOLE_SCORE_MAX =				80; 			
+	public static int HOLE_SCORE_MAX =				80; 
 	public static int INITIAL_NR_HOLES = 			4;
 	public static int WALL_SIZE_MIN =				2;
 	public static int WALL_SIZE_MAX = 				4;
@@ -62,4 +63,17 @@ public class TileworldSettings
 	public static boolean TEST_ENV = false;
 	
 	public static boolean PRINT_NOTHING = true;
+	
+	public static void copyValues(JSONParameters params) {
+		WORLD_SIZE = params.worldSize;
+		HOLE_GESTATION_TIME_MIN = params.holeGestTimeMin;
+		HOLE_GESTATION_TIME_MAX = params.holeGestTimeMax;
+		HOLE_LIFE_EXP_MIN = params.holeLifeExpMin;
+		HOLE_LIFE_EXP_MAX = params.holeLifeExpMax;
+		HOLE_SCORE_MIN = params.holeScoreMin;
+		HOLE_SCORE_MAX = params.holeScoreMax;
+		INITIAL_NR_HOLES = params.initNrHoles;
+		INITIAL_NR_WALLS = params.initNrWalls;
+		PLANNING_TIME = params.planningTime;
+	}
 }
