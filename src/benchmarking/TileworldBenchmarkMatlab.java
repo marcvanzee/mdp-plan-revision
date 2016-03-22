@@ -199,26 +199,4 @@ public class TileworldBenchmarkMatlab {
 		System.out.println(output);
 		writer.println(output);
 	}
-
-	private void setBenchmarkValue(int value) {
-		switch (BenchmarkSettings.BENCHMARK_TYPE) {
-		case DYNAMISM:
-			TileworldSettings.DYNAMISM = value;
-			break;
-		case MIN_GESTATION_TIME:
-			TileworldSettings.HOLE_GESTATION_TIME_MIN = value;
-			TileworldSettings.HOLE_GESTATION_TIME_MAX = value + BenchmarkSettings.BENCHMARK_RANGE;
-			break;
-		case MIN_LIFETIME:
-			TileworldSettings.HOLE_LIFE_EXP_MIN = value;
-			TileworldSettings.HOLE_LIFE_EXP_MAX = value + BenchmarkSettings.BENCHMARK_RANGE;
-			break;
-		case PLANNING_TIME:
-			TileworldSettings.PLANNING_TIME = value;
-			break;
-		case WORLD_SIZE:
-			TileworldSettings.WORLD_SIZE = value;
-			break;
-		}
-	}
 }

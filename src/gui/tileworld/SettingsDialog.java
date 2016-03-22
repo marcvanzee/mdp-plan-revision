@@ -410,7 +410,7 @@ public class SettingsDialog {
 				(radioTargetDisOrNearerHole.isSelected() ? ReactionStrategy.TARGET_DIS_OR_NEARER_HOLE :
 					null)));
 		
-		validateConstraint(holeGestationTimeMin < holeGestationTimeMax);
+		validateConstraint(holeGestationTimeMin <= holeGestationTimeMax);
 		validateConstraint(holeLifeExpMin < holeLifeExpMax);
 		validateConstraint(holeScoreMin < holeScoreMax);
 		validateConstraint(wallSizeMin < wallSizeMax);
