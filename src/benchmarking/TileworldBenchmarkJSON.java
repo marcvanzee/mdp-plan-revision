@@ -72,7 +72,6 @@ public class TileworldBenchmarkJSON {
 					});
 		
 		GenericUrl url = new GenericUrl(new java.net.URL(GET_URL));
-		url.put("pop", 1);
 		
 		HttpRequest request = requestFactory.buildGetRequest(url);
 		
@@ -83,10 +82,11 @@ public class TileworldBenchmarkJSON {
 		int count = 0;
 		while (true) {
 			try {
-				parseResponse(request.execute());
-			
+				HttpResponse ht = request.execute();
+				parseResponse(ht);
+				
 				HashMap<String,Object> results = singleBenchmark();
-			
+				
 				GenericUrl url2 = new GenericUrl(new java.net.URL(PUT_URL));
 				url2.put("id", ID);
 				url2.putAll(results);
@@ -94,8 +94,15 @@ public class TileworldBenchmarkJSON {
 				requestFactory.buildGetRequest(url2).execute();
 			//printResponse(hr2);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				System.out.println("***** Detected socket read error, retrying!");
+				e.printStackTrace();
+				System.out.print("***** Detected socket read error. Possibly we're overloading the server. Sleeping for 30s...");
+				try {
+					Thread.sleep(30000);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				System.out.println("done! Retrying...");
 				continue;
 			}
 			
