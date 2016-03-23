@@ -1,7 +1,10 @@
 package benchmarking;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
@@ -29,18 +32,28 @@ public class TileworldBenchmarkJSON {
 	
 	final int simrep = 20, simlength = 80000;
 	
-	static final String URL = "http://localhost/~marc.vanzee/handle.php";
+	//static final String GET_URL = "http://www.marcvanzee.nl/mdp-json/getParameters.php",
+	//		PUT_URL = "http://www.marcvanzee.nl/mdp-json/addResult.php";
+	static final String GET_URL = "http://www.marcvanzee.nl/mdp-json/getParameters.php",
+					PUT_URL = "http://www.marcvanzee.nl/mdp-json/addResult.php";
 	
 	static final HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
 	static final JsonFactory JSON_FACTORY = new JacksonFactory();
 	
-	static boolean FINISHED = false;
+	static int ID;
 	
 	private static void parseResponse(HttpResponse response) throws IOException {
 		JSONParameters params = response.parseAs(JSONParameters.class);
 		
-		FINISHED = params.done;
+		System.out.println(params);
+		
+		ID = params.id;
 		TileworldSettings.copyValues(params);
+	}
+	
+	private static void printResponse(HttpResponse hr) throws IOException {
+		java.util.Scanner s = new java.util.Scanner(hr.getContent()).useDelimiter("\\A");
+		System.out.println(s.hasNext() ? s.next() : "");
 	}
 	
 	public static void main(String args[]) {
@@ -62,44 +75,35 @@ public class TileworldBenchmarkJSON {
 						}
 					});
 		
-		GenericUrl url = new GenericUrl(new java.net.URL(URL));
+		GenericUrl url = new GenericUrl(new java.net.URL(GET_URL));
 		url.put("pop", 1);
 		
 		HttpRequest request = requestFactory.buildGetRequest(url);
 		
-		System.out.println("Tileworld JSON Benchmarker. Using handle: " + URL + "\n\n");
+		System.out.println("Tileworld JSON Benchmarker. Using handle: " + GET_URL + "\n\n");
 //				+ "% RESULTS: worldSize,holeGestTimeMin,holeGestTimeMax,holeLifetimeMin,holeLifetimeMax,holeScoreMin,holeScoreMax,"
 //					+ "wallSizeMin,wallSizeMax,initialNrHoles,initialNrWalls,planningTime,effBold,effAny,effCloser,winner(0=bold,1=any_hole,2=closer_hole,-1=no winner)\n");
 //		
 		int count = 0;
-		while (!FINISHED) {
-			parseResponse(request.execute());
+		while (true) {
+			HttpResponse hr = request.execute();
+			parseResponse(hr);
 			
-			if (!constraintsViolated()) { 
-				HashMap<String,Object> results = singleBenchmark();
-				
-				GenericUrl url2 = new GenericUrl(new java.net.URL(URL));
-				url2.put("result", 1);
-				url2.putAll(results);
-				
-				requestFactory.buildGetRequest(url2).execute();
-				
-				System.out.print(".");
-				count++;
-				if (count % 1000 == 0) { System.out.print(count); };
-			}
+			HashMap<String,Object> results = singleBenchmark();
+			
+			GenericUrl url2 = new GenericUrl(new java.net.URL(PUT_URL));
+			url2.put("id", ID);
+			url2.putAll(results);
+			
+			HttpResponse hr2 = requestFactory.buildGetRequest(url2).execute();
+			//printResponse(hr2);
+			
+			System.out.print(".");
+			count++;
+			if (count % 100 == 0) { System.out.println(count); };
 		}
 	}
-	
-	private boolean constraintsViolated() {
-		return (TileworldSettings.HOLE_GESTATION_TIME_MAX < TileworldSettings.HOLE_GESTATION_TIME_MIN) ||
-				(TileworldSettings.HOLE_LIFE_EXP_MAX < TileworldSettings.HOLE_LIFE_EXP_MIN) ||
-				(TileworldSettings.HOLE_SCORE_MAX < TileworldSettings.HOLE_SCORE_MIN) ||
-				(TileworldSettings.WALL_SIZE_MAX < TileworldSettings.WALL_SIZE_MIN) ||
-				(TileworldSettings.WORLD_SIZE*TileworldSettings.WORLD_SIZE <= 
-								TileworldSettings.INITIAL_NR_HOLES + TileworldSettings.WALL_SIZE_MAX*TileworldSettings.INITIAL_NR_WALLS + TileworldSettings.INITIAL_NR_HOLES) ||
-				(TileworldSettings.WORLD_SIZE*TileworldSettings.WORLD_SIZE <= TileworldSettings.WALL_SIZE_MAX*TileworldSettings.INITIAL_NR_WALLS*2);
-	}
+
 	
 	private HashMap<String,Object> singleBenchmark() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		// run for three reactive agents and record effectiveness
@@ -122,10 +126,9 @@ public class TileworldBenchmarkJSON {
 		int winner = (eff0 == eff1 && eff1 == eff2) ? -1 : (eff0 > eff1 ? (eff2 > eff0 ? 2 : 0) : (eff2 > eff1 ? 2 : 1));
 		
 		HashMap<String,Object> ret = new HashMap<String,Object>();
-		ret.putAll(parametersToMap());
-		ret.put("eff0", MathOperations.round(eff0, 4));
-		ret.put("eff1", MathOperations.round(eff1, 4));
-		ret.put("eff2", MathOperations.round(eff2, 4));
+		ret.put("effBold", MathOperations.round(eff0, 4));
+		ret.put("effAny", MathOperations.round(eff1, 4));
+		ret.put("effCloser", MathOperations.round(eff2, 4));
 		ret.put("winner", winner);
 		
 		return ret;
@@ -174,24 +177,5 @@ public class TileworldBenchmarkJSON {
 				System.out.print(MathOperations.round((results.get(rs)/simrep)*100,2) + ",");
 			}
 		}
-	}
-	
-	private HashMap<String, Object> parametersToMap() {
-		HashMap<String,Object> ret = new HashMap<String,Object>();
-		
-		ret.put(JSONParameters.WORLDSIZE, TileworldSettings.WORLD_SIZE);
-		ret.put(JSONParameters.HOLEGESTTIMEMIN, TileworldSettings.HOLE_GESTATION_TIME_MIN);
-		ret.put(JSONParameters.HOLEGESTTIMEMAX, TileworldSettings.HOLE_GESTATION_TIME_MAX);
-		ret.put(JSONParameters.HOLELIFEXPMIN, TileworldSettings.HOLE_LIFE_EXP_MIN);
-		ret.put(JSONParameters.HOLELIFEXPMAX, TileworldSettings.HOLE_LIFE_EXP_MAX);
-		ret.put(JSONParameters.HOLESCOREMIN, TileworldSettings.HOLE_SCORE_MIN);
-		ret.put(JSONParameters.HOLESCOREMAX, TileworldSettings.HOLE_SCORE_MAX);
-		ret.put(JSONParameters.WALLSIZEMIN, TileworldSettings.WALL_SIZE_MIN);
-		ret.put(JSONParameters.WALLSIZEMAX, TileworldSettings.WALL_SIZE_MAX);
-		ret.put(JSONParameters.INITNRHOLES, TileworldSettings.INITIAL_NR_HOLES);
-		ret.put(JSONParameters.INITNRWALLS, TileworldSettings.INITIAL_NR_WALLS);
-		ret.put(JSONParameters.PLANNINGTIME, TileworldSettings.PLANNING_TIME);
-		
-		return ret;
 	}
 }

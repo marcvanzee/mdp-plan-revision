@@ -5,6 +5,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -41,13 +46,13 @@ public class TileworldBenchmarkComplex {
 		try {
 			(new TileworldBenchmarkComplex()).go();
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-				| NoSuchMethodException | SecurityException | FileNotFoundException e) {
+				| NoSuchMethodException | SecurityException | FileNotFoundException | SQLException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
 
 	public void go() throws InstantiationException, IllegalAccessException, IllegalArgumentException,
-			InvocationTargetException, NoSuchMethodException, SecurityException, FileNotFoundException {
+			InvocationTargetException, NoSuchMethodException, SecurityException, FileNotFoundException, SQLException, ClassNotFoundException {
 		try {
 			Main.loadSettings();
 		} catch (IOException e) {
@@ -59,7 +64,7 @@ public class TileworldBenchmarkComplex {
 	}
 
 	public void benchmark() throws InstantiationException, IllegalAccessException, IllegalArgumentException,
-			InvocationTargetException, NoSuchMethodException, SecurityException, FileNotFoundException {
+			InvocationTargetException, NoSuchMethodException, SecurityException, FileNotFoundException, SQLException, ClassNotFoundException {
 		
 		try {
 			writer = new PrintWriter(file, "UTF-8");
@@ -93,6 +98,14 @@ public class TileworldBenchmarkComplex {
 				+ "% RESULTS: worldSize,holeGestTimeMin,holeGestTimeMax,holeLifetimeMin,holeLifetimeMax,holeScoreMin,holeScoreMax,"
 					+ "wallSizeMin,wallSizeMax,initialNrHoles,initialNrWalls,planningTime,effBold,effAny,effCloser,winner(0=bold,1=any_hole,2=closer_hole),winner(-1,0,1,2 (-1=no winner))\n");
 				
+		Class.forName("com.mysql.jdbc.Driver") ;
+		Connection conn = DriverManager.getConnection("jdbc:mysql://95.170.70.167:3306/marcvanzee_nl_bijles", "marcv_nl_bijles", "westsidE1") ;
+		Statement stmt = conn.createStatement() ;
+		String query = "SELECT * FROM mdp_param_space WHERE free=true AND resultID=null ORDER BY worldSize ASC LIMIT 1;";
+		ResultSet rs = stmt.executeQuery(query) ;
+		
+		/*
+		
 		for (int ws : worldSize) {
 			TileworldSettings.WORLD_SIZE = ws;
 			for (int hgtmin : holeGestTimeMin) {
@@ -133,7 +146,7 @@ public class TileworldBenchmarkComplex {
 		}
 		if (writer != null) {
 			writer.close();
-		}
+		}*/
 	}
 	
 	private boolean constraintsViolated() {

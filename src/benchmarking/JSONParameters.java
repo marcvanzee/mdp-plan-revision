@@ -17,6 +17,7 @@ public class JSONParameters extends GenericJson {
 	public static final String INITNRHOLES = "initNrHoles";
 	public static final String INITNRWALLS = "initNrWalls";
 	public static final String PLANNINGTIME = "planningTime";
+	public static final String ID = "id";
 	
 		@Key(DONE)
 		public boolean done;
@@ -56,4 +57,7 @@ public class JSONParameters extends GenericJson {
 		
 		@Key(PLANNINGTIME)
 		public  int planningTime;
+		
+		@Key(ID)
+		public int id;
 	}

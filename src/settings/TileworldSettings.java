@@ -76,4 +76,22 @@ public class TileworldSettings
 		INITIAL_NR_WALLS = params.initNrWalls;
 		PLANNING_TIME = params.planningTime;
 	}
+
+	public static void print() {
+		System.out.println("% --- TILEWORLD SETTINGS:\n"
+				+ "% world size = " + TileworldSettings.WORLD_SIZE + "\n"
+				+ "% holeGestationTimeMin = " + TileworldSettings.HOLE_GESTATION_TIME_MIN + "\n"
+				+ "% holeGestationTimeMax = " + TileworldSettings.HOLE_GESTATION_TIME_MAX + "\n"
+				+ "% holeLifetimeMin = " + TileworldSettings.HOLE_LIFE_EXP_MIN + "\n"
+				+ "% holeLifetimeMax = " + TileworldSettings.HOLE_LIFE_EXP_MAX + "\n"
+				+ "% holeScoreMin = " + TileworldSettings.HOLE_SCORE_MIN + "\n"
+				+ "% holeScoreMax = " + TileworldSettings.HOLE_SCORE_MAX + "\n"
+				+ "% initialNrHoles = " + TileworldSettings.INITIAL_NR_HOLES + "\n" 
+				+ "% wallSizeMin = " + TileworldSettings.WALL_SIZE_MIN + "\n" 
+				+ "% wallSizeMax = " + TileworldSettings.WALL_SIZE_MAX + "\n" 
+				+ "% initialNrWalls = " + TileworldSettings.INITIAL_NR_WALLS + "\n" 
+				+ "% dynamism = " + TileworldSettings.DYNAMISM+ "\n" 
+				+ "% planningTime = " + TileworldSettings.PLANNING_TIME);
+		
+	}
 }
