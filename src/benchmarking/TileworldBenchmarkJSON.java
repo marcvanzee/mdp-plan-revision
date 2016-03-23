@@ -95,9 +95,9 @@ public class TileworldBenchmarkJSON {
 			//printResponse(hr2);
 			} catch (IOException e) {
 				e.printStackTrace();
-				System.out.print("***** Detected socket read error. Possibly we're overloading the server. Sleeping for 30s...");
+				System.out.print("***** Detected socket read error. Possibly we're overloading the server. Sleeping for 2min...");
 				try {
-					Thread.sleep(30000);
+					Thread.sleep(120000);
 				} catch (InterruptedException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
