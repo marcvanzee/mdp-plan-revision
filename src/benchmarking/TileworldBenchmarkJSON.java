@@ -95,8 +95,7 @@ public class TileworldBenchmarkJSON {
 			//printResponse(hr2);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
-				System.out.println("Detected socket read error, retrying!");
+				System.out.println("***** Detected socket read error, retrying!");
 				continue;
 			}
 			
