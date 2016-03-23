@@ -1,10 +1,6 @@
 package benchmarking;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
@@ -66,7 +62,7 @@ public class TileworldBenchmarkJSON {
 	}
 
 	public void go() throws InstantiationException, IllegalAccessException, IllegalArgumentException,
-			InvocationTargetException, NoSuchMethodException, SecurityException, FileNotFoundException, IOException {
+			InvocationTargetException, NoSuchMethodException, SecurityException, IOException {
 		HttpRequestFactory requestFactory =
 					HTTP_TRANSPORT.createRequestFactory(new HttpRequestInitializer() {
 						@Override
@@ -86,17 +82,24 @@ public class TileworldBenchmarkJSON {
 //		
 		int count = 0;
 		while (true) {
-			HttpResponse hr = request.execute();
-			parseResponse(hr);
+			try {
+				parseResponse(request.execute());
 			
-			HashMap<String,Object> results = singleBenchmark();
+				HashMap<String,Object> results = singleBenchmark();
 			
-			GenericUrl url2 = new GenericUrl(new java.net.URL(PUT_URL));
-			url2.put("id", ID);
-			url2.putAll(results);
+				GenericUrl url2 = new GenericUrl(new java.net.URL(PUT_URL));
+				url2.put("id", ID);
+				url2.putAll(results);
 			
-			HttpResponse hr2 = requestFactory.buildGetRequest(url2).execute();
+				requestFactory.buildGetRequest(url2).execute();
 			//printResponse(hr2);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				System.out.println("Detected socket read error, retrying!");
+				continue;
+			}
+			
 			
 			System.out.print(".");
 			count++;
