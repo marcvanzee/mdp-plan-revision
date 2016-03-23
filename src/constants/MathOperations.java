@@ -19,7 +19,7 @@ public class MathOperations
 	}
 	
 	public static double round(double d, int decimals) {
-		return Math.round(d * 100.0)/100.0;
+		return Math.round(d * Math.pow(10, decimals))/Math.pow(10, decimals);
 	}
 	
 	public static boolean throw_dice(double d) {
