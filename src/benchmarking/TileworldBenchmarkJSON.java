@@ -26,7 +26,7 @@ public class TileworldBenchmarkJSON {
 	
 	private TileworldSimulation simulation;
 	
-	final int simrep = 20, simlength = 80000;
+	final int simrep = 5, simlength = 15000;
 	
 	//static final String GET_URL = "http://www.marcvanzee.nl/mdp-json/getParameters.php",
 	//		PUT_URL = "http://www.marcvanzee.nl/mdp-json/addResult.php";
